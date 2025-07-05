@@ -3,11 +3,12 @@ import '../../../../core/util/typedef.dart';
 import '../entities/user.dart';
 import '../repositories/authentication.repository.dart';
 
-class GetUsers extends UseCaseWithoutParams<List<User>> {
+class GetUsers extends UsecaseWithParams<List<User>, String> {
   const GetUsers(this._repository);
 
   final AuthenticationRepository _repository;
 
   @override
-  ResultFuture<List<User>> call() async => _repository.getUsers();
+  ResultFuture<List<User>> call(String param) async =>
+      _repository.getUsers(param);
 }

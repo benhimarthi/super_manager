@@ -155,7 +155,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   Future<void> fetchUsers() async {
     emit(const AuthenticationLoading());
 
-    final result = await _getUsers();
+    final result = await _getUsers(SessionManager.getUserSession()!.id);
 
     result.fold(
       (failure) => _handleFailure(failure),

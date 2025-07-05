@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/session/session.manager.dart';
+import 'package:super_manager/features/image_manager/domain/entities/app.image.dart';
+import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
+import 'package:super_manager/features/image_manager/presentation/cubit/app.image.state.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 
 class MenuApplicationView extends StatefulWidget {
@@ -12,6 +18,15 @@ class MenuApplicationView extends StatefulWidget {
 class _MenuApplicationViewState extends State<MenuApplicationView> {
   final double initialSelectorPosition = 0;
   late double targetPosition = 0;
+  final currentUser = SessionManager.getUserSession();
+  late final AppImage avatar;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AppImageManagerCubit>().loadImages(currentUser!.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -35,7 +50,32 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Icon(Icons.person, color: Theme.of(context).primaryColor),
+                      BlocBuilder<AppImageManagerCubit, AppImageState>(
+                        builder: (context, state) {
+                          if (state is AppImageManagerLoaded) {
+                            final currentImage = state.images
+                                .where((x) => x.url.isNotEmpty)
+                                .lastOrNull;
+                            if (currentImage != null) {
+                              return CircleAvatar(
+                                backgroundImage: FileImage(
+                                  File(currentImage.url),
+                                ),
+                              );
+                            } else {
+                              return Icon(
+                                Icons.person,
+                                color: Theme.of(context).primaryColor,
+                              );
+                            }
+                          } else {
+                            return Icon(
+                              Icons.person,
+                              color: Theme.of(context).primaryColor,
+                            );
+                          }
+                        },
+                      ),
                       Icon(
                         Icons.notifications,
                         color: Theme.of(context).primaryColor,

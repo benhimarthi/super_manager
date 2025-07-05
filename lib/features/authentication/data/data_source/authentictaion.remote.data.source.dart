@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/errors/custom.exception.dart';
 import '../models/user.model.dart';
 
@@ -12,7 +11,7 @@ abstract class AuthenticationRemoteDataSource {
   Future<UserModel> getUserByEmail(String email);
   Future<void> updateUser(UserModel user);
   Future<void> deleteUser(String userId);
-  Future<List<UserModel>> getUsers();
+  Future<List<UserModel>> getUsers(String creatorUID);
 }
 
 class AuthenticationRemoteDataSrcImpl
@@ -137,9 +136,12 @@ class AuthenticationRemoteDataSrcImpl
   }
 
   @override
-  Future<List<UserModel>> getUsers() async {
+  Future<List<UserModel>> getUsers(String creatorUID) async {
     try {
-      final snapshot = await _firestore.collection('users').get();
+      final snapshot = await _firestore
+          .collection('users')
+          .where("createdBy", isEqualTo: creatorUID)
+          .get();
       return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);

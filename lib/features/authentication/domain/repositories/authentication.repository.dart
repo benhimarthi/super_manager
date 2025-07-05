@@ -18,5 +18,6 @@ abstract class AuthenticationRepository {
   ResultFuture<User> getCurrentUser();
   ResultVoid updateUser(User user);
   ResultVoid deleteUser(String userId);
-  ResultFuture<List<User>> getUsers();
+  ResultFuture<List<User>> getUsers(String creatorId);
+  ResultVoid manageUserStatus(String userUid, bool value);
 }

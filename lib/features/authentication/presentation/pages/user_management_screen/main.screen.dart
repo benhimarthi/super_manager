@@ -7,7 +7,6 @@ import '../../../../../core/session/session.manager.dart';
 import '../../../domain/entities/user.dart';
 import '../../cubit/authentication.cubit.dart';
 import '../../widgets/edit.user.dialog.dart';
-import 'user.profile.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

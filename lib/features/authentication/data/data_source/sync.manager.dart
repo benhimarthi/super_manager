@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:super_manager/core/session/session.manager.dart';
 import 'authentication.local.data.source.dart';
 import 'authentictaion.remote.data.source.dart';
 
@@ -14,13 +15,15 @@ class SyncManager {
     if (connectivityResult == ConnectivityResult.none) {
       return; // No internet connection, skip sync
     }
-    //await _syncPendingUserCreations();
+    await _syncPendingUserCreations();
     await _syncPendingUserUpdates();
     await _syncPendingUserDeletions();
   }
 
   Future<void> _syncPendingUserCreations() async {
-    final pendingUsers = await _localDataSource.getCachedUsers();
+    final pendingUsers = await _localDataSource.getCachedUsers(
+      SessionManager.getUserSession()!.id,
+    );
     for (final user in pendingUsers) {
       if (await _localDataSource.isUserMarkedAsPending(user.id)) {
         await _remoteDataSource.createUser(user);

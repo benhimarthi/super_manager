@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/authentication/data/models/user.model.dart';
 import 'package:super_manager/features/authentication/presentation/cubit/authentication.cubit.dart';
 import 'package:super_manager/features/authentication/presentation/widgets/add.userto.account.dart';
 import 'package:super_manager/features/authentication/presentation/widgets/delete.user.confirmation.screen.dart';
+import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
+import 'package:super_manager/features/image_manager/presentation/cubit/app.image.state.dart';
 import '../../../domain/entities/user.dart';
 import '../../cubit/authentication.state.dart';
 import '../../widgets/edit.user.dialog.dart';
@@ -17,6 +21,9 @@ class UserManagement extends StatefulWidget {
 
 class _UserManagementState extends State<UserManagement> {
   late bool isSwitched = false;
+  AssetImage img = Random().nextDouble() >= .5
+      ? AssetImage('assets/images/boy.png')
+      : AssetImage('assets/images/girl.png');
   @override
   void initState() {
     super.initState();
@@ -75,6 +82,7 @@ class _UserManagementState extends State<UserManagement> {
                     ? false
                     : users[index].activated!;
                 final currentUser = users[index];
+                context.read<AppImageManagerCubit>().loadImages(currentUser.id);
                 return GestureDetector(
                   onTap: () {
                     _onEditUser(currentUser);
@@ -165,18 +173,47 @@ class _UserManagementState extends State<UserManagement> {
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              width: double.infinity,
-                              child: CircleAvatar(
-                                backgroundColor: const Color.fromARGB(
-                                  136,
-                                  255,
-                                  255,
-                                  255,
-                                ),
-                                radius: 35,
-                                child: CircleAvatar(radius: 30),
-                              ),
+                            BlocConsumer<AppImageManagerCubit, AppImageState>(
+                              listener: (context, state) {
+                                // TODO: implement listener
+                              },
+                              builder: (context, state) {
+                                if (state is AppImageManagerLoaded) {
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: CircleAvatar(
+                                      backgroundColor: const Color.fromARGB(
+                                        136,
+                                        255,
+                                        255,
+                                        255,
+                                      ),
+                                      radius: 35,
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: img,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: CircleAvatar(
+                                      backgroundColor: const Color.fromARGB(
+                                        136,
+                                        255,
+                                        255,
+                                        255,
+                                      ),
+                                      radius: 35,
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: img,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),

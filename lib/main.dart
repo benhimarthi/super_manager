@@ -14,7 +14,13 @@ import 'features/authentication/presentation/pages/registration_screen/registrat
 import 'features/authentication/presentation/pages/splash_screen/splash.screen.dart';
 import 'features/authentication/presentation/pages/user_management_screen/main.screen.dart';
 import 'features/image_manager/presentation/cubit/app.image.cubit.dart';
+import 'features/product/presentation/cubit/product.cubit.dart';
+import 'features/product_category/presentation/cubit/local.category.manager.cubit.dart';
+import 'features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import 'features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
+import 'features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
+import 'features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
+import 'features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,19 +47,23 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<AuthenticationSyncTriggerCubit>(
           create: (context) => getIt<AuthenticationSyncTriggerCubit>(),
         ),
-        /*BlocProvider<LocalCategoryManagerCubit>(
-              create: (context) => getIt<LocalCategoryManagerCubit>()),
-          BlocProvider<ProductCategorySyncTriggerCubit>(
-              create: (context) => getIt<ProductCategorySyncTriggerCubit>()),
-          BlocProvider<ProductPricingCubit>(
-              create: (context) => getIt<ProductPricingCubit>()),
-          BlocProvider<ProductPricingSyncTriggerCubit>(
-              create: (context) => getIt<ProductPricingSyncTriggerCubit>()),
-          BlocProvider<ProductCubit>(
-              create: (context) => getIt<ProductCubit>()),
-          BlocProvider<ProductSyncTriggerCubit>(
-              create: (context) => getIt<ProductSyncTriggerCubit>()),
-          BlocProvider<InventoryCubit>(
+        BlocProvider<LocalCategoryManagerCubit>(
+          create: (context) => getIt<LocalCategoryManagerCubit>(),
+        ),
+        BlocProvider<ProductCategorySyncTriggerCubit>(
+          create: (context) => getIt<ProductCategorySyncTriggerCubit>(),
+        ),
+        BlocProvider<ProductPricingCubit>(
+          create: (context) => getIt<ProductPricingCubit>(),
+        ),
+        BlocProvider<ProductPricingSyncTriggerCubit>(
+          create: (context) => getIt<ProductPricingSyncTriggerCubit>(),
+        ),
+        BlocProvider<ProductCubit>(create: (context) => getIt<ProductCubit>()),
+        BlocProvider<ProductSyncTriggerCubit>(
+          create: (context) => getIt<ProductSyncTriggerCubit>(),
+        ),
+        /*BlocProvider<InventoryCubit>(
               create: (context) => getIt<InventoryCubit>()),
           BlocProvider<InventorySyncTriggerCubit>(
             create: (context) => getIt<InventorySyncTriggerCubit>(),
@@ -81,7 +91,7 @@ class _MyAppState extends State<MyApp> {
             theme: AppTheme.lightTheme,
             debugShowCheckedModeBanner: false,
             routerConfig: GoRouter(
-              initialLocation: "/splash", // Corrected splash/users
+              initialLocation: "/users", // Corrected splash/splash
               routes: [
                 GoRoute(
                   path: '/splash',

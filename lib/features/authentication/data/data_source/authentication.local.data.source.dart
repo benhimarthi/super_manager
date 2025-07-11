@@ -28,7 +28,7 @@ class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
   @override
   Future<void> cacheUser(UserModel user) async {
     try {
-      await _hiveBox.put(user.email, user.toMap());
+      await _hiveBox.put(user.id, user.toMap());
     } catch (e) {
       throw const LocalException(
         message: "Failed to cache user",
@@ -38,9 +38,9 @@ class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
   }
 
   @override
-  Future<UserModel?> getCachedUser(String email) async {
+  Future<UserModel?> getCachedUser(String uid) async {
     try {
-      final userData = _hiveBox.get(email);
+      final userData = _hiveBox.get(uid);
       return userData != null ? UserModel.fromMap(userData) : null;
     } catch (e) {
       throw const LocalException(
@@ -53,7 +53,7 @@ class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
   @override
   Future<void> updateCachedUser(UserModel user) async {
     try {
-      await _hiveBox.put(user.email, user.toMap());
+      await _hiveBox.put(user.id, user.toMap());
     } catch (e) {
       throw const LocalException(
         message: "Failed to update cached user",

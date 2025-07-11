@@ -107,6 +107,15 @@ class ImageStorageService {
     return dir.listSync().whereType<File>().toList();
   }
 
+  ResultFuture<List<File>> getImagesFromDir(String dirName) async {
+    try {
+      final result = await listSavedImages(dirName);
+      return Right(result);
+    } on LocalException catch (e) {
+      return Left(LocalFailure.fromLocalException(e));
+    }
+  }
+
   /// Deletes all images from the internal safe directory
   Future<void> clearAllImages(String dirName) async {
     final dir = await getSafeDirectory(dirName);

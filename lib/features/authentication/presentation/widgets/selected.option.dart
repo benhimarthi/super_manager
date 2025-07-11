@@ -38,7 +38,7 @@ class _SelectedOptionState extends State<SelectedOption> {
               const SizedBox(height: 5),
               Container(
                 //color: Color.fromARGB(68, 255, 193, 7),
-                height: 500,
+                height: 600,
                 width: 55,
                 child: Stack(
                   children: [

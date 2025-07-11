@@ -18,9 +18,6 @@ class AppImageSyncManagerImpl implements AppImageSyncManager {
     final created = await _local.getCreatedImages();
     final updated = await _local.getUpdatedImages();
     final deleted = await _local.getDeletedImageIds();
-    print(
-      "SSSSSSSSSSSSSSSSSSSSSAVVEEEEEEEEEEEEEEEE IN CREATE BOX d ${created.length}",
-    );
     for (final image in created) {
       await _remote.uploadImage(image);
     }

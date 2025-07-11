@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:super_manager/features/image_manager/domain/usecases/get.app.image.by.id.dart';
+import 'package:super_manager/features/product/domain/usecases/get.product.by.id.dart';
+import 'package:super_manager/features/product_pricing/domain/usecases/get.product.pricing.by.id.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../features/authentication/data/data_source/authentication.local.data.source.dart';
 import '../../features/authentication/data/data_source/authentictaion.remote.data.source.dart';
@@ -19,8 +21,17 @@ import '../../features/authentication/domain/usecases/login.with.google.dart';
 import '../../features/authentication/domain/usecases/logout.user.dart';
 import '../../features/authentication/domain/usecases/update.user.dart';
 import '../../features/authentication/presentation/cubit/authentication.cubit.dart';
-/*import '../../features/product/presentation/cubit/product.cubit.dart';
+import '../../features/product/data/data_sources/product.local.data.source.dart';
+import '../../features/product/data/data_sources/product.remote.data.source.dart';
+import '../../features/product/data/repositories/product.repository.impl.dart';
+import '../../features/product/domain/repositories/product.repository.dart';
+import '../../features/product/domain/usecases/create.product.dart';
+import '../../features/product/domain/usecases/delete.product.dart';
+import '../../features/product/domain/usecases/get.all.product.dart';
+import '../../features/product/domain/usecases/update.product.dart';
+import '../../features/product/presentation/cubit/product.cubit.dart';
 import '../../features/product_category/data/data_sources/product.category.local.data.source.dart';
+import '../../features/product_category/data/data_sources/product.category.remote.data.source.dart';
 import '../../features/product_category/data/repositories/product.category.repository.impl.dart';
 import '../../features/product_category/domain/repositories/product.category.repository.dart';
 import '../../features/product_category/domain/usecases/create.product.category.dart';
@@ -28,7 +39,6 @@ import '../../features/product_category/domain/usecases/delete.product.category.
 import '../../features/product_category/domain/usecases/get.all.product.categories.dart';
 import '../../features/product_category/domain/usecases/get.product.category.by.id.dart';
 import '../../features/product_category/domain/usecases/update.product.category.dart';
-import '../../features/synchronisation/cubit/authentication_synch_manager_cubit/sync.trigger.cubit.dart';*/
 import '../../features/image_manager/data/data_source/app.image.local.data.source.dart';
 import '../../features/image_manager/data/data_source/app.image.remote.data.source.dart';
 import '../../features/image_manager/data/repositories/app.image.repository.impl.dart';
@@ -38,9 +48,25 @@ import '../../features/image_manager/domain/usecases/delete.app.image.dart';
 import '../../features/image_manager/domain/usecases/get.iamges.for.entity.dart';
 import '../../features/image_manager/domain/usecases/update.app.image.dart';
 import '../../features/image_manager/presentation/cubit/app.image.cubit.dart';
+import '../../features/product_category/presentation/cubit/local.category.manager.cubit.dart';
+import '../../features/product_pricing/data/data_source/product.pricing.local.data.source.dart';
+import '../../features/product_pricing/data/data_source/product.pricing.remote.data.source.dart';
+import '../../features/product_pricing/data/repositories/product.pricing.repository.impl.dart';
+import '../../features/product_pricing/domain/repositories/product.pricing.repository.dart';
+import '../../features/product_pricing/domain/usecases/create.product.pricing.dart';
+import '../../features/product_pricing/domain/usecases/delete.product.pricing.dart';
+import '../../features/product_pricing/domain/usecases/get.all.product.pricing.dart';
+import '../../features/product_pricing/domain/usecases/update.product.pricing.dart';
+import '../../features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import '../../features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
 import '../../features/synchronisation/synchronisation_manager/app.image.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/product.category.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/product.pricing.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/product.sync.manager.dart';
 import '../image_storage_service/image.storage.service.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -127,7 +153,6 @@ Future<void> setupDependencyInjection() async {
       getCurrentUser: getIt<GetCurrentUser>(),
     ),
   );
-  /*
   // Open Hive boxes
   final mainBox = await Hive.openBox('product_categories');
   final createdBox = await Hive.openBox('product_categories_created');
@@ -135,14 +160,16 @@ Future<void> setupDependencyInjection() async {
   final deletedBox = await Hive.openBox('product_categories_deleted');
   // Local Data Source
   getIt
-    ..registerFactory(() => LocalCategoryManagerCubit(
-          getAll: getIt(),
-          create: getIt(),
-          update: getIt(),
-          delete: getIt(),
-          connectivity: getIt(),
-          syncCubit: getIt(),
-        ))
+    ..registerFactory(
+      () => LocalCategoryManagerCubit(
+        getAll: getIt(),
+        create: getIt(),
+        update: getIt(),
+        delete: getIt(),
+        connectivity: getIt(),
+        syncCubit: getIt(),
+      ),
+    )
     ..registerLazySingleton(() => CreateProductCategory(getIt()))
     ..registerLazySingleton(() => GetAllProductCategories(getIt()))
     ..registerLazySingleton(() => GetProductCategoryById(getIt()))
@@ -157,27 +184,27 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton<ProductCategoryRemoteDataSource>(
-      () => ProductCategoryRemoteDataSourceImpl(
-        getIt(),
-      ),
+      () => ProductCategoryRemoteDataSourceImpl(getIt()),
     )
     ..registerLazySingleton<ProductCategoryRepository>(
       () => ProductCategoryRepositoryImpl(getIt()),
     );
 
   getIt
-    ..registerLazySingleton(() => ProductCategorySyncManager(
-          getIt<ProductCategoryLocalDataSource>(),
-          getIt<ProductCategoryRemoteDataSource>(),
-        ))
+    ..registerLazySingleton(
+      () => ProductCategorySyncManager(
+        getIt<ProductCategoryLocalDataSource>(),
+        getIt<ProductCategoryRemoteDataSource>(),
+      ),
+    )
     ..registerFactory(() => ProductCategorySyncTriggerCubit(getIt()));
 
-  getIt.registerLazySingleton(
+  /*getIt.registerLazySingleton(
     () => RefreshCategoriesFromRemote(
       getIt(),
       getIt(),
     ),
-  );
+  );*/
 
   final ppm = await Hive.openBox('product_pricing_main');
   final ppc = await Hive.openBox('product_pricing_created');
@@ -188,6 +215,7 @@ Future<void> setupDependencyInjection() async {
     ..registerFactory(
       () => ProductPricingCubit(
         getAll: getIt(),
+        getById: getIt(),
         create: getIt(),
         update: getIt(),
         delete: getIt(),
@@ -196,14 +224,13 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton(() => GetAllProductPricing(getIt()))
+    ..registerLazySingleton(() => GetProductPricingById(getIt()))
     ..registerLazySingleton(() => CreateProductPricing(getIt()))
     ..registerLazySingleton(() => UpdateProductPricing(getIt()))
     ..registerLazySingleton(() => DeleteProductPricing(getIt()))
     ..registerLazySingleton(() => ProductPricingSyncTriggerCubit(getIt()))
     ..registerLazySingleton<ProductPricingRepository>(
-      () => ProductPricingRepositoryImpl(
-        local: getIt(),
-      ),
+      () => ProductPricingRepositoryImpl(local: getIt()),
     )
     ..registerLazySingleton<ProductPricingLocalDataSource>(
       () => ProductPricingLocalDataSourceImpl(
@@ -214,15 +241,10 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton<ProductPricingRemoteDataSource>(
-      () => ProductPricingRemoteDataSourceImpl(
-        getIt(),
-      ),
+      () => ProductPricingRemoteDataSourceImpl(getIt()),
     )
     ..registerLazySingleton<ProductPricingSyncManager>(
-      () => ProductPricingSyncManagerImpl(
-        getIt(),
-        getIt(),
-      ),
+      () => ProductPricingSyncManagerImpl(getIt(), getIt()),
     );
 
   final productBox = await Hive.openBox('products');
@@ -235,6 +257,7 @@ Future<void> setupDependencyInjection() async {
       () => ProductCubit(
         create: getIt(),
         getAll: getIt(),
+        getById: getIt(),
         update: getIt(),
         delete: getIt(),
         connectivity: getIt(),
@@ -243,11 +266,13 @@ Future<void> setupDependencyInjection() async {
     )
     ..registerLazySingleton(() => CreateProduct(getIt()))
     ..registerLazySingleton(() => GetAllProducts(getIt()))
+    ..registerLazySingleton(() => GetProductById(getIt()))
     ..registerLazySingleton(() => UpdateProduct(getIt()))
     ..registerLazySingleton(() => DeleteProduct(getIt()))
     ..registerLazySingleton(() => ProductSyncTriggerCubit(getIt()))
     ..registerLazySingleton<ProductRepository>(
-        () => ProductRepositoryImpl(local: getIt()))
+      () => ProductRepositoryImpl(local: getIt()),
+    )
     ..registerLazySingleton<ProductLocalDataSource>(
       () => ProductLocalDataSourceImpl(
         mainBox: productBox,
@@ -257,10 +282,12 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton<ProductRemoteDataSource>(
-        () => ProductRemoteDataSourceImpl(getIt()))
+      () => ProductRemoteDataSourceImpl(getIt()),
+    )
     ..registerLazySingleton<ProductSyncManager>(
-        () => ProductSyncManagerImpl(getIt(), getIt()));
-
+      () => ProductSyncManagerImpl(getIt(), getIt()),
+    );
+  /*
   final inventoryBox = await Hive.openBox('inventories');
   final createdinventoryBox = await Hive.openBox('inventories_created');
   final updatedinventoryBox = await Hive.openBox('inventories_updated');

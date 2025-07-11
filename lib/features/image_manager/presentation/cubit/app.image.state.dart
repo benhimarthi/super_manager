@@ -13,6 +13,11 @@ class AppImageManagerLoading extends AppImageState {}
 
 class AppImageUpdatedSuccessfully extends AppImageState {}
 
+class LoadedAllImagesFromDirectorySuccessfully extends AppImageState {
+  final List<File> images;
+  const LoadedAllImagesFromDirectorySuccessfully(this.images);
+}
+
 class AppImageManagerLoaded extends AppImageState {
   final List<AppImage> images;
 

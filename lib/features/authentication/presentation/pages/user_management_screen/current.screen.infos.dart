@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/product/presentation/pages/product.page.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
-
 import 'user.management.dart';
 import 'user.profile.dart';
 
@@ -18,7 +18,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "USER MANAGER";
+    title = "PRODUCT";
   }
 
   @override
@@ -35,6 +35,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
         return switch (title) {
           "HOME" => Container(),
           "PROFILE" => UserProfile(),
+          "PRODUCT" => ProductPage(),
           "USER MANAGER" => UserManagement(),
           String() => throw UnimplementedError(),
         };

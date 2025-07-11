@@ -1,7 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/authorization_management/authorization.service.dart';
+import 'package:super_manager/core/authorization_management/permissions.dart';
 import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/image_manager/domain/entities/app.image.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
@@ -20,6 +21,7 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
   late double targetPosition = 0;
   final currentUser = SessionManager.getUserSession();
   late final AppImage avatar;
+  late String selectedMenu = "HOME";
 
   @override
   void initState() {
@@ -84,99 +86,116 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                RotatedBox(
-                  quarterTurns: -1, // Rotates 90° counter-clockwise
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        targetPosition = 0;
-                        context.read<WidgetManipulatorCubit>().changeMenu(
-                          targetPosition,
-                          "HOME",
-                        );
-                      });
-                    },
-                    child: const Text(
-                      'Home',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color.fromARGB(255, 64, 64, 64),
-                      ),
-                    ),
+                menuItem(
+                  "Home",
+                  () {
+                    setState(() {
+                      targetPosition = 0;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "HOME",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
                   ),
                 ),
                 const SizedBox(height: 50),
-                RotatedBox(
-                  quarterTurns: -1, // Rotates 90° counter-clockwise
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        targetPosition = 118;
-                        context.read<WidgetManipulatorCubit>().changeMenu(
-                          targetPosition,
-                          "USER MANAGER",
-                        );
-                      });
-                    },
-                    child: const Text(
-                      'User Management',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color.fromARGB(255, 64, 64, 64),
-                      ),
-                    ),
+                menuItem(
+                  "Products",
+                  () {
+                    setState(() {
+                      targetPosition = 118;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "PRODUCT",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
                   ),
                 ),
                 const SizedBox(height: 50),
-                RotatedBox(
-                  quarterTurns: -1, // Rotates 90° counter-clockwise
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        setState(() {
-                          targetPosition = 118 * 2;
-                          context.read<WidgetManipulatorCubit>().changeMenu(
-                            targetPosition,
-                            "MY FINANCES",
-                          );
-                        });
-                      });
-                    },
-                    child: const Text(
-                      'My finances',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color.fromARGB(255, 64, 64, 64),
-                      ),
-                    ),
+                menuItem(
+                  "Users",
+                  () {
+                    setState(() {
+                      targetPosition = 118 * 2;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "USERS",
+                      );
+                    });
+                  },
+                  !AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.usersRead,
                   ),
                 ),
                 const SizedBox(height: 50),
-                RotatedBox(
-                  quarterTurns: -1, // Rotates 90° counter-clockwise
-                  child: GestureDetector(
-                    onTap: () {
+                menuItem(
+                  "Finances",
+                  () {
+                    setState(() {
                       setState(() {
                         targetPosition = 118 * 3;
                         context.read<WidgetManipulatorCubit>().changeMenu(
                           targetPosition,
-                          "MY STATS",
+                          "FINANCE",
                         );
                       });
-                    },
-                    child: const Text(
-                      'My Stats',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color.fromARGB(255, 64, 64, 64),
-                      ),
-                    ),
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 50),
+                menuItem(
+                  "Stats",
+                  () {
+                    setState(() {
+                      targetPosition = 118 * 4;
+                      selectedMenu = "STATS";
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        selectedMenu,
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  menuItem(String title, onTap, bool authorization) {
+    return Visibility(
+      visible: authorization,
+      child: RotatedBox(
+        quarterTurns: -1, // Rotates 90° counter-clockwise
+        child: GestureDetector(
+          onTap: onTap,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              color: Color.fromARGB(255, 64, 64, 64),
+            ),
+          ),
+        ),
       ),
     );
   }

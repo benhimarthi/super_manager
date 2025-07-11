@@ -129,7 +129,14 @@ class AuthenticationRemoteDataSrcImpl
   @override
   Future<void> deleteUser(String userId) async {
     try {
-      await _firestore.collection('users').doc(userId).delete();
+      final deleted = await _firestore
+          .collection('users')
+          .where("id", isEqualTo: userId)
+          .get();
+      final userD = deleted.docs.firstOrNull;
+      if (userD != null) {
+        await _firestore.collection("users").doc(userD.id).delete();
+      }
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
     }

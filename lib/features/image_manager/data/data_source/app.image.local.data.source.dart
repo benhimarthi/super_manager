@@ -63,10 +63,11 @@ class AppImageLocalDataSourceImpl implements AppImageLocalDataSource {
 
   @override
   Future<List<AppImageModel>> getImagesForEntity(String entityId) async {
-    return mainBox.values
+    var res = mainBox.values
         .map((e) => AppImageModel.fromMap(Map<String, dynamic>.from(e)))
         .where((img) => img.entityId == entityId && img.active)
         .toList();
+    return res;
   }
 
   // ➕ Create Staging

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static Color deactivatedStatusColor = Color.fromARGB(255, 27, 29, 31);
+  static Color activatedStatusColor = Colors.green;
   static ThemeData lightTheme = ThemeData(
     primaryColor: const Color(0xFF9F7AEA),
     scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -10,7 +12,7 @@ class AppTheme {
       elevation: 0,
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
+      bodyLarge: TextStyle(fontSize: 16, color: Color(0xFF9F7AEA)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -50,7 +52,7 @@ class AppTheme {
       ),
       labelStyle: TextStyle(color: Colors.white70),
       filled: true,
-      fillColor: Color(0xFF2A2C36),
+      fillColor: Color.fromARGB(62, 159, 122, 234),
       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       hintStyle: TextStyle(color: Colors.white70, fontSize: 16),
     ),

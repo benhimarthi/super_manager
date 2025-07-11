@@ -80,6 +80,7 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
   }
 
   Future<void> openImageFromGalery(String dirName) async {
+    emit(AppImageManagerLoading());
     final result = await _imageStorageService.pick(dirName);
     result.fold(
       (l) => emit(AppImageManagerError(l.message)),
@@ -92,6 +93,14 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
     result.fold(
       (l) => emit(AppImageManagerError(l.message)),
       (r) => emit(GetAppImageByIdSuccessfully(r)),
+    );
+  }
+
+  Future<void> getImagesFromDirectory(String dirName) async {
+    final result = await _imageStorageService.getImagesFromDir(dirName);
+    result.fold(
+      (l) => emit(AppImageManagerError(l.message)),
+      (r) => emit(LoadedAllImagesFromDirectorySuccessfully(r)),
     );
   }
 

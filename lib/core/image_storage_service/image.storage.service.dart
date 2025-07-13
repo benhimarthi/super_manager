@@ -101,6 +101,15 @@ class ImageStorageService {
     return false;
   }
 
+  ResultVoid deleteImageFromDirectory(String name, String directory) async {
+    try {
+      await deleteImageByName(name, directory);
+      return Right(null);
+    } on LocalException catch (e) {
+      return Left(LocalFailure.fromLocalException(e));
+    }
+  }
+
   /// List all saved files
   Future<List<File>> listSavedImages(String dirName) async {
     final dir = await getSafeDirectory(dirName);

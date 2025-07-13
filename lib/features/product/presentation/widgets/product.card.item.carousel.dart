@@ -62,8 +62,10 @@ class _ProductCardItemCarouselState extends State<ProductCardItemCarousel> {
                       .where((x) => x.entityId == widget.productUid)
                       .toList()
                 : productImages;
-            currentImageUrl = productImages.first.url;
-            if (state.images.length >= 2) {
+            currentImageUrl = productImages.isNotEmpty
+                ? productImages.first.url
+                : "";
+            if (productImages.length >= 2) {
               carousel = CircularListNavigator(productImages);
             }
           }

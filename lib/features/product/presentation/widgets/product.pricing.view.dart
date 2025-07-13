@@ -40,9 +40,11 @@ class _ProductPricingViewState extends State<ProductPricingView> {
     return BlocConsumer<ProductPricingCubit, ProductPricingState>(
       listener: (context, state) {
         if (state is ProductPricingManagerLoaded) {
-          myProductPricing = state.pricingList
-              .where((x) => x.productId == _productId)
-              .toList();
+          if (state.pricingList.isNotEmpty) {
+            myProductPricing = state.pricingList
+                .where((x) => x.productId == _productId)
+                .toList();
+          }
         }
       },
       builder: (context, state) {
@@ -70,10 +72,15 @@ class _ProductPricingViewState extends State<ProductPricingView> {
                     ? Row(
                         children: myProductPricing
                             .map(
-                              (x) => SizedBox(
+                              (x) => Container(
                                 width: 80,
                                 height: 45,
-                                //color: Colors.green,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: [

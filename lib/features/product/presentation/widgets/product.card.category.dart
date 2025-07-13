@@ -24,6 +24,7 @@ class _ProductCardCategoryState extends State<ProductCardCategory> {
   @override
   void initState() {
     super.initState();
+    myProductCategories = [];
     categoryImage = null;
     context.read<LocalCategoryManagerCubit>().loadCategories();
   }

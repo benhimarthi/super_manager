@@ -8,7 +8,8 @@ import '../../../image_manager/presentation/cubit/app.image.cubit.dart';
 import '../../../image_manager/presentation/cubit/app.image.state.dart';
 
 class ProductProfileImage extends StatefulWidget {
-  const ProductProfileImage({super.key});
+  final String productId;
+  const ProductProfileImage({super.key, required this.productId});
 
   @override
   State<ProductProfileImage> createState() => _ProductProfileImageState();
@@ -20,23 +21,29 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
   late bool isUpdated;
   late File? productImageFile;
   late List<String> myProductImages;
+  late List<String> existingIamges;
   late CircularListNavigator listNavigator;
   late bool addProductProfileImage = false;
+  late List<AppImage> myAppProductImages;
 
   @override
   void initState() {
     super.initState();
     displayable = false;
-    productId = "";
+    productId = widget.productId;
     myProductImages = [];
+    myAppProductImages = [];
+    existingIamges = [];
     if (myProductImages.isNotEmpty) {
-      listNavigator = CircularListNavigator(myProductImages);
+      listNavigator = CircularListNavigator(existingIamges);
+    }
+    if (productId.isNotEmpty) {
+      context.read<AppImageManagerCubit>().loadProductImages(widget.productId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    late AppImage? productImage;
     return SizedBox(
       width: 130,
       height: 130,
@@ -51,7 +58,7 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
               decoration: displayable
                   ? BoxDecoration(
                       image: DecorationImage(
-                        image: FileImage(File(myProductImages.first)),
+                        image: FileImage(File(existingIamges.first)),
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(10),
@@ -67,13 +74,16 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
             alignment: Alignment(0.3, 0.3),
             child: BlocConsumer<AppImageManagerCubit, AppImageState>(
               listener: (context, state) {
-                if (state is AppImageManagerLoaded) {
-                  productImage = state.images.firstOrNull;
-                  if (productImage != null) {
-                    if (productImage!.entityId == productId) {
-                      displayable = productImage!.url.isNotEmpty;
-                      productImageFile = File(productImage!.url);
-                    }
+                if (state is AppImageProductLoaded) {
+                  final myImages = state.images
+                      .where((x) => x.entityId == widget.productId)
+                      .toList();
+                  if (myImages.isNotEmpty) {
+                    myAppProductImages = myImages;
+                    existingIamges = myImages.map((x) => x.url).toList();
+                    displayable = true;
+                    listNavigator = CircularListNavigator(existingIamges);
+                    productImageFile = File(existingIamges.first);
                   }
                 }
                 if (state is OpenImageFromGalerySuccessfully) {
@@ -82,15 +92,32 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                       productImageFile = state.imageLink;
                       displayable = state.imageLink!.path.isNotEmpty;
                       myProductImages.add(state.imageLink!.path);
-                      listNavigator = CircularListNavigator(myProductImages);
+                      existingIamges.add(state.imageLink!.path);
+                      listNavigator = CircularListNavigator(existingIamges);
                       addProductProfileImage = false;
                     });
                   }
                 }
+                if (state is DeleteImageFromDirectorySuccessfully) {
+                  setState(() {
+                    myProductImages.removeWhere(
+                      (x) => x == productImageFile!.path,
+                    );
+                    existingIamges.removeWhere(
+                      (x) => x == productImageFile!.path,
+                    );
+                    if (existingIamges.isEmpty) {
+                      displayable = false;
+                    } else {
+                      listNavigator = CircularListNavigator(existingIamges);
+                      productImageFile = File(existingIamges.first);
+                    }
+                  });
+                }
               },
               builder: (context, state) {
-                if (state is AppImageManagerLoaded ||
-                    state is OpenImageFromGalerySuccessfully) {
+                /*if (state is AppImageManagerLoaded ||
+                    state is DeleteImageFromDirectorySuccessfully) {
                   return displayable
                       ? Container(
                           height: 100,
@@ -138,7 +165,36 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                       ),
                     ),
                   );
-                }
+                }*/
+                return displayable
+                    ? Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          image: DecorationImage(
+                            image: FileImage(productImageFile!),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.photo,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                      );
               },
             ),
           ),
@@ -164,18 +220,25 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
           Align(
             alignment: Alignment.topLeft,
             child: Visibility(
-              visible: myProductImages.isNotEmpty,
+              visible: existingIamges.isNotEmpty,
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    myProductImages.removeWhere(
-                      (x) => x == productImageFile!.path,
-                    );
-                    if (myProductImages.isEmpty) {
-                      displayable = false;
-                    } else {
-                      listNavigator.next();
-                      productImageFile = File(listNavigator.current.toString());
+                    var deletedImage = myAppProductImages
+                        .where((x) => x.url == productImageFile!.path)
+                        .firstOrNull;
+                    if (deletedImage != null) {
+                      context.read<AppImageManagerCubit>().deleteImage(
+                        deletedImage.id,
+                        deletedImage.entityId,
+                      );
+                      String imageName = deletedImage.url.split("/").last;
+                      context
+                          .read<AppImageManagerCubit>()
+                          .removeImageFromDirectory(
+                            imageName,
+                            deletedImage.entityType,
+                          );
                     }
                   });
                 },
@@ -192,7 +255,7 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
           Align(
             alignment: Alignment.centerRight,
             child: Visibility(
-              visible: myProductImages.length > 1,
+              visible: existingIamges.length > 1,
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -213,7 +276,7 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
           Align(
             alignment: Alignment.centerLeft,
             child: Visibility(
-              visible: myProductImages.length > 1,
+              visible: existingIamges.length > 1,
               child: GestureDetector(
                 onTap: () {
                   setState(() {

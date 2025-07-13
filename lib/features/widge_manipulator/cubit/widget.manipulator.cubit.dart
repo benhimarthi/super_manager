@@ -20,6 +20,19 @@ class WidgetManipulatorCubit extends Cubit<WidgetManipulatorState> {
     );
   }
 
+  Future<void> selectinProductCategoryFilter(
+    String title,
+    String categoryId,
+  ) async {
+    emit(WidgetManipulatorInitial());
+    emit(
+      SelectingProductCategoryFilterSuccessfully(
+        categoryName: title,
+        categoryuid: categoryId,
+      ),
+    );
+  }
+
   Future<void> cacheProduct(Product product) async {
     emit(WidgetManipulatorInitial());
     emit(CacheProductSuccessfully(product));

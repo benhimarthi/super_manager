@@ -44,13 +44,10 @@ class AppTheme {
         borderRadius: BorderRadius.all(Radius.circular(5)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: Color.fromARGB(255, 255, 255, 255),
-          width: 1.5,
-        ),
+        borderSide: BorderSide(color: Color(0xFF9F7AEA), width: 1.5),
         borderRadius: BorderRadius.all(Radius.circular(5)),
       ),
-      labelStyle: TextStyle(color: Colors.white70),
+      labelStyle: TextStyle(color: Color(0xFF9F7AEA)),
       filled: true,
       fillColor: Color.fromARGB(62, 159, 122, 234),
       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),

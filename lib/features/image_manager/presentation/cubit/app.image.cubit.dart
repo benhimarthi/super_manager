@@ -49,7 +49,26 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
     );
   }
 
+  Future<void> loadProductImages(String entityId) async {
+    emit(AppImageManagerLoading());
+    final result = await _getAll(entityId);
+    result.fold(
+      (failure) => emit(AppImageManagerError(failure.message)),
+      (images) => emit(AppImageProductLoaded(images)),
+    );
+  }
+
+  Future<void> loadCategoryImages(String entityId) async {
+    emit(AppImageManagerLoading());
+    final result = await _getAll(entityId);
+    result.fold(
+      (failure) => emit(AppImageManagerError(failure.message)),
+      (images) => emit(AppImageCategoryLoaded(images)),
+    );
+  }
+
   Future<void> createImage(AppImage image) async {
+    emit(AppImageManagerLoading());
     final result = await _create(image);
     if (result.isLeft()) {
       emit(AppImageManagerError(result.fold((l) => l.message, (_) => '')));
@@ -60,6 +79,7 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
   }
 
   Future<void> updateImage(AppImage image) async {
+    emit(AppImageManagerLoading());
     final result = await _update(image);
     if (result.isLeft()) {
       emit(AppImageManagerError(result.fold((l) => l.message, (_) => '')));
@@ -70,6 +90,7 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
   }
 
   Future<void> deleteImage(String id, String entityId) async {
+    emit(AppImageManagerLoading());
     final result = await _delete(id);
     if (result.isLeft()) {
       emit(AppImageManagerError(result.fold((l) => l.message, (_) => '')));
@@ -89,6 +110,7 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
   }
 
   Future<void> getAppImageById(String uid) async {
+    emit(AppImageManagerLoading());
     final result = await _getById(uid);
     result.fold(
       (l) => emit(AppImageManagerError(l.message)),
@@ -97,6 +119,7 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
   }
 
   Future<void> getImagesFromDirectory(String dirName) async {
+    emit(AppImageManagerLoading());
     final result = await _imageStorageService.getImagesFromDir(dirName);
     result.fold(
       (l) => emit(AppImageManagerError(l.message)),
@@ -104,7 +127,23 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
     );
   }
 
+  Future<void> removeImageFromDirectory(
+    String fileName,
+    String directory,
+  ) async {
+    emit(AppImageManagerLoading());
+    final result = await _imageStorageService.deleteImageFromDirectory(
+      fileName,
+      directory,
+    );
+    result.fold(
+      (l) => emit(AppImageManagerError(l.message)),
+      (r) => emit(DeleteImageFromDirectorySuccessfully()),
+    );
+  }
+
   Future<void> _tryAutoSync() async {
+    emit(AppImageManagerLoading());
     final conn = await _connectivity.checkConnectivity();
     if (conn != ConnectivityResult.none) {
       await _syncCubit.triggerManualSync();

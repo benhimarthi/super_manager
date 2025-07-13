@@ -25,6 +25,17 @@ class SelectingProductCategorySuccessfully extends WidgetManipulatorState {
   });
 }
 
+class SelectingProductCategoryFilterSuccessfully
+    extends WidgetManipulatorState {
+  final String categoryName;
+  final String categoryuid;
+
+  const SelectingProductCategoryFilterSuccessfully({
+    required this.categoryName,
+    required this.categoryuid,
+  });
+}
+
 class SelectingCurrencySuccessfully extends WidgetManipulatorState {
   final String currency;
   final String country;

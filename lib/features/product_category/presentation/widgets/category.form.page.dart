@@ -160,8 +160,10 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                       }
                     }
                     if (state is OpenImageFromGalerySuccessfully) {
-                      displayable = true;
-                      categoryImageFile = state.imageLink;
+                      if (state.imageLink != null) {
+                        displayable = true;
+                        categoryImageFile = state.imageLink;
+                      }
                     }
                   },
                   builder: (context, state) {
@@ -171,12 +173,35 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                           ? Container(
                               height: 50,
                               width: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                image: DecorationImage(
-                                  image: FileImage(categoryImageFile!),
-                                  fit: BoxFit.cover,
-                                ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      image: DecorationImage(
+                                        image: FileImage(categoryImageFile!),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: GestureDetector(
+                                      child: CircleAvatar(
+                                        radius: 9,
+                                        backgroundColor: Theme.of(
+                                          context,
+                                        ).primaryColor,
+                                        child: Center(
+                                          child: Icon(Icons.refresh, size: 12),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             )
                           : GestureDetector(
@@ -253,7 +278,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                   builder: (context, state) {
                     return SelectingParentCategory(
                       category: widget.category,
-                      parentCategoryName: parentCategoryName,
+                      categoryUid: parentCategoryName,
                     );
                   },
                 ),

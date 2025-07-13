@@ -115,7 +115,14 @@ class _ProductFormPageState extends State<ProductFormPage> {
           GestureDetector(
             onTap: () {
               setState(() {
-                if (page == 0) _submit();
+                if (page == 0) {
+                  _submit();
+                  page = 1;
+                  return;
+                }
+                if (page == 1) {
+                  page = 0;
+                }
               });
             },
             child: Text(
@@ -151,7 +158,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
                             }
                           },
                           builder: (context, state) {
-                            return ProductProfileImage();
+                            return ProductProfileImage(
+                              productId: widget.product != null
+                                  ? widget.product!.id
+                                  : "",
+                            );
                           },
                         ),
                         SizedBox(height: 20),
@@ -241,11 +252,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                     },
                                     builder: (context, state) {
                                       return SelectingParentCategory(
-                                        category: productCategory,
-                                        parentCategoryName:
-                                            productCategory != null
-                                            ? productCategory!.id
+                                        categoryUid: widget.product != null
+                                            ? widget.product!.categoryId
                                             : "",
+                                        useInProduct: true,
                                       );
                                     },
                                   ),
@@ -273,7 +283,6 @@ class _ProductFormPageState extends State<ProductFormPage> {
                         ),
                         SizedBox(height: 20),
                         const SizedBox(height: 16),
-                        //ElevatedButton(onPressed: _submit, child: const Text('Save')),
                       ],
                     ),
                   ),

@@ -77,13 +77,11 @@ class _ProductPricingFormPageState extends State<ProductPricingFormPage> {
     final cubit = context.read<ProductPricingCubit>();
 
     if (widget.pricing == null) {
-      cubit.addPricing(pricing).whenComplete(() {
-        context.read<WidgetManipulatorCubit>().addELement(pricingId);
-      });
+      cubit.addPricing(pricing).whenComplete(() {});
+      context.read<WidgetManipulatorCubit>().addELement(pricingId);
     } else {
-      cubit.updatePricing(pricing).whenComplete(() {
-        context.read<WidgetManipulatorCubit>().addELement(pricingId);
-      });
+      cubit.updatePricing(pricing).whenComplete(() {});
+      context.read<WidgetManipulatorCubit>().addELement(pricingId);
     }
     Navigator.pop(context);
   }

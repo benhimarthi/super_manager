@@ -38,24 +38,27 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
     } else {
       product = null;
     }
-    _unit = TextEditingController(text: "");
-    _barcode = TextEditingController(text: "");
-    _active = false;
+    _unit = TextEditingController(text: product != null ? product!.unit : "");
+    _barcode = TextEditingController(
+      text: product != null ? product!.barcode : "",
+    );
+    _active = product != null ? product!.active : _active;
   }
 
   _submit() {
     for (var t in widget.myProductImages) {
       context.read<AppImageManagerCubit>().createImage(t);
     }
+    print(
+      "ZZZZZZZZZZZZZZXXXXXXXXXXXXXXX ${princingValue.isNotEmpty ? princingValue : (product != null ? product!.pricingId : "")}",
+    );
     final finalProduct = ProductModel.fromEntity(product!).copyWith(
       barcode: _barcode.text.trim(),
       unit: _unit.text.trim(),
       active: _active,
       pricingId: princingValue.isNotEmpty
           ? princingValue
-          : product != null
-          ? product!.id
-          : "",
+          : (product != null ? product!.pricingId : ""),
     );
     final cubit = context.read<ProductCubit>();
     if (widget.creation) {
@@ -63,7 +66,6 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
     } else {
       cubit.updateProduct(finalProduct);
     }
-
     Navigator.pop(context);
   }
 
@@ -78,7 +80,6 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
           _active = product.active;
         }
         if (state is ElementAddedSuccessfully) {
-          print("WWWWWWWMMMMMMMMMMMDDDWCCCCCCCCCCCVSSSS ${state.elementId}");
           princingValue = state.elementId;
         }
       },

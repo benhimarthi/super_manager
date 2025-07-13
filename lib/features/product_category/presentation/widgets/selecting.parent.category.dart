@@ -13,12 +13,14 @@ import '../../domain/usecases/get.all.product.categories.dart';
 
 class SelectingParentCategory extends StatefulWidget {
   final ProductCategory? category;
-  final String? parentCategoryName;
+  final String? categoryUid;
+  final bool? useInProduct;
 
   const SelectingParentCategory({
     super.key,
     this.category,
-    this.parentCategoryName,
+    this.categoryUid,
+    this.useInProduct,
   });
 
   @override
@@ -46,7 +48,7 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = widget.parentCategoryName!;
+    selectedCategory = widget.categoryUid!;
     context.read<AppImageManagerCubit>().getImagesFromDirectory('product');
   }
 
@@ -60,10 +62,9 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
             ? SizedBox(
                 width: 300,
                 height: 100,
-                //color: Colors.red,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: List.generate(items.length, (index) {
+                  children: List.generate(items.length - 1, (index) {
                     var currentCategory = items[index];
                     context.read<AppImageManagerCubit>().loadImages(
                       currentCategory.id,
@@ -90,21 +91,22 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
                               if (state
                                   is SelectingProductCategorySuccessfully) {
                                 setState(() {
-                                  selectedCategory = state.categoryName;
+                                  selectedCategory = state.categoryuid;
                                 });
                               }
                             },
                             builder: (context, state) {
                               return productCategoryItem(
                                 currentCategory.name,
-                                imageUrl.elementAt(index).isEmpty
+                                index < imageUrl.length &&
+                                        imageUrl.elementAt(index).isEmpty
                                     ? ""
                                     : imageUrl.elementAt(index),
-                                selectedCategory == currentCategory.name,
+                                selectedCategory == currentCategory.id,
                                 () {
                                   setState(() {
                                     if (selectedCategory !=
-                                        currentCategory.name) {
+                                        currentCategory.id) {
                                       context
                                           .read<WidgetManipulatorCubit>()
                                           .selectProductCategory(

@@ -110,6 +110,7 @@ class AppImageLocalDataSourceImpl implements AppImageLocalDataSource {
   // ❌ Delete Staging
   @override
   Future<void> stageDeletedImage(String id) async {
+    await deleteImage(id);
     await deletedBox.put(id, {'id': id});
   }
 

@@ -18,6 +18,24 @@ class LoadedAllImagesFromDirectorySuccessfully extends AppImageState {
   const LoadedAllImagesFromDirectorySuccessfully(this.images);
 }
 
+class AppImageProductLoaded extends AppImageState {
+  final List<AppImage> images;
+
+  const AppImageProductLoaded(this.images);
+
+  @override
+  List<Object?> get props => [images];
+}
+
+class AppImageCategoryLoaded extends AppImageState {
+  final List<AppImage> images;
+
+  const AppImageCategoryLoaded(this.images);
+
+  @override
+  List<Object?> get props => [images];
+}
+
 class AppImageManagerLoaded extends AppImageState {
   final List<AppImage> images;
 
@@ -26,6 +44,8 @@ class AppImageManagerLoaded extends AppImageState {
   @override
   List<Object?> get props => [images];
 }
+
+class DeleteImageFromDirectorySuccessfully extends AppImageState {}
 
 class GetAppImageByIdSuccessfully extends AppImageState {
   final AppImage image;

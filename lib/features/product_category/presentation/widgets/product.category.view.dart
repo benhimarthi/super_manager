@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_manager/features/product_category/presentation/pages/product.category.image.item.dart';
+import 'package:super_manager/features/product_category/presentation/widgets/product.category.image.item.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/product.category.dart';

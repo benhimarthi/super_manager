@@ -37,6 +37,7 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
   Future<List<ProductCategory>> _loadParentOptions() async {
     imageUrl = {};
     final result = await getIt<GetAllProductCategories>()();
+
     return result.fold((_) => [], (categories) {
       // Exclude self to prevent circular parenting
       return widget.category == null
@@ -64,14 +65,14 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
                 height: 100,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: List.generate(items.length - 1, (index) {
+                  children: List.generate(items.length, (index) {
                     var currentCategory = items[index];
-                    context.read<AppImageManagerCubit>().loadImages(
+                    context.read<AppImageManagerCubit>().loadCategoryImages(
                       currentCategory.id,
                     );
                     return BlocConsumer<AppImageManagerCubit, AppImageState>(
                       listener: (context, state) {
-                        if (state is AppImageManagerLoaded) {
+                        if (state is AppImageCategoryLoaded) {
                           var image = state.images.firstOrNull;
                           if (image != null) {
                             imageUrl.add(image.url);

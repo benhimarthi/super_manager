@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/image_manager/data/models/app.image.model.dart';
 import 'package:super_manager/features/image_manager/domain/entities/app.image.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
 import 'package:super_manager/features/product_category/presentation/widgets/selecting.parent.category.dart';
@@ -43,6 +44,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
     final cat = widget.category;
     parentCategoryUid = "";
     parentCategoryName = "";
+    categoryImage = null;
     _name = TextEditingController(text: cat?.name ?? '');
     _description = TextEditingController(text: cat?.description ?? '');
     _selectedIcon = widget.category?.iconCodePoint != null
@@ -51,6 +53,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
 
     if (cat != null && cat.parentId != null) {
       // Load parent reference for dropdown
+
       categoryId = cat.id;
       final state = context.read<LocalCategoryManagerCubit>().state;
       final allCategories = state is LocalCategoryManagerLoaded
@@ -64,7 +67,7 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
       } catch (_) {
         _selectedParent = null; // No match found
       }
-      context.read<AppImageManagerCubit>().loadImages(cat.id);
+      context.read<AppImageManagerCubit>().loadCategoryImages(cat.id);
     } else {
       categoryId = _uuid.v4();
     }
@@ -102,26 +105,42 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
       context.read<AppImageManagerCubit>().createImage(categoryImg);
     }
     final cubit = context.read<LocalCategoryManagerCubit>();
-    isNew ? cubit.addCategory(newCategory) : cubit.updateCategory(newCategory);
-    cubit.loadCategories();
+    isNew
+        ? cubit.addCategory(newCategory).whenComplete(() {
+            setState(() {
+              cubit.loadCategories();
+            });
+          })
+        : cubit.updateCategory(newCategory);
+
     Navigator.pop(context); // return to list after submission
   }
 
   updateCategoryImage(String imageUrl) {
     if (categoryImage != null) {
-      context.read<AppImageManagerCubit>().deleteImage(
+      /*context.read<AppImageManagerCubit>().deleteImage(
         categoryImage!.id,
         categoryImage!.entityId,
       );
+      String imageName = categoryImage!.url.split("/").last;
+      context.read<AppImageManagerCubit>().removeImageFromDirectory(
+        imageName,
+        categoryImage!.entityType,
+      );*/
+      var updatedImage = (categoryImage as AppImageModel).copyWith(
+        url: imageUrl,
+      );
+      context.read<AppImageManagerCubit>().updateImage(updatedImage);
+    } else {
+      return AppImage(
+        id: _uuid.v4(),
+        url: imageUrl,
+        entityId: categoryId,
+        entityType: "product",
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
     }
-    return AppImage(
-      id: _uuid.v4(),
-      url: imageUrl,
-      entityId: categoryId,
-      entityType: "product",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
   }
 
   @override
@@ -136,41 +155,41 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
           color: Theme.of(context).primaryColor,
         ),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Text(
-                  "Add image",
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-                const SizedBox(height: 10),
-                BlocConsumer<AppImageManagerCubit, AppImageState>(
-                  listener: (context, state) {
-                    if (state is AppImageManagerLoaded) {
-                      categoryImage = state.images.firstOrNull;
-                      if (categoryImage != null) {
-                        if (categoryImage!.entityId == categoryId) {
-                          displayable = categoryImage!.url.isNotEmpty;
-                          categoryImageFile = File(categoryImage!.url);
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Text(
+                    "Add image",
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  const SizedBox(height: 10),
+                  BlocConsumer<AppImageManagerCubit, AppImageState>(
+                    listener: (context, state) {
+                      if (state is AppImageCategoryLoaded) {
+                        var catImage = state.images.firstOrNull;
+                        if (catImage != null) {
+                          if (catImage.entityId == categoryId) {
+                            displayable = catImage.url.isNotEmpty;
+                            categoryImageFile = File(categoryImage!.url);
+                            categoryImage = catImage;
+                          }
                         }
                       }
-                    }
-                    if (state is OpenImageFromGalerySuccessfully) {
-                      if (state.imageLink != null) {
-                        displayable = true;
-                        categoryImageFile = state.imageLink;
+                      if (state is OpenImageFromGalerySuccessfully) {
+                        if (state.imageLink != null) {
+                          displayable = true;
+                          categoryImageFile = state.imageLink;
+                        }
                       }
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is AppImageManagerLoaded ||
-                        state is OpenImageFromGalerySuccessfully) {
+                    },
+                    builder: (context, state) {
                       return displayable
-                          ? Container(
+                          ? SizedBox(
                               height: 50,
                               width: 50,
                               child: Stack(
@@ -190,6 +209,15 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                                   Align(
                                     alignment: Alignment.bottomRight,
                                     child: GestureDetector(
+                                      onTap: () {
+                                        context
+                                            .read<AppImageManagerCubit>()
+                                            .openImageFromGalery("product")
+                                            .whenComplete(() {
+                                              setState(() {});
+                                            });
+                                        isUpdated = true;
+                                      },
                                       child: CircleAvatar(
                                         radius: 9,
                                         backgroundColor: Theme.of(
@@ -238,76 +266,80 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                                 ),
                               ),
                             );
-                    } else {
-                      return GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color.fromARGB(149, 158, 158, 158),
-                              width: 2,
+                      /*if (state is AppImageManagerLoaded ||
+                          state is OpenImageFromGalerySuccessfully) {
+                      } else {
+                        return GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color.fromARGB(149, 158, 158, 158),
+                                width: 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.add,
+                                color: Theme.of(context).primaryColor,
+                              ),
                             ),
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.add,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
+                        );
+                      }*/
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Select parent category",
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  SizedBox(height: 10),
+                  BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
+                    listener: (context, state) {
+                      if (state is SelectingProductCategorySuccessfully) {
+                        parentCategoryUid = state.categoryuid;
+                      }
+                    },
+                    builder: (context, state) {
+                      return SelectingParentCategory(
+                        category: widget.category,
+                        categoryUid: parentCategoryName,
                       );
-                    }
-                  },
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "Select parent category",
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-                SizedBox(height: 10),
-                BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
-                  listener: (context, state) {
-                    if (state is SelectingProductCategorySuccessfully) {
-                      parentCategoryUid = state.categoryuid;
-                    }
-                  },
-                  builder: (context, state) {
-                    return SelectingParentCategory(
-                      category: widget.category,
-                      categoryUid: parentCategoryName,
-                    );
-                  },
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: _name,
-                  decoration: const InputDecoration(labelText: 'Name'),
-                  validator: (value) => (value == null || value.trim().isEmpty)
-                      ? 'Name is required'
-                      : null,
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: _description,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  minLines: 3,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: _submit,
-                  icon: Icon(isEdit ? Icons.save : Icons.add),
-                  label: Text(isEdit ? 'Save Changes' : 'Create Category'),
-                ),
-              ],
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _name,
+                    decoration: const InputDecoration(labelText: 'Name'),
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                        ? 'Name is required'
+                        : null,
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: _description,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    minLines: 3,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: _submit,
+                    icon: Icon(isEdit ? Icons.save : Icons.add),
+                    label: Text(isEdit ? 'Save Changes' : 'Create Category'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

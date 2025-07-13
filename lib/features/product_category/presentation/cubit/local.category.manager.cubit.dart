@@ -33,6 +33,7 @@ class LocalCategoryManagerCubit extends Cubit<LocalCategoryManagerState> {
 
   Future<void> loadCategories() async {
     emit(LocalCategoryManagerLoading());
+
     final result = await _getAll();
     result.fold(
       (failure) => emit(LocalCategoryManagerError(failure.message)),

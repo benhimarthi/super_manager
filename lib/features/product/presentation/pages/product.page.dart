@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/product/presentation/widgets/product.card.item.dart';
-import 'package:super_manager/features/product_category/presentation/pages/product.category.view.dart';
+import 'package:super_manager/features/product_category/presentation/widgets/product.category.view.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/product.dart';

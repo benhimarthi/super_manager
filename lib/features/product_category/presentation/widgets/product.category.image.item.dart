@@ -22,18 +22,19 @@ class _ProductCategoryImageItemState extends State<ProductCategoryImageItem> {
   void initState() {
     super.initState();
     categoryIamge = null;
-    context.read<AppImageManagerCubit>().loadImages(widget.categoryUid);
+    context.read<AppImageManagerCubit>().loadCategoryImages(widget.categoryUid);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppImageManagerCubit, AppImageState>(
       listener: (context, state) {
-        if (state is AppImageManagerLoaded) {
+        if (state is AppImageCategoryLoaded) {
           var catImage = state.images.firstOrNull;
           if (catImage != null) {
             if (catImage.entityId == widget.categoryUid) {
               categoryIamge = catImage;
+              //print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ${categoryIamge}");
             }
           }
         }

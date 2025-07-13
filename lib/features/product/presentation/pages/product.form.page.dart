@@ -6,7 +6,7 @@ import 'package:super_manager/features/image_manager/presentation/cubit/app.imag
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.state.dart';
 import 'package:super_manager/features/product/presentation/widgets/product.profile.image.dart';
 import 'package:super_manager/features/product_category/domain/entities/product.category.dart';
-import 'package:super_manager/features/product_category/presentation/widgets/category.form.page.dart';
+import 'package:super_manager/features/product_category/presentation/pages/category.form.page.dart';
 import 'package:uuid/uuid.dart';
 import '../../../product_category/presentation/cubit/local.category.manager.cubit.dart';
 import '../../../product_category/presentation/cubit/local.category.manager.state.dart';

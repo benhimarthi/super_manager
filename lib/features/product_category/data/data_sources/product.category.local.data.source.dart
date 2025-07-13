@@ -116,6 +116,7 @@ class ProductCategoryLocalDataSourceImpl
   @override
   Future<List<ProductCategoryModel>> getAllLocalCategories() async {
     try {
+      //await clearAll();
       return _mainBox.values
           .map(
             (e) => ProductCategoryModel.fromMap(Map<String, dynamic>.from(e)),

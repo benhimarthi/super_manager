@@ -26,9 +26,6 @@ class _ProductCardPricingState extends State<ProductCardPricing> {
     return BlocConsumer<ProductPricingCubit, ProductPricingState>(
       listener: (context, state) {
         if (state is ProductPricingManagerLoaded) {
-          print(
-            "@@@@@@@@@@@@@@@@@@@@@@@##################### ${widget.pricingUid}",
-          );
           if (state.pricingList.isNotEmpty) {
             var myPricing = state.pricingList
                 .where((x) => x.id == widget.pricingUid)

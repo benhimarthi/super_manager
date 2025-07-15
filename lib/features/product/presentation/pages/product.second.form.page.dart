@@ -49,9 +49,6 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
     for (var t in widget.myProductImages) {
       context.read<AppImageManagerCubit>().createImage(t);
     }
-    print(
-      "ZZZZZZZZZZZZZZXXXXXXXXXXXXXXX ${princingValue.isNotEmpty ? princingValue : (product != null ? product!.pricingId : "")}",
-    );
     final finalProduct = ProductModel.fromEntity(product!).copyWith(
       barcode: _barcode.text.trim(),
       unit: _unit.text.trim(),

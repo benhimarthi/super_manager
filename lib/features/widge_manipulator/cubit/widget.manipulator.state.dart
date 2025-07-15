@@ -52,3 +52,8 @@ class ElementAddedSuccessfully extends WidgetManipulatorState {
 
   const ElementAddedSuccessfully(this.elementId);
 }
+
+class EmitRandomElementSuccessfully extends WidgetManipulatorState {
+  final dynamic element;
+  const EmitRandomElementSuccessfully(this.element);
+}

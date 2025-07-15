@@ -28,10 +28,13 @@ class _ProductPricingViewState extends State<ProductPricingView> {
     _productId = widget.productId;
   }
 
-  void _addProductPricing() {
+  void _addProductPricing(ProductPricing? productPricing) {
     showDialog(
       context: context,
-      builder: (context) => ProductPricingFormPage(productId: widget.productId),
+      builder: (context) => ProductPricingFormPage(
+        productId: widget.productId,
+        pricing: productPricing,
+      ),
     );
   }
 
@@ -52,7 +55,7 @@ class _ProductPricingViewState extends State<ProductPricingView> {
           children: [
             GestureDetector(
               onTap: () {
-                _addProductPricing();
+                _addProductPricing(null);
               },
               child: Container(
                 width: 50,
@@ -72,39 +75,44 @@ class _ProductPricingViewState extends State<ProductPricingView> {
                     ? Row(
                         children: myProductPricing
                             .map(
-                              (x) => Container(
-                                width: 80,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Text.rich(
-                                      TextSpan(
-                                        text: x.amount.toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                        children: [
-                                          TextSpan(
-                                            text: " DH",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Theme.of(
-                                                context,
-                                              ).primaryColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                              (x) => GestureDetector(
+                                onTap: () {
+                                  _addProductPricing(x);
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
                                     ),
-                                  ],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Text.rich(
+                                        TextSpan(
+                                          text: x.amount.toString(),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: " DH",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Theme.of(
+                                                  context,
+                                                ).primaryColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             )

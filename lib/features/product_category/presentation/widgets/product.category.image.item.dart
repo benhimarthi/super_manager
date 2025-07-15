@@ -34,7 +34,6 @@ class _ProductCategoryImageItemState extends State<ProductCategoryImageItem> {
           if (catImage != null) {
             if (catImage.entityId == widget.categoryUid) {
               categoryIamge = catImage;
-              //print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ${categoryIamge}");
             }
           }
         }

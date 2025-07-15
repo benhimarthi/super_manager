@@ -37,16 +37,20 @@ class _ProductFormPageState extends State<ProductFormPage> {
   late ProductCategory? productCategory;
   late int page = 0;
   late List<AppImage> myProductImages;
+  late List<String> myCachedImages;
+  late Product? cachedProduct;
 
   @override
   void initState() {
     super.initState();
     myProductImages = [];
+    myCachedImages = [];
     var product = widget.product;
     productUid = widget.product != null ? widget.product!.id : Uuid().v4();
     _name = TextEditingController(text: product?.name ?? '');
     _description = TextEditingController(text: product?.description ?? '');
     productCategory = null;
+    cachedProduct = null;
     _selectedCategoryId = "";
     context.read<ProductPricingCubit>().loadPricing();
     context.read<LocalCategoryManagerCubit>().loadCategories();
@@ -89,6 +93,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
       createdAt: widget.product?.createdAt ?? now,
       updatedAt: now,
     );
+    setState(() {
+      cachedProduct = product;
+    });
     context.read<WidgetManipulatorCubit>().cacheProduct(product);
     setState(() {
       page = 1;
@@ -121,7 +128,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   return;
                 }
                 if (page == 1) {
-                  page = 0;
+                  setState(() {
+                    page = 0;
+                    myCachedImages = myProductImages.map((x) => x.url).toList();
+                  });
                 }
               });
             },
@@ -162,6 +172,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                               productId: widget.product != null
                                   ? widget.product!.id
                                   : "",
+                              cahedImages: myCachedImages,
                             );
                           },
                         ),
@@ -254,7 +265,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                       return SelectingParentCategory(
                                         categoryUid: widget.product != null
                                             ? widget.product!.categoryId
-                                            : "",
+                                            : (cachedProduct != null
+                                                  ? cachedProduct!.categoryId
+                                                  : ""),
                                         useInProduct: true,
                                       );
                                     },

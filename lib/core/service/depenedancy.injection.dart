@@ -7,6 +7,15 @@ import 'package:super_manager/features/image_manager/domain/usecases/get.app.ima
 import 'package:super_manager/features/product/domain/usecases/get.product.by.id.dart';
 import 'package:super_manager/features/product_pricing/domain/usecases/get.product.pricing.by.id.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
+import '../../features/Inventory/data/data_sources/inventory.local.data.source.dart';
+import '../../features/Inventory/data/data_sources/inventory.remote.data.source.dart';
+import '../../features/Inventory/data/repositories/inventory.repository.impl.dart';
+import '../../features/Inventory/domain/repositories/inventory.repository.dart';
+import '../../features/Inventory/domain/usecases/create.inventory.dart';
+import '../../features/Inventory/domain/usecases/delete.inventory.dart';
+import '../../features/Inventory/domain/usecases/get.all.inventory.dart';
+import '../../features/Inventory/domain/usecases/update.inventory.dart';
+import '../../features/Inventory/presentation/cubit/inventory.cubit.dart';
 import '../../features/authentication/data/data_source/authentication.local.data.source.dart';
 import '../../features/authentication/data/data_source/authentictaion.remote.data.source.dart';
 import '../../features/authentication/data/data_source/sync.manager.dart';
@@ -21,6 +30,14 @@ import '../../features/authentication/domain/usecases/login.with.google.dart';
 import '../../features/authentication/domain/usecases/logout.user.dart';
 import '../../features/authentication/domain/usecases/update.user.dart';
 import '../../features/authentication/presentation/cubit/authentication.cubit.dart';
+import '../../features/inventory_meta_data/data/data_source/inventory.meta.data.local.data.source.dart';
+import '../../features/inventory_meta_data/data/data_source/inventory.meta.data.remote.data.source.dart';
+import '../../features/inventory_meta_data/data/repositories/inventory.meta.data.repository.impl.dart';
+import '../../features/inventory_meta_data/domain/repositories/inventory.meta.data.repository.dart';
+import '../../features/inventory_meta_data/domain/usecases/create.inventory.meta.data.dart';
+import '../../features/inventory_meta_data/domain/usecases/delete.inventory.meta.data.dart';
+import '../../features/inventory_meta_data/domain/usecases/get.all.inventory.meta.data.data.dart';
+import '../../features/inventory_meta_data/domain/usecases/update.inventory.meta.data.dart';
 import '../../features/product/data/data_sources/product.local.data.source.dart';
 import '../../features/product/data/data_sources/product.remote.data.source.dart';
 import '../../features/product/data/repositories/product.repository.impl.dart';
@@ -60,10 +77,15 @@ import '../../features/product_pricing/domain/usecases/update.product.pricing.da
 import '../../features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import '../../features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import '../../features/synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/inventory_sync_trigger_cubit/inventory.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
 import '../../features/synchronisation/synchronisation_manager/app.image.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/inventory.meta.data.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/inventory.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/product.category.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/product.pricing.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/product.sync.manager.dart';
@@ -287,7 +309,6 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton<ProductSyncManager>(
       () => ProductSyncManagerImpl(getIt(), getIt()),
     );
-  /*
   final inventoryBox = await Hive.openBox('inventories');
   final createdinventoryBox = await Hive.openBox('inventories_created');
   final updatedinventoryBox = await Hive.openBox('inventories_updated');
@@ -309,9 +330,7 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => DeleteInventory(getIt()))
     ..registerLazySingleton(() => InventorySyncTriggerCubit(getIt()))
     ..registerLazySingleton<InventoryRepository>(
-      () => InventoryRepositoryImpl(
-        local: getIt(),
-      ),
+      () => InventoryRepositoryImpl(local: getIt()),
     )
     ..registerLazySingleton<InventoryLocalDataSource>(
       () => InventoryLocalDataSourceImpl(
@@ -322,21 +341,22 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton<InventoryRemoteDataSource>(
-        () => InventoryRemoteDataSourceImpl(getIt()))
+      () => InventoryRemoteDataSourceImpl(getIt()),
+    )
     ..registerLazySingleton<InventorySyncManager>(
-      () => InventorySyncManagerImpl(
-        getIt(),
-        getIt(),
-      ),
+      () => InventorySyncManagerImpl(getIt(), getIt()),
     );
 
   final inventoryMetadataBox = await Hive.openBox('inventoryMetadata');
-  final createdInventoryMetadataBox =
-      await Hive.openBox('inventoryMetadata_created');
-  final updatedInventoryMetadataBox =
-      await Hive.openBox('inventoryMetadata_updated');
-  final deletedInventoryMetadataBox =
-      await Hive.openBox<String>('inventoryMetadata_deleted');
+  final createdInventoryMetadataBox = await Hive.openBox(
+    'inventoryMetadata_created',
+  );
+  final updatedInventoryMetadataBox = await Hive.openBox(
+    'inventoryMetadata_updated',
+  );
+  final deletedInventoryMetadataBox = await Hive.openBox<String>(
+    'inventoryMetadata_deleted',
+  );
   getIt
     ..registerFactory(
       () => InventoryMetadataCubit(
@@ -354,7 +374,8 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => DeleteInventoryMetadata(getIt()))
     ..registerLazySingleton(() => InventoryMetadataSyncTriggerCubit(getIt()))
     ..registerLazySingleton<InventoryMetadataRepository>(
-        () => InventoryMetadataRepositoryImpl(local: getIt()))
+      () => InventoryMetadataRepositoryImpl(local: getIt()),
+    )
     ..registerLazySingleton<InventoryMetadataLocalDataSource>(
       () => InventoryMetadataLocalDataSourceImpl(
         mainBox: inventoryMetadataBox,
@@ -364,13 +385,11 @@ Future<void> setupDependencyInjection() async {
       ),
     )
     ..registerLazySingleton<InventoryMetadataRemoteDataSource>(
-        () => InventoryMetadataRemoteDataSourceImpl(getIt()))
+      () => InventoryMetadataRemoteDataSourceImpl(getIt()),
+    )
     ..registerLazySingleton<InventoryMetadataSyncManager>(
-      () => InventoryMetadataSyncManagerImpl(
-        getIt(),
-        getIt(),
-      ),
-    );*/
+      () => InventoryMetadataSyncManagerImpl(getIt(), getIt()),
+    );
 
   final appImageBox = await Hive.openBox('appImages');
   final createdappImageBox = await Hive.openBox('app_image_created');

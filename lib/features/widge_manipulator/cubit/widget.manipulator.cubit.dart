@@ -33,6 +33,11 @@ class WidgetManipulatorCubit extends Cubit<WidgetManipulatorState> {
     );
   }
 
+  Future<void> emitRandomElement(dynamic element) async {
+    emit(WidgetManipulatorInitial());
+    emit(EmitRandomElementSuccessfully(element));
+  }
+
   Future<void> cacheProduct(Product product) async {
     emit(WidgetManipulatorInitial());
     emit(CacheProductSuccessfully(product));

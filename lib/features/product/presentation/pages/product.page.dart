@@ -41,6 +41,7 @@ class _ProductPageState extends State<ProductPage> {
       listener: (context, state) {
         if (state is ProductManagerLoaded) {
           setState(() {
+            print("XXXXXXXXXXXXXXXXCCCCCCCCCCCCCCCCCCCC@@@@@@@@@@@@@");
             myProduct = state.products;
             productList = state.products;
           });
@@ -62,7 +63,6 @@ class _ProductPageState extends State<ProductPage> {
                 SizedBox(
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * .1,
-                  //color: Colors.amber,
                   child: Column(
                     children: [
                       BlocConsumer<

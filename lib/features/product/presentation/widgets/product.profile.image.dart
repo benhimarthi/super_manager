@@ -9,7 +9,12 @@ import '../../../image_manager/presentation/cubit/app.image.state.dart';
 
 class ProductProfileImage extends StatefulWidget {
   final String productId;
-  const ProductProfileImage({super.key, required this.productId});
+  final List<String>? cahedImages;
+  const ProductProfileImage({
+    super.key,
+    required this.productId,
+    this.cahedImages,
+  });
 
   @override
   State<ProductProfileImage> createState() => _ProductProfileImageState();
@@ -33,9 +38,11 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
     productId = widget.productId;
     myProductImages = [];
     myAppProductImages = [];
-    existingIamges = [];
-    if (myProductImages.isNotEmpty) {
+    existingIamges = widget.cahedImages != null ? widget.cahedImages! : [];
+    if (existingIamges.isNotEmpty) {
       listNavigator = CircularListNavigator(existingIamges);
+      productImageFile = File(existingIamges.first);
+      displayable = true;
     }
     if (productId.isNotEmpty) {
       context.read<AppImageManagerCubit>().loadProductImages(widget.productId);

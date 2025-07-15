@@ -8,6 +8,7 @@ import 'package:super_manager/firebase_options.dart';
 
 import 'core/app_theme/app.theme.dart';
 import 'core/service/depenedancy.injection.dart';
+import 'features/Inventory/presentation/cubit/inventory.cubit.dart';
 import 'features/authentication/presentation/cubit/authentication.cubit.dart';
 import 'features/authentication/presentation/pages/login_screen/login.screen.dart';
 import 'features/authentication/presentation/pages/registration_screen/registration.screen.dart';
@@ -18,6 +19,9 @@ import 'features/product/presentation/cubit/product.cubit.dart';
 import 'features/product_category/presentation/cubit/local.category.manager.cubit.dart';
 import 'features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import 'features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
+import 'features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'features/synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
+import 'features/synchronisation/cubit/inventory_sync_trigger_cubit/inventory.sync.trigger.cubit.dart';
 import 'features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
 import 'features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
 import 'features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
@@ -63,17 +67,18 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<ProductSyncTriggerCubit>(
           create: (context) => getIt<ProductSyncTriggerCubit>(),
         ),
-        /*BlocProvider<InventoryCubit>(
-              create: (context) => getIt<InventoryCubit>()),
-          BlocProvider<InventorySyncTriggerCubit>(
-            create: (context) => getIt<InventorySyncTriggerCubit>(),
-          ),
-          BlocProvider<InventoryMetadataCubit>(
-            create: (context) => getIt<InventoryMetadataCubit>(),
-          ),
-          BlocProvider<InventoryMetadataSyncTriggerCubit>(
-            create: (context) => getIt<InventoryMetadataSyncTriggerCubit>(),
-          ),*/
+        BlocProvider<InventoryCubit>(
+          create: (context) => getIt<InventoryCubit>(),
+        ),
+        BlocProvider<InventorySyncTriggerCubit>(
+          create: (context) => getIt<InventorySyncTriggerCubit>(),
+        ),
+        BlocProvider<InventoryMetadataCubit>(
+          create: (context) => getIt<InventoryMetadataCubit>(),
+        ),
+        BlocProvider<InventoryMetadataSyncTriggerCubit>(
+          create: (context) => getIt<InventoryMetadataSyncTriggerCubit>(),
+        ),
         BlocProvider<AppImageSyncTriggerCubit>(
           create: (context) => getIt<AppImageSyncTriggerCubit>(),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/product/presentation/pages/product.page.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
+import '../../../../Inventory/presentation/pages/inventory.detail.screen.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
 
@@ -18,7 +19,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "PRODUCT";
+    title = "INVENTORY";
   }
 
   @override
@@ -37,6 +38,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "PROFILE" => UserProfile(),
           "PRODUCT" => ProductPage(),
           "USER MANAGER" => UserManagement(),
+          "INVENTORY" => InventoryDetailScreen(),
           String() => throw UnimplementedError(),
         };
       },

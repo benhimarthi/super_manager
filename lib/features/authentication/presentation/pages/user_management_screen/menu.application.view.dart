@@ -121,6 +121,23 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                 ),
                 const SizedBox(height: 50),
                 menuItem(
+                  "Inventory",
+                  () {
+                    setState(() {
+                      targetPosition = 118;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "INVENTORY",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 50),
+                menuItem(
                   "Users",
                   () {
                     setState(() {

@@ -33,6 +33,23 @@ class ProductModel extends Product {
     );
   }
 
+  factory ProductModel.empty() {
+    return ProductModel(
+      id: "id",
+      name: "name",
+      description: "description",
+      categoryId: "categoryId",
+      unit: "unit",
+      barcode: "barcode",
+      imageUrl: "imageUrl",
+      pricingId: "pricingId",
+      active: false,
+      creatorID: "creatorID",
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
   Product toEntity() => Product(
     id: id,
     name: name,
@@ -71,7 +88,7 @@ class ProductModel extends Product {
       imageUrl: imageUrl ?? this.imageUrl,
       pricingId: pricingId ?? this.pricingId,
       active: active ?? this.active,
-      creatorID: creatorId ?? this.creatorID,
+      creatorID: creatorId ?? creatorID,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

@@ -44,6 +44,21 @@ class ProductPricingModel extends ProductPricing {
     );
   }
 
+  factory ProductPricingModel.empty() {
+    return ProductPricingModel(
+      id: "id",
+      productId: "productId",
+      currency: "MAD",
+      country: "country",
+      amount: 100,
+      discountPercent: .5,
+      active: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      creatorId: "creatorId",
+    );
+  }
+
   ProductPricing copyWith({
     String? productId,
     String? currency,

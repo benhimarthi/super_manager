@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.available.product.list.dart';
-import 'package:super_manager/features/product/domain/entities/product.dart';
-import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.meta.data.form.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
@@ -32,11 +31,13 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   late bool _isLowStock;
   late bool _isBlocked;
   late DateTime _lastRestockDate;
+  late int page;
 
   @override
   void initState() {
     super.initState();
     final inv = widget.inventory;
+    page = 0;
     // Inventory init
     _productIdController = TextEditingController(text: inv?.productId ?? '');
     _warehouseIdController = TextEditingController(
@@ -81,6 +82,18 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   }
 
   void _save() {
+    if (_productIdController.text.trim().isEmpty) {
+      showBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            decoration: BoxDecoration(color: Colors.red),
+            child: Text("Must select a product"),
+          );
+        },
+      );
+      return;
+    }
     if (_formKey.currentState?.validate() ?? false) {
       final inventory = Inventory(
         id: widget.inventory?.id ?? UniqueKey().toString(),
@@ -120,11 +133,32 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   Widget build(BuildContext context) {
     final isEditing = widget.inventory != null;
     return AlertDialog(
-      title: AppBar(
-        title: Text(
-          isEditing ? 'Edit Inventory' : 'Add Inventory',
-          style: TextStyle(color: Theme.of(context).primaryColor),
-        ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            isEditing ? 'Edit Inventory' : 'Add Inventory',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return InventoryMetaDataForm(inventory: null);
+                },
+              );
+            },
+            child: Text(
+              "Next",
+              style: TextStyle(color: Colors.blue, fontSize: 16),
+            ),
+          ),
+        ],
       ),
       content: SingleChildScrollView(
         //padding: const EdgeInsets.all(),
@@ -238,7 +272,13 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                 onChanged: (val) => setState(() => _isBlocked = val),
               ),*/
               ListTile(
-                title: const Text('Last Restock Date'),
+                title: Text(
+                  'Last Restock Date',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
                 subtitle: Text('${_lastRestockDate.toLocal()}'.split(' ')[0]),
                 trailing: IconButton(
                   icon: const Icon(Icons.calendar_today),

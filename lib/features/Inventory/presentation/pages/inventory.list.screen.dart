@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
 
 import '../cubit/inventory.cubit.dart';
 import '../cubit/inventory.state.dart';
@@ -48,11 +49,12 @@ class InventoryListScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const InventoryDetailScreen(),
-              ));
+          showDialog(
+            context: context,
+            builder: (context) {
+              return InventoryFormData();
+            },
+          );
         },
         child: const Icon(Icons.add),
       ),

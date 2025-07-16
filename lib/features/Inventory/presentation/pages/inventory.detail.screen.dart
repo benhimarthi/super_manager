@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.meta.data.form.dart';
 
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
@@ -41,6 +42,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
     super.initState();
 
     final inv = widget.inventory;
+    inventory = inv;
     final meta = widget.metadata;
 
     // Metadata init
@@ -131,9 +133,21 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
     final isEditing = widget.inventory != null;
 
     return Scaffold(
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return InventoryMetaDataForm(inventory: inventory);
+            },
+          );
+        },
+        child: CircleAvatar(),
+      ),
       appBar: AppBar(
         title: Text(isEditing ? 'Edit Inventory' : 'Add Inventory'),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(2),
         child: Form(
@@ -142,6 +156,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InventoryFormData(),
+              InventoryMetaDataForm(inventory: null),
               const Divider(height: 40),
               const Text(
                 'Inventory Metadata',

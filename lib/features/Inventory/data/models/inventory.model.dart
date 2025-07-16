@@ -79,6 +79,26 @@ class InventoryModel extends Inventory {
     );
   }
 
+  factory InventoryModel.empty() {
+    return InventoryModel(
+      id: "id",
+      productId: "productId",
+      warehouseId: "warehouseId",
+      quantityAvailable: 15,
+      quantityReserved: 5,
+      quantitySold: 6,
+      reorderLevel: 3,
+      minimumStock: 3,
+      maximumStock: 120,
+      isOutOfStock: false,
+      isLowStock: false,
+      isBlocked: false,
+      lastRestockDate: DateTime.now(),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -101,20 +121,20 @@ class InventoryModel extends Inventory {
 
   @override
   List<Object?> get props => [
-        id,
-        productId,
-        warehouseId,
-        quantityAvailable,
-        quantityReserved,
-        quantitySold,
-        reorderLevel,
-        minimumStock,
-        maximumStock,
-        isOutOfStock,
-        isLowStock,
-        isBlocked,
-        lastRestockDate,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    productId,
+    warehouseId,
+    quantityAvailable,
+    quantityReserved,
+    quantitySold,
+    reorderLevel,
+    minimumStock,
+    maximumStock,
+    isOutOfStock,
+    isLowStock,
+    isBlocked,
+    lastRestockDate,
+    createdAt,
+    updatedAt,
+  ];
 }

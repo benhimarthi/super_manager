@@ -138,7 +138,10 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
           showDialog(
             context: context,
             builder: (context) {
-              return InventoryMetaDataForm(inventory: inventory);
+              return InventoryMetaDataForm(
+                inventory: inventory,
+                isBuilding: false,
+              );
             },
           );
         },
@@ -155,8 +158,8 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InventoryFormData(),
-              InventoryMetaDataForm(inventory: null),
+              InventoryFormData(isBuilding: true),
+              InventoryMetaDataForm(inventory: null, isBuilding: true),
               const Divider(height: 40),
               const Text(
                 'Inventory Metadata',

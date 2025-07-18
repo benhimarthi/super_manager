@@ -11,7 +11,12 @@ import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class InventoryAvailableProductItem extends StatefulWidget {
   final Product product;
-  const InventoryAvailableProductItem({super.key, required this.product});
+  final String? selectedItemId;
+  const InventoryAvailableProductItem({
+    super.key,
+    this.selectedItemId,
+    required this.product,
+  });
 
   @override
   State<InventoryAvailableProductItem> createState() =>
@@ -27,8 +32,15 @@ class _InventoryAvailableProductItemState
   void initState() {
     super.initState();
     myProductImage = null;
-    isItemSelected = false;
-    selectedProductUid = "";
+
+    selectedProductUid = widget.selectedItemId != null
+        ? widget.selectedItemId!
+        : "";
+    if (selectedProductUid.isNotEmpty) {
+      isItemSelected = selectedProductUid == widget.product.id;
+    } else {
+      isItemSelected = false;
+    }
     context.read<AppImageManagerCubit>().loadProductImages(widget.product.id);
   }
 

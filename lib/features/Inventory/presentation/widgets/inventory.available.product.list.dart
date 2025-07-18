@@ -7,7 +7,8 @@ import '../../../product/presentation/cubit/product.cubit.dart';
 import '../../../product/presentation/cubit/product.state.dart';
 
 class InventoryAvailableProductList extends StatefulWidget {
-  const InventoryAvailableProductList({super.key});
+  final String? selectedItem;
+  const InventoryAvailableProductList({super.key, this.selectedItem});
 
   @override
   State<InventoryAvailableProductList> createState() =>
@@ -42,6 +43,7 @@ class _InventoryAvailableProductListState
             itemBuilder: (context, ind) {
               return InventoryAvailableProductItem(
                 product: availableProduct[ind],
+                selectedItemId: widget.selectedItem,
               );
             },
           ),

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class Inventory extends Equatable {
   final String id;
   final String productId;
+  final String userUid;
   final String warehouseId;
   final int quantityAvailable;
   final int quantityReserved;
@@ -20,6 +21,7 @@ class Inventory extends Equatable {
   const Inventory({
     required this.id,
     required this.productId,
+    required this.userUid,
     required this.warehouseId,
     required this.quantityAvailable,
     required this.quantityReserved,
@@ -37,20 +39,20 @@ class Inventory extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        productId,
-        warehouseId,
-        quantityAvailable,
-        quantityReserved,
-        quantitySold,
-        reorderLevel,
-        minimumStock,
-        maximumStock,
-        isOutOfStock,
-        isLowStock,
-        isBlocked,
-        lastRestockDate,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    productId,
+    warehouseId,
+    quantityAvailable,
+    quantityReserved,
+    quantitySold,
+    reorderLevel,
+    minimumStock,
+    maximumStock,
+    isOutOfStock,
+    isLowStock,
+    isBlocked,
+    lastRestockDate,
+    createdAt,
+    updatedAt,
+  ];
 }

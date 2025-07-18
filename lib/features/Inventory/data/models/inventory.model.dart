@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 import '../../domain/entities/inventory.dart';
 
 class InventoryModel extends Inventory {
@@ -17,12 +19,14 @@ class InventoryModel extends Inventory {
     required super.lastRestockDate,
     required super.createdAt,
     required super.updatedAt,
+    required super.userUid,
   });
 
   factory InventoryModel.fromEntity(Inventory entity) {
     return InventoryModel(
       id: entity.id,
       productId: entity.productId,
+      userUid: entity.userUid,
       warehouseId: entity.warehouseId,
       quantityAvailable: entity.quantityAvailable,
       quantityReserved: entity.quantityReserved,
@@ -43,6 +47,7 @@ class InventoryModel extends Inventory {
     return Inventory(
       id: id,
       productId: productId,
+      userUid: userUid,
       warehouseId: warehouseId,
       quantityAvailable: quantityAvailable,
       quantityReserved: quantityReserved,
@@ -63,6 +68,7 @@ class InventoryModel extends Inventory {
     return InventoryModel(
       id: map['id'] as String,
       productId: map['productId'] as String,
+      userUid: map['userUid'] as String,
       warehouseId: map['warehouseId'] as String,
       quantityAvailable: map['quantityAvailable'] as int,
       quantityReserved: map['quantityReserved'] as int,
@@ -81,9 +87,10 @@ class InventoryModel extends Inventory {
 
   factory InventoryModel.empty() {
     return InventoryModel(
-      id: "id",
+      id: Uuid().v4(),
       productId: "productId",
       warehouseId: "warehouseId",
+      userUid: "_",
       quantityAvailable: 15,
       quantityReserved: 5,
       quantitySold: 6,
@@ -104,6 +111,7 @@ class InventoryModel extends Inventory {
       'id': id,
       'productId': productId,
       'warehouseId': warehouseId,
+      'userUid': userUid,
       'quantityAvailable': quantityAvailable,
       'quantityReserved': quantityReserved,
       'quantitySold': quantitySold,

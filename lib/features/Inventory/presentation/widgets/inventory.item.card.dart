@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:super_manager/features/product/domain/entities/product.dart';
 
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../domain/entities/inventory.dart';
 
 class InventoryItemCard extends StatelessWidget {
   final Inventory inventory;
+  final Product? product;
   final InventoryMetadata? metadata;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
@@ -13,6 +15,7 @@ class InventoryItemCard extends StatelessWidget {
   const InventoryItemCard({
     Key? key,
     required this.inventory,
+    this.product,
     this.metadata,
     this.onTap,
     this.onEdit,
@@ -52,11 +55,17 @@ class InventoryItemCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                      child: Text('Product ID: ${inventory.productId}',
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
-                  Expanded(
-                      child: Text('Warehouse ID: ${inventory.warehouseId}',
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
+                    child: Text(
+                      'Product ID: ${product != null ? product!.name : "your product"}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  /*Expanded(
+                    child: Text(
+                      'Codebare: ${product != null ? product!.barcode : "your product"}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),*/
                 ],
               ),
               const SizedBox(height: 8),
@@ -70,39 +79,53 @@ class InventoryItemCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text('Stock Status: $stockStatusText',
-                  style: TextStyle(
-                      color: stockStatusColor, fontWeight: FontWeight.bold)),
+              Text(
+                'Stock Status: $stockStatusText',
+                style: TextStyle(
+                  color: stockStatusColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
 
               // Metadata info (conditionally shown)
               if (metadata != null) ...[
                 const Divider(),
-                const Text('Metadata',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Metadata',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Text(
-                    'Cost Per Unit: \$${metadata!.costPerUnit.toStringAsFixed(2)}'),
+                  'Cost Per Unit: \$${metadata!.costPerUnit.toStringAsFixed(2)}',
+                ),
                 Text(
-                    'Total Stock Value: \$${metadata!.totalStockValue.toStringAsFixed(2)}'),
+                  'Total Stock Value: \$${metadata!.totalStockValue.toStringAsFixed(2)}',
+                ),
                 Text(
-                    'Markup: ${metadata!.markupPercentage.toStringAsFixed(2)}%'),
+                  'Markup: ${metadata!.markupPercentage.toStringAsFixed(2)}%',
+                ),
                 Text(
-                    'Avg Daily Sales: ${metadata!.averageDailySales.toStringAsFixed(2)}'),
+                  'Avg Daily Sales: ${metadata!.averageDailySales.toStringAsFixed(2)}',
+                ),
                 Text(
-                    'Stock Turnover Rate: ${metadata!.stockTurnoverRate.toStringAsFixed(2)}'),
+                  'Stock Turnover Rate: ${metadata!.stockTurnoverRate.toStringAsFixed(2)}',
+                ),
                 Text('Lead Time (Days): ${metadata!.leadTimeInDays}'),
                 Text(
-                    'Demand Forecast: ${metadata!.demandForecast.toStringAsFixed(2)}'),
+                  'Demand Forecast: ${metadata!.demandForecast.toStringAsFixed(2)}',
+                ),
                 Text(
-                    'Seasonality Factor: ${metadata!.seasonalityFactor.toStringAsFixed(2)}'),
-                Text('Inventory Source: ${metadata!.inventorySource}'),
-                Text('Created By: ${metadata!.createdBy}'),
-                Text('Updated By: ${metadata!.updatedBy}'),
+                  'Seasonality Factor: ${metadata!.seasonalityFactor.toStringAsFixed(2)}',
+                ),
               ] else
-                const Text('No metadata available',
-                    style: TextStyle(
-                        fontStyle: FontStyle.italic, color: Colors.grey)),
+                const Text(
+                  'No metadata available',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey,
+                  ),
+                ),
 
               // Actions
               if (onEdit != null || onDelete != null)
@@ -120,10 +143,15 @@ class InventoryItemCard extends StatelessWidget {
                       if (onDelete != null)
                         TextButton.icon(
                           onPressed: onDelete,
-                          icon: const Icon(Icons.delete,
-                              size: 18, color: Colors.red),
-                          label: const Text('Delete',
-                              style: TextStyle(color: Colors.red)),
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 18,
+                            color: Colors.red,
+                          ),
+                          label: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                     ],
                   ),
@@ -140,8 +168,10 @@ class InventoryItemCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        Text(value.toString(),
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          value.toString(),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
       ],
     );
   }

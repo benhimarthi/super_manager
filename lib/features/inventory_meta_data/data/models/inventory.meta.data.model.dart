@@ -53,6 +53,38 @@ class InventoryMetadataModel extends InventoryMetadata {
     );
   }
 
+  InventoryMetadataModel copyWith({
+    String? id,
+    String? inventoryId,
+    double? costPerUnit,
+    double? totalStockValue,
+    double? markupPercentage,
+    double? averageDailySales,
+    double? stockTurnoverRate,
+    int? leadTimeInDays,
+    double? demandForecast,
+    double? seasonalityFactor,
+    String? inventorySource,
+    String? createdBy,
+    String? updatedBy,
+  }) {
+    return InventoryMetadataModel(
+      id: id ?? this.id,
+      inventoryId: inventoryId ?? this.inventoryId,
+      costPerUnit: costPerUnit ?? this.costPerUnit,
+      totalStockValue: totalStockValue ?? this.totalStockValue,
+      markupPercentage: markupPercentage ?? this.markupPercentage,
+      averageDailySales: averageDailySales ?? this.averageDailySales,
+      stockTurnoverRate: stockTurnoverRate ?? this.stockTurnoverRate,
+      leadTimeInDays: leadTimeInDays ?? this.leadTimeInDays,
+      demandForecast: demandForecast ?? this.demandForecast,
+      seasonalityFactor: seasonalityFactor ?? this.seasonalityFactor,
+      inventorySource: inventorySource ?? this.inventorySource,
+      createdBy: createdBy ?? this.createdBy,
+      updatedBy: updatedBy ?? this.updatedBy,
+    );
+  }
+
   factory InventoryMetadataModel.fromMap(Map<String, dynamic> map) {
     return InventoryMetadataModel(
       id: map['id'] as String,
@@ -91,18 +123,18 @@ class InventoryMetadataModel extends InventoryMetadata {
 
   @override
   List<Object?> get props => [
-        id,
-        inventoryId,
-        costPerUnit,
-        totalStockValue,
-        markupPercentage,
-        averageDailySales,
-        stockTurnoverRate,
-        leadTimeInDays,
-        demandForecast,
-        seasonalityFactor,
-        inventorySource,
-        createdBy,
-        updatedBy,
-      ];
+    id,
+    inventoryId,
+    costPerUnit,
+    totalStockValue,
+    markupPercentage,
+    averageDailySales,
+    stockTurnoverRate,
+    leadTimeInDays,
+    demandForecast,
+    seasonalityFactor,
+    inventorySource,
+    createdBy,
+    updatedBy,
+  ];
 }

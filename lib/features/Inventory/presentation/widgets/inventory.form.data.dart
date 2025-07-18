@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.available.product.list.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.meta.data.form.dart';
+import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
+import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
-
+import 'package:uuid/uuid.dart';
+import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/inventory.dart';
 
 class InventoryFormData extends StatefulWidget {
   final Inventory? inventory;
-  const InventoryFormData({super.key, this.inventory});
+  final bool isBuilding;
+  const InventoryFormData({
+    super.key,
+    required this.isBuilding,
+    this.inventory,
+  });
 
   @override
   State<InventoryFormData> createState() => _InventoryFormDataState();
@@ -17,10 +26,6 @@ class InventoryFormData extends StatefulWidget {
 
 class _InventoryFormDataState extends State<InventoryFormData> {
   final _formKey = GlobalKey<FormState>();
-
-  // Inventory controllers
-  late TextEditingController _productIdController;
-  late TextEditingController _warehouseIdController;
   late TextEditingController _quantityAvailableController;
   late TextEditingController _quantityReservedController;
   late TextEditingController _quantitySoldController;
@@ -30,19 +35,23 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   late bool _isOutOfStock;
   late bool _isLowStock;
   late bool _isBlocked;
+  late bool _displayWarning;
   late DateTime _lastRestockDate;
   late int page;
+  late String inventoryId;
+  late String productId;
+  late InventoryMetadata? metadata;
 
   @override
   void initState() {
     super.initState();
+    metadata = null;
+    productId = widget.inventory != null ? widget.inventory!.productId : "";
+    _displayWarning = false;
     final inv = widget.inventory;
     page = 0;
+    inventoryId = widget.inventory?.id ?? Uuid().v4();
     // Inventory init
-    _productIdController = TextEditingController(text: inv?.productId ?? '');
-    _warehouseIdController = TextEditingController(
-      text: inv?.warehouseId ?? '',
-    );
     _quantityAvailableController = TextEditingController(
       text: inv?.quantityAvailable.toString() ?? '0',
     );
@@ -65,40 +74,29 @@ class _InventoryFormDataState extends State<InventoryFormData> {
     _isLowStock = inv?.isLowStock ?? false;
     _isBlocked = inv?.isBlocked ?? false;
     _lastRestockDate = inv?.lastRestockDate ?? DateTime.now();
+    if (widget.inventory != null) {
+      context.read<InventoryMetadataCubit>().loadMetadata();
+    }
   }
 
   @override
   void dispose() {
-    super.dispose();
-    // Inventory controllers
-    _productIdController.dispose();
-    _warehouseIdController.dispose();
     _quantityAvailableController.dispose();
     _quantityReservedController.dispose();
     _quantitySoldController.dispose();
     _reorderLevelController.dispose();
     _minimumStockController.dispose();
     _maximumStockController.dispose();
+    super.dispose();
   }
 
-  void _save() {
-    if (_productIdController.text.trim().isEmpty) {
-      showBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            decoration: BoxDecoration(color: Colors.red),
-            child: Text("Must select a product"),
-          );
-        },
-      );
-      return;
-    }
+  _save() {
     if (_formKey.currentState?.validate() ?? false) {
       final inventory = Inventory(
-        id: widget.inventory?.id ?? UniqueKey().toString(),
-        productId: _productIdController.text,
-        warehouseId: _warehouseIdController.text,
+        id: inventoryId,
+        productId: productId,
+        userUid: SessionManager.getUserSession()!.id,
+        warehouseId: "",
         quantityAvailable: int.parse(_quantityAvailableController.text),
         quantityReserved: int.parse(_quantityReservedController.text),
         quantitySold: int.parse(_quantitySoldController.text),
@@ -112,6 +110,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
         createdAt: widget.inventory?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
+      return inventory;
     }
   }
 
@@ -136,6 +135,21 @@ class _InventoryFormDataState extends State<InventoryFormData> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          BlocConsumer<InventoryMetadataCubit, InventoryMetadataState>(
+            listener: (context, state) {
+              if (state is InventoryMetadataManagerLoaded) {
+                var metaData = state.metadataList
+                    .where((x) => x.inventoryId == inventoryId)
+                    .firstOrNull;
+                if (metaData != null) {
+                  metadata = metaData;
+                }
+              }
+            },
+            builder: (context, state) {
+              return Container();
+            },
+          ),
           Text(
             isEditing ? 'Edit Inventory' : 'Add Inventory',
             style: TextStyle(
@@ -145,11 +159,22 @@ class _InventoryFormDataState extends State<InventoryFormData> {
           ),
           GestureDetector(
             onTap: () {
+              if (productId.isEmpty) {
+                setState(() {
+                  _displayWarning = true;
+                });
+                return;
+              }
+              var prod = _save();
               Navigator.pop(context);
               showDialog(
                 context: context,
                 builder: (context) {
-                  return InventoryMetaDataForm(inventory: null);
+                  return InventoryMetaDataForm(
+                    inventory: prod,
+                    isBuilding: widget.isBuilding,
+                    inventoryMetadata: metadata,
+                  );
                 },
               );
             },
@@ -171,31 +196,49 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                   if (state is EmitRandomElementSuccessfully) {
                     try {
                       var productId = (state.element as String);
-                      _productIdController.text = productId;
-                    } catch (e) {
-                      print(e);
-                    }
+                      setState(() {
+                        //print(productId);
+                        this.productId = productId;
+                        _displayWarning = false;
+                      });
+                    } catch (e) {}
                   }
                 },
                 builder: (context, state) {
-                  return InventoryAvailableProductList();
+                  return Column(
+                    children: [
+                      Visibility(
+                        visible: _displayWarning,
+                        child: Text(
+                          "You must select a product.",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      Stack(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 100,
+                            decoration: _displayWarning
+                                ? BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.red,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5),
+                                  )
+                                : BoxDecoration(),
+                          ),
+                          InventoryAvailableProductList(
+                            selectedItem: widget.inventory != null
+                                ? widget.inventory!.productId
+                                : "",
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
                 },
-              ),
-              Visibility(
-                visible: false,
-                child: TextFormField(
-                  controller: _productIdController,
-                  decoration: const InputDecoration(labelText: 'Product ID'),
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                ),
-              ),
-              Visibility(
-                visible: false,
-                child: TextFormField(
-                  controller: _warehouseIdController,
-                  decoration: const InputDecoration(labelText: 'Warehouse ID'),
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                ),
               ),
               SizedBox(height: 15),
               TextFormField(
@@ -219,15 +262,6 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                     ? 'Enter valid number'
                     : null,
               ),
-              /*SizedBox(height: 15),
-              TextFormField(
-                controller: _quantitySoldController,
-                decoration: const InputDecoration(labelText: 'Quantity Sold'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v == null || int.tryParse(v) == null
-                    ? 'Enter valid number'
-                    : null,
-              ),*/
               SizedBox(height: 15),
               TextFormField(
                 controller: _reorderLevelController,
@@ -255,22 +289,14 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                     ? 'Enter valid number'
                     : null,
               ),
-
-              /*SwitchListTile(
-                title: const Text('Out of Stock'),
-                value: _isOutOfStock,
-                onChanged: (val) => setState(() => _isOutOfStock = val),
+              Transform.scale(
+                scale: .7,
+                child: SwitchListTile(
+                  title: const Text('Blocked'),
+                  value: _isBlocked,
+                  onChanged: (val) => setState(() => _isBlocked = val),
+                ),
               ),
-              SwitchListTile(
-                title: const Text('Low Stock'),
-                value: _isLowStock,
-                onChanged: (val) => setState(() => _isLowStock = val),
-              ),
-              SwitchListTile(
-                title: const Text('Blocked'),
-                value: _isBlocked,
-                onChanged: (val) => setState(() => _isBlocked = val),
-              ),*/
               ListTile(
                 title: Text(
                   'Last Restock Date',

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:super_manager/features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/firebase_options.dart';
-
 import 'core/app_theme/app.theme.dart';
 import 'core/service/depenedancy.injection.dart';
 import 'features/Inventory/presentation/cubit/inventory.cubit.dart';

@@ -106,7 +106,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           createdBy: SessionManager.getUserSession()!.id,
           updatedBy: SessionManager.getUserSession()!.id,
         );
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@###################");
         context.read<InventoryCubit>().addInventory(widget.inventory!);
         context.read<InventoryMetadataCubit>().addMetadata(metadata);
       } else {
@@ -206,7 +205,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
               ),
             ),
             SizedBox(height: 10),
-            BlocConsumer<ProductCubit, ProductState>(
+            /*BlocConsumer<ProductCubit, ProductState>(
               listener: (context, state) {
                 if (state is GetProductByIdSuccessfully) {
                   inventoryProduct = state.product;
@@ -266,7 +265,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
                 inventoryMetaDataItem("Seasonality Factor", "0.6", "h"),
               ],
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 10),*/
             ElevatedButton(
               onPressed: _save,
               child: Text(isEditing ? 'Update' : 'Create'),

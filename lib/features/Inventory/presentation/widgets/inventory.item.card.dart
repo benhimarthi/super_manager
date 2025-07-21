@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
@@ -40,6 +42,7 @@ class InventoryItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
+      color: const Color.fromARGB(255, 27, 29, 31),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
@@ -50,32 +53,23 @@ class InventoryItemCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Inventory basic info
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Product ID: ${product != null ? product!.name : "your product"}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  /*Expanded(
-                    child: Text(
-                      'Codebare: ${product != null ? product!.barcode : "your product"}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),*/
-                ],
-              ),
+              InventoryItemCardDateSelector(inventory: inventory),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 16,
                 runSpacing: 8,
                 children: [
-                  _buildQuantityInfo('Available', inventory.quantityAvailable),
-                  _buildQuantityInfo('Reserved', inventory.quantityReserved),
-                  _buildQuantityInfo('Sold', inventory.quantitySold),
+                  _buildQuantityInfo(
+                    'Available',
+                    inventory.quantityAvailable,
+                    context,
+                  ),
+                  _buildQuantityInfo(
+                    'Reserved',
+                    inventory.quantityReserved,
+                    context,
+                  ),
+                  _buildQuantityInfo('Sold', inventory.quantitySold, context),
                 ],
               ),
               const SizedBox(height: 8),
@@ -91,6 +85,7 @@ class InventoryItemCard extends StatelessWidget {
               // Metadata info (conditionally shown)
               if (metadata != null) ...[
                 const Divider(),
+                InventoryRelevantNumbersView(),
                 const Text(
                   'Metadata',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -163,14 +158,18 @@ class InventoryItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildQuantityInfo(String label, int value) {
+  Widget _buildQuantityInfo(String label, int value, context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         Text(
           value.toString(),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Theme.of(context).primaryColor,
+          ),
         ),
       ],
     );

@@ -56,6 +56,8 @@ dependencies:
   path: 
   permission_handler: 
   country_currency_pickers:
+  flutter_chart: 
+  charts_flutter_new: 
 
 dev_dependencies:
   flutter_test:

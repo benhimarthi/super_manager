@@ -79,7 +79,8 @@ class _MainScreenState extends State<MainScreen> {
               alignment: Alignment.topLeft,
               child: Container(
                 color: const Color.fromARGB(255, 0, 0, 0),
-                width: MediaQuery.of(context).size.width * .89,
+                width: MediaQuery.of(context).size.width * .87,
+                padding: EdgeInsets.all(2),
                 child: const CurrentSCreenInfos(),
               ),
             ),

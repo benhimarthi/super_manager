@@ -50,6 +50,34 @@ class SaleModel extends Sale {
     );
   }
 
+  SaleModel copyWith({
+    String? id,
+    String? customerId,
+    DateTime? date,
+    String? status,
+    double? totalAmount,
+    double? totalTax,
+    double? discountAmount,
+    String? paymentMethod,
+    String? currency,
+    String? notes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return SaleModel(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      status: status ?? this.status,
+      totalAmount: totalAmount ?? this.totalAmount,
+      totalTax: totalTax ?? this.totalTax,
+      discountAmount: discountAmount ?? this.discountAmount,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      currency: currency ?? this.currency,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   factory SaleModel.fromMap(Map<String, dynamic> map) {
     return SaleModel(
       id: map['id'] as String,
@@ -86,17 +114,17 @@ class SaleModel extends Sale {
 
   @override
   List<Object?> get props => [
-        id,
-        customerId,
-        date,
-        status,
-        totalAmount,
-        totalTax,
-        discountAmount,
-        paymentMethod,
-        currency,
-        notes,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    customerId,
+    date,
+    status,
+    totalAmount,
+    totalTax,
+    discountAmount,
+    paymentMethod,
+    currency,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
 }

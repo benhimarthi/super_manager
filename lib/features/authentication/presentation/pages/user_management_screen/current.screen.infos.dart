@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/product/presentation/pages/product.page.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
-import '../../../../Inventory/presentation/pages/inventory.detail.screen.dart';
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
+import '../../../../sale_item/presentation/pages/sale.view.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
 
@@ -20,7 +20,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "INVENTORY";
+    title = "SALE";
   }
 
   @override
@@ -40,6 +40,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "PRODUCT" => ProductPage(),
           "USER MANAGER" => UserManagement(),
           "INVENTORY" => InventoryListScreen(),
+          "SALE" => SaleView(),
           String() => throw UnimplementedError(),
         };
       },

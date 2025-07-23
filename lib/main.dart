@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/firebase_options.dart';
 import 'core/app_theme/app.theme.dart';
@@ -86,6 +88,10 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider<WidgetManipulatorCubit>(
           create: (context) => getIt<WidgetManipulatorCubit>(),
+        ),
+        BlocProvider<SaleCubit>(create: (context) => getIt<SaleCubit>()),
+        BlocProvider<SaleSyncTriggerCubit>(
+          create: (context) => getIt<SaleSyncTriggerCubit>(),
         ),
       ],
       child: Builder(

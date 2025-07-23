@@ -38,6 +38,28 @@ class SaleItemModel extends SaleItem {
     );
   }
 
+  SaleItem copyWith({
+    String? id,
+    String? saleId,
+    String? productId,
+    int? quantity,
+    double? unitPrice,
+    double? totalPrice,
+    double? taxAmount,
+    double? discountApplied,
+  }) {
+    return SaleItem(
+      id: id ?? this.id,
+      saleId: saleId ?? this.saleId,
+      productId: productId ?? this.productId,
+      quantity: quantity ?? this.quantity,
+      unitPrice: unitPrice ?? this.unitPrice,
+      totalPrice: totalPrice ?? this.totalPrice,
+      taxAmount: taxAmount ?? this.taxAmount,
+      discountApplied: discountApplied ?? this.discountApplied,
+    );
+  }
+
   factory SaleItemModel.fromMap(Map<String, dynamic> map) {
     return SaleItemModel(
       id: map['id'] as String,
@@ -66,13 +88,13 @@ class SaleItemModel extends SaleItem {
 
   @override
   List<Object?> get props => [
-        id,
-        saleId,
-        productId,
-        quantity,
-        unitPrice,
-        totalPrice,
-        taxAmount,
-        discountApplied,
-      ];
+    id,
+    saleId,
+    productId,
+    quantity,
+    unitPrice,
+    totalPrice,
+    taxAmount,
+    discountApplied,
+  ];
 }

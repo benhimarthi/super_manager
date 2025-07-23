@@ -30,7 +30,6 @@ class _ProductCardPricingState extends State<ProductCardPricing> {
             var myPricing = state.pricingList
                 .where((x) => x.id == widget.pricingUid)
                 .firstOrNull;
-            //print("@@@@@@@@@@@@@@@@@@@@@@@##################### ${myPricing}");
             if (myPricing != null) {
               productPricing = myPricing;
             }

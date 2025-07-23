@@ -41,7 +41,6 @@ class _ProductPageState extends State<ProductPage> {
       listener: (context, state) {
         if (state is ProductManagerLoaded) {
           setState(() {
-            print("XXXXXXXXXXXXXXXXCCCCCCCCCCCCCCCCCCCC@@@@@@@@@@@@@");
             myProduct = state.products;
             productList = state.products;
           });

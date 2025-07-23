@@ -38,7 +38,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        color: Colors.grey,
+        //color: Colors.grey,
         child: Column(
           children: [
             BlocConsumer<ProductCubit, ProductState>(
@@ -78,7 +78,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                   return Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * .9,
-                    color: Colors.amber,
+                    //color: Colors.amber,
                     child: Column(
                       children: [
                         BlocConsumer<ProductCubit, ProductState>(
@@ -105,7 +105,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                           },
                         ),
                         Container(
-                          color: Colors.green,
+                          //color: Colors.green,
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * .8,
                           child: ListView.builder(

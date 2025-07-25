@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/data/models/inventory.model.dart';
+import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
+import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
+import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
+import 'package:super_manager/features/sale_item/presentation/widgets/sale.item.list.dart';
+import 'package:super_manager/features/sale_item/presentation/widgets/sale.product.item.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class ConfirmSaleView extends StatefulWidget {
-  const ConfirmSaleView({super.key});
+  final List<Inventory> inventory;
+  const ConfirmSaleView({super.key, required this.inventory});
 
   @override
   State<ConfirmSaleView> createState() => _ConfirmSaleViewState();
@@ -17,6 +25,40 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
   void initState() {
     super.initState();
     saleItems = {};
+  }
+
+  _saveSales() {
+    for (var n in saleItems.values) {
+      context.read<SaleCubit>().addSale(n[1]);
+      context.read<SaleItemCubit>().addSaleItem(n[2]);
+      //Update the inventory productId
+      final productId = n[2].productId;
+      var inventory = widget.inventory
+          .where((x) => x.productId == productId)
+          .firstOrNull;
+      if (inventory != null) {
+        print("###########################@@@@@@@@@@@@@@@@@@!!!!!!!!");
+        int qtt = n[2].quantity;
+        int qttAvailable = inventory.quantityAvailable - qtt;
+        int qttSold = 0;
+        int reservedQtt = 0;
+        switch (n[1].status) {
+          case "Paid":
+            qttSold = inventory.quantitySold + qtt;
+            break;
+          case "Pending":
+          case "Reserved":
+            reservedQtt = inventory.quantityReserved + qtt;
+            break;
+        }
+        var updatedInv = InventoryModel.fromEntity(inventory).copyWith(
+          quantityAvailable: qttAvailable,
+          quantitySold: qttSold,
+          quantityReserved: reservedQtt,
+        );
+        context.read<InventoryCubit>().updateInventory(updatedInv);
+      }
+    }
   }
 
   @override
@@ -41,12 +83,11 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
                     value['sale'],
                     value['sale_item'],
                   ];
-                  print(saleItems);
+                } else if (value['id'] == "delete_sale") {
+                  saleItems.remove(value['sale_id']);
                 }
               });
-            } catch (e) {
-              print(e);
-            }
+            } catch (e) {}
           }
         },
         builder: (context, state) {
@@ -67,7 +108,7 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
                     padding: EdgeInsets.all(10),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color.fromARGB(166, 255, 255, 255),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15),
@@ -76,51 +117,70 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Visibility(
-                          visible: saleItems.length > 1,
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return SaleItemList(saleItems: saleItems);
+                              },
+                            );
+                          },
                           child: Text(
                             "See More...",
                             textAlign: TextAlign.end,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
+                              color: saleItems.length > 1
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey,
                               fontSize: 16,
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Container(
-                          width: double.infinity,
-                          height: 150,
-                          constraints: BoxConstraints(maxHeight: 200),
-                          child: ListView(
-                            children: List.generate(saleItems.values.length, (
-                              index,
-                            ) {
-                              final data = saleItems.values.toList()[index];
-                              final productName = data.first;
-                              final totalAmount = data[1].totalAmount;
-                              final quantity = data[2].quantity;
-                              return saleProductItem(
-                                productName,
-                                totalAmount,
-                                quantity,
-                              );
-                            }),
-                          ),
+                        Builder(
+                          builder: (context) {
+                            final data = saleItems.values.toList()[0];
+                            final productName = data.first;
+                            final totalAmount = data[1].totalAmount;
+                            final quantity = data[2].quantity;
+                            return saleProductItem(
+                              context,
+                              productName,
+                              totalAmount,
+                              quantity,
+                              onDelete: () {
+                                context
+                                    .read<WidgetManipulatorCubit>()
+                                    .emitRandomElement({
+                                      "id": "delete_sale",
+                                      "sale_id": data[1].id,
+                                      "product_id": data[2].productId,
+                                    });
+                              },
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    child: Center(
-                      child: Text(
-                        "REGISTER SALES",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                  GestureDetector(
+                    onTap: () {
+                      _saveSales();
+                      setState(() {
+                        saleItems = {};
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Center(
+                        child: Text(
+                          "REGISTER SALES",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -130,65 +190,6 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  saleProductItem(
-    String productName,
-    double totalAmount,
-    int quantity, {
-    String currency = "MAD",
-  }) {
-    return Container(
-      padding: EdgeInsets.all(2),
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: 110,
-            //color: Colors.amber,
-            child: Text(
-              productName,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-                fontSize: 16,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          SizedBox(
-            width: 90,
-            //color: Colors.amber,
-            child: Text(
-              "$currency $totalAmount",
-              style: TextStyle(
-                //color: Colors.blue
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          SizedBox(
-            width: 60,
-            //color: Colors.amber,
-            child: Text(
-              "x$quantity",
-              style: TextStyle(
-                //color: Colors.blue
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          GestureDetector(
-            child: CircleAvatar(
-              child: Icon(Icons.close, color: Colors.red, size: 14),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulato
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
 import '../../../../sale_item/presentation/pages/sale.view.dart';
+import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
 

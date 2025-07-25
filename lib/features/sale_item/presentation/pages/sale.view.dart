@@ -106,7 +106,7 @@ class _SaleViewState extends State<SaleView> {
                         }
                       },
                     ),
-                    ConfirmSaleView(),
+                    ConfirmSaleView(inventory: inventories),
                   ],
                 ),
               ),

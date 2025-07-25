@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
@@ -8,12 +6,12 @@ import 'package:super_manager/features/product/presentation/cubit/product.cubit.
 import 'package:super_manager/features/product/presentation/cubit/product.state.dart';
 import 'package:super_manager/features/product/presentation/widgets/product.card.item.carousel.dart';
 import 'package:super_manager/features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
-import 'package:super_manager/features/sale/domain/entities/sale.dart';
-import 'package:uuid/uuid.dart';
+import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../product/domain/entities/product.dart';
 import '../../../product/presentation/widgets/product.card.pricing.dart';
 import '../../../product_pricing/domain/entities/product.pricing.dart';
 import '../../../product_pricing/presentation/cubit/product.pricing.state.dart';
+import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import 'register.sale.form.dart';
 
 class SaleItem extends StatefulWidget {
@@ -151,61 +149,85 @@ class _SaleItemState extends State<SaleItem> {
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                ),
-                child: !saleProduct
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            saleProduct = true;
-                          });
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Colors.grey,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Colors.grey,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            ),
-                            SizedBox(width: 20),
-                            Text(
-                              "Register Sale",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
+              BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
+                listener: (context, state) {
+                  if (state is EmitRandomElementSuccessfully) {
+                    try {
+                      setState(() {
+                        var value = (state.element as Map<String, dynamic>);
+                        if (value['id'] == "delete_sale") {
+                          saleProduct =
+                              widget.product.id != value['product_id'];
+                        }
+                      });
+                    } catch (e) {}
+                  }
+                },
+                builder: (context, state) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        saleProduct = true;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
                         ),
-                      )
-                    : RegisterSaleForm(
-                        productPricing: productPricing!,
-                        productSale: widget.product,
-                        inventory: widget.inventory,
-                        inventoryMetadata: widget.inventoryMetadata,
                       ),
-                //
+                      child: !saleProduct
+                          ? GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  saleProduct = true;
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: Colors.grey,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: Colors.grey,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: Colors.grey,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 20),
+                                  Text(
+                                    "Register Sale",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : RegisterSaleForm(
+                              productPricing: productPricing!,
+                              productSale: widget.product,
+                              inventory: widget.inventory,
+                              inventoryMetadata: widget.inventoryMetadata,
+                            ),
+                      //
+                    ),
+                  );
+                },
               ),
             ],
           ),

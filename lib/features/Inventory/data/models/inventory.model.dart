@@ -85,6 +85,44 @@ class InventoryModel extends Inventory {
     );
   }
 
+  InventoryModel copyWith({
+    String? id,
+    String? productId,
+    String? userUid,
+    String? warehouseId,
+    int? quantityAvailable,
+    int? quantityReserved,
+    int? quantitySold,
+    int? reorderLevel,
+    int? minimumStock,
+    int? maximumStock,
+    bool? isOutOfStock,
+    bool? isLowStock,
+    bool? isBlocked,
+    DateTime? lastRestockDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return InventoryModel(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      warehouseId: warehouseId ?? this.warehouseId,
+      quantityAvailable: quantityAvailable ?? this.quantityAvailable,
+      quantityReserved: quantityReserved ?? this.quantityReserved,
+      quantitySold: quantitySold ?? this.quantitySold,
+      reorderLevel: reorderLevel ?? this.reorderLevel,
+      minimumStock: minimumStock ?? this.minimumStock,
+      maximumStock: maximumStock ?? this.maximumStock,
+      isOutOfStock: isOutOfStock ?? this.isOutOfStock,
+      isLowStock: isLowStock ?? this.isLowStock,
+      isBlocked: isBlocked ?? this.isBlocked,
+      lastRestockDate: lastRestockDate ?? this.lastRestockDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      userUid: userUid ?? this.userUid,
+    );
+  }
+
   factory InventoryModel.empty() {
     return InventoryModel(
       id: Uuid().v4(),

@@ -114,7 +114,7 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        /*Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -131,6 +131,10 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
               ),
             ),
           ],
+        ),*/
+        Text(
+          "Register Sale",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10),
         Row(
@@ -170,7 +174,9 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        quantity += 1;
+                        if (quantity < widget.inventory.quantityAvailable) {
+                          quantity += 1;
+                        }
                       });
                       updateSaleItem();
                     },

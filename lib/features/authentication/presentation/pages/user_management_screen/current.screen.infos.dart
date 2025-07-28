@@ -21,7 +21,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "SALE";
+    title = "INVENTORY"; 
   }
 
   @override

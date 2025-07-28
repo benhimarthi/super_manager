@@ -8,7 +8,6 @@ import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cu
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.item.list.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.product.item.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
-
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class ConfirmSaleView extends StatefulWidget {
@@ -37,7 +36,6 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
           .where((x) => x.productId == productId)
           .firstOrNull;
       if (inventory != null) {
-        print("###########################@@@@@@@@@@@@@@@@@@!!!!!!!!");
         int qtt = n[2].quantity;
         int qttAvailable = inventory.quantityAvailable - qtt;
         int qttSold = 0;
@@ -58,6 +56,11 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
         );
         context.read<InventoryCubit>().updateInventory(updatedInv);
       }
+      context.read<WidgetManipulatorCubit>().emitRandomElement({
+        "id": "delete_sale",
+        "sale_id": n[1].id,
+        "product_id": n[2].productId,
+      });
     }
   }
 

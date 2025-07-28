@@ -6,6 +6,7 @@ import 'package:super_manager/features/inventory_meta_data/domain/entities/inven
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/confirm.sale.view.dart';
+import 'package:super_manager/features/sale_item/presentation/widgets/daily.activity.infos.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.item.dart';
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 
@@ -51,14 +52,10 @@ class _SaleViewState extends State<SaleView> {
               Container(
                 height: 45,
                 width: double.infinity,
-                color: Colors.green,
+                //color: Colors.green,
               ),
               SizedBox(height: 10),
-              Container(
-                height: 100,
-                width: double.infinity,
-                color: Colors.green,
-              ),
+              DailyActivityInfos(),
               SizedBox(height: 10),
               BlocConsumer<InventoryMetadataCubit, InventoryMetadataState>(
                 listener: (context, state) {

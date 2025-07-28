@@ -15,6 +15,16 @@ import 'package:super_manager/features/sale/domain/usecases/delete.sale.dart';
 import 'package:super_manager/features/sale/domain/usecases/get.all.sale.dart';
 import 'package:super_manager/features/sale/domain/usecases/update.sale.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
+import 'package:super_manager/features/sale_item/data/data_sources/sale.item.local.data.source.dart';
+import 'package:super_manager/features/sale_item/data/data_sources/sale.item.remote.data.source.dart';
+import 'package:super_manager/features/sale_item/data/repositories/sale.item.repository.impl.dart';
+import 'package:super_manager/features/sale_item/domain/repositories/sale.item.repository.dart';
+import 'package:super_manager/features/sale_item/domain/usecases/create.sale.item.dart';
+import 'package:super_manager/features/sale_item/domain/usecases/delete.sale.item.dart';
+import 'package:super_manager/features/sale_item/domain/usecases/get.sale.items.by.sale.id.dart';
+import 'package:super_manager/features/sale_item/domain/usecases/update.sale.item.dart';
+import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/sale.item.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
@@ -100,6 +110,7 @@ import '../../features/synchronisation/synchronisation_manager/inventory.sync.ma
 import '../../features/synchronisation/synchronisation_manager/product.category.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/product.pricing.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/product.sync.manager.dart';
+import '../../features/synchronisation/synchronisation_manager/sale.sync.manger.dart';
 import '../image_storage_service/image.storage.service.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -445,6 +456,7 @@ Future<void> setupDependencyInjection() async {
       () => AppImageRemoteDataSourceImpl(firestore: getIt()),
     );
   getIt.registerFactory(() => WidgetManipulatorCubit());
+
   final saleBox = await Hive.openBox('sales');
   final createdSaleBox = await Hive.openBox('sales_created');
   final updatedSaleBox = await Hive.openBox('sales_updated');
@@ -465,8 +477,8 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => UpdateSale(getIt()))
     ..registerLazySingleton(() => DeleteSale(getIt()))
     ..registerLazySingleton(() => SaleSyncTriggerCubit(getIt()))
-    ..registerLazySingleton<SaleItemSyncManager>(
-      () => SaleItemSyncManagerImpl(getIt(), getIt()),
+    ..registerLazySingleton<SaleSyncManager>(
+      () => SaleSyncManagerImpl(getIt(), getIt()),
     )
     ..registerLazySingleton<SaleRepository>(
       () => SaleRepositoryImpl(local: getIt()),
@@ -480,6 +492,44 @@ Future<void> setupDependencyInjection() async {
         createdBox: createdSaleBox,
         updatedBox: updatedSaleBox,
         deletedBox: deletedSaleBox,
+      ),
+    );
+
+  final saleItemBox = await Hive.openBox('saleItem');
+  final createdSaleItemBox = await Hive.openBox('sale_item_created');
+  final updatedSaleItemBox = await Hive.openBox('sale_item_updated');
+  final deletedSaleItemBox = await Hive.openBox<String>('sale_item_deleted');
+  getIt
+    ..registerFactory(
+      () => SaleItemCubit(
+        getBySaleId: getIt(),
+        create: getIt(),
+        update: getIt(),
+        delete: getIt(),
+        syncCubit: getIt(),
+        connectivity: getIt(),
+      ),
+    )
+    ..registerLazySingleton(() => GetSaleItemsBySaleId(getIt()))
+    ..registerLazySingleton(() => CreateSaleItem(getIt()))
+    ..registerLazySingleton(() => UpdateSaleItem(getIt()))
+    ..registerLazySingleton(() => DeleteSaleItem(getIt()))
+    ..registerLazySingleton(() => SaleItemSyncTriggerCubit(getIt()))
+    ..registerLazySingleton<SaleItemSyncManager>(
+      () => SaleItemSyncManagerImpl(getIt(), getIt()),
+    )
+    ..registerLazySingleton<SaleItemRepository>(
+      () => SaleItemRepositoryImpl(local: getIt()),
+    )
+    ..registerLazySingleton<SaleItemRemoteDataSource>(
+      () => SaleItemRemoteDataSourceImpl(getIt()),
+    )
+    ..registerLazySingleton<SaleItemLocalDataSource>(
+      () => SaleItemLocalDataSourceImpl(
+        mainBox: saleItemBox,
+        createdBox: createdSaleItemBox,
+        updatedBox: updatedSaleItemBox,
+        deletedBox: deletedSaleItemBox,
       ),
     );
 }

@@ -31,10 +31,10 @@ class SaleLocalDataSourceImpl implements SaleLocalDataSource {
     required Box createdBox,
     required Box updatedBox,
     required Box<String> deletedBox,
-  })  : _mainBox = mainBox,
-        _createdBox = createdBox,
-        _updatedBox = updatedBox,
-        _deletedBox = deletedBox;
+  }) : _mainBox = mainBox,
+       _createdBox = createdBox,
+       _updatedBox = updatedBox,
+       _deletedBox = deletedBox;
 
   @override
   Future<void> addCreatedSale(SaleModel model) async {

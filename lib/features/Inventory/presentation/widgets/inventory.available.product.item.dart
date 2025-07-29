@@ -82,9 +82,7 @@ class _InventoryAvailableProductItemState
                         }
                       });
                       // ignore: empty_catches
-                    } catch (e) {
-                      print(e);
-                    }
+                    } catch (e) {}
                   }
                 },
                 builder: (context, state) {

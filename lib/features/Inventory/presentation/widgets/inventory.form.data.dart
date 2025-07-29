@@ -12,10 +12,12 @@ import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/inventory.dart';
 
 class InventoryFormData extends StatefulWidget {
+  final List<Inventory> myInventories;
   final Inventory? inventory;
   final bool isBuilding;
   const InventoryFormData({
     super.key,
+    required this.myInventories,
     required this.isBuilding,
     this.inventory,
   });
@@ -50,7 +52,8 @@ class _InventoryFormDataState extends State<InventoryFormData> {
     _displayWarning = false;
     final inv = widget.inventory;
     page = 0;
-    inventoryId = widget.inventory?.id ?? Uuid().v4();
+    inventoryId = inv?.id ?? Uuid().v4();
+
     // Inventory init
     _quantityAvailableController = TextEditingController(
       text: inv?.quantityAvailable.toString() ?? '0',
@@ -233,6 +236,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                             selectedItem: widget.inventory != null
                                 ? widget.inventory!.productId
                                 : "",
+                            existionInventories: widget.myInventories,
                           ),
                         ],
                       ),

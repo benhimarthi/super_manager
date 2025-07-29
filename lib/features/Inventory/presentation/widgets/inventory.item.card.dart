@@ -7,6 +7,7 @@ import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../domain/entities/inventory.dart';
 
 class InventoryItemCard extends StatelessWidget {
+  final List<Inventory> myInventories;
   final Inventory inventory;
   final Product? product;
   final InventoryMetadata? metadata;
@@ -16,6 +17,7 @@ class InventoryItemCard extends StatelessWidget {
 
   const InventoryItemCard({
     Key? key,
+    required this.myInventories,
     required this.inventory,
     this.product,
     this.metadata,
@@ -85,7 +87,7 @@ class InventoryItemCard extends StatelessWidget {
               // Metadata info (conditionally shown)
               if (metadata != null) ...[
                 const Divider(),
-                InventoryRelevantNumbersView(),
+                InventoryRelevantNumbersView(inventory: inventory),
                 const Text(
                   'Metadata',
                   style: TextStyle(fontWeight: FontWeight.bold),

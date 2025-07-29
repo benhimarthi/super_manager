@@ -13,11 +13,7 @@ import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
 import 'package:super_manager/features/product_pricing/data/models/product.pricing.model.dart';
 import 'package:super_manager/features/product_pricing/domain/entities/product.pricing.dart';
-import 'package:super_manager/features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
-
-import '../../../product/presentation/cubit/product.state.dart';
-import '../../../product_pricing/presentation/cubit/product.pricing.state.dart';
 
 class InventoryMetaDataForm extends StatefulWidget {
   final Inventory? inventory;
@@ -149,6 +145,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
                 builder: (context) {
                   return InventoryFormData(
                     inventory: widget.inventory,
+                    myInventories: [],
                     isBuilding: true,
                   );
                 },

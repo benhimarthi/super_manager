@@ -158,7 +158,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InventoryFormData(isBuilding: true),
+              InventoryFormData(isBuilding: true, myInventories: []),
               InventoryMetaDataForm(inventory: null, isBuilding: true),
               const Divider(height: 40),
               const Text(

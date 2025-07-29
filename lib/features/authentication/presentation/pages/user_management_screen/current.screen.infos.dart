@@ -18,10 +18,11 @@ class CurrentSCreenInfos extends StatefulWidget {
 
 class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   late String title;
+
   @override
   void initState() {
     super.initState();
-    title = "INVENTORY"; 
+    title = "INVENTORY";
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
@@ -25,6 +26,11 @@ class _InventoryItemCardDateSelectorState
     selectedPeriod = "Weekly";
     _endDate = DateTime.now();
     _startDate = getPeriodStart(_endDate!, selectedPeriod);
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "filter_sales_by_date",
+      "start_date": _startDate,
+      "end_date": _endDate,
+    });
   }
 
   Future<void> _pickDate(bool isStart) async {
@@ -93,7 +99,11 @@ class _InventoryItemCardDateSelectorState
                 setState(() {
                   selectedPeriod = value!;
                   _startDate = getPeriodStart(DateTime.now(), selectedPeriod);
-                  // Optionally: periodEndDate = getPeriodEnd(...)
+                  context.read<WidgetManipulatorCubit>().emitRandomElement({
+                    "id": "filter_sales_by_date",
+                    "start_date": _startDate,
+                    "end_date": _endDate,
+                  });
                 });
               },
             ),

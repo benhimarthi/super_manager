@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
@@ -21,11 +22,14 @@ class InventoryListScreen extends StatefulWidget {
 class _InventoryListScreenState extends State<InventoryListScreen> {
   late List<Product> products;
   late List<InventoryMetadata> metadatas;
+  late List<Inventory> myInventories;
+
   @override
   void initState() {
     super.initState();
     products = [];
     metadatas = [];
+    myInventories = [];
     context.read<InventoryCubit>().loadInventory();
     context.read<ProductCubit>().loadProducts();
     context.read<InventoryMetadataCubit>().loadMetadata();
@@ -35,7 +39,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Inventory')),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         //color: Colors.grey,
@@ -62,7 +66,11 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
               },
             ),
             BlocConsumer<InventoryCubit, InventoryState>(
-              listener: (context, state) {},
+              listener: (context, state) {
+                if (state is InventoryManagerLoaded) {
+                  myInventories = state.inventoryList;
+                }
+              },
               builder: (context, state) {
                 if (state is InventoryManagerLoading) {
                   return const Center(child: CircularProgressIndicator());
@@ -75,7 +83,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                       child: Text('No inventory items found.'),
                     );
                   }
-                  return Container(
+                  return SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * .9,
                     //color: Colors.amber,
@@ -104,7 +112,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                             return Container();
                           },
                         ),
-                        Container(
+                        SizedBox(
                           //color: Colors.green,
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * .8,
@@ -113,6 +121,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                             itemBuilder: (context, index) {
                               final item = inventoryList[index];
                               return InventoryItemCard(
+                                myInventories: myInventories,
                                 inventory: item,
                                 product: products
                                     .where((x) => x.id == item.productId)
@@ -124,7 +133,16 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                                   // Navigate to detail or edit screen
                                 },
                                 onEdit: () {
-                                  // Trigger edit action
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return InventoryFormData(
+                                        myInventories: myInventories,
+                                        isBuilding: false,
+                                        inventory: inventoryList[index],
+                                      );
+                                    },
+                                  );
                                 },
                                 onDelete: () {
                                   // Trigger delete action
@@ -149,7 +167,10 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
           showDialog(
             context: context,
             builder: (context) {
-              return InventoryFormData(isBuilding: true);
+              return InventoryFormData(
+                isBuilding: true,
+                myInventories: myInventories,
+              );
             },
           );
         },

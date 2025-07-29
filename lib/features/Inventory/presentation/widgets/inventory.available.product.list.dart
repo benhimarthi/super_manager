@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.available.product.item.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
-
 import '../../../product/presentation/cubit/product.cubit.dart';
 import '../../../product/presentation/cubit/product.state.dart';
+import '../cubit/inventory.state.dart';
 
 class InventoryAvailableProductList extends StatefulWidget {
   final String? selectedItem;
-  const InventoryAvailableProductList({super.key, this.selectedItem});
+  final List<Inventory> existionInventories;
+  const InventoryAvailableProductList({
+    super.key,
+    this.selectedItem,
+    required this.existionInventories,
+  });
 
   @override
   State<InventoryAvailableProductList> createState() =>
@@ -18,10 +25,13 @@ class InventoryAvailableProductList extends StatefulWidget {
 class _InventoryAvailableProductListState
     extends State<InventoryAvailableProductList> {
   late List<Product> availableProduct;
+  late Product? selectedProduct;
+
   @override
   void initState() {
     super.initState();
     availableProduct = [];
+    selectedProduct = null;
     context.read<ProductCubit>().loadProducts();
   }
 
@@ -31,22 +41,43 @@ class _InventoryAvailableProductListState
       listener: (context, state) {
         if (state is ProductManagerLoaded) {
           availableProduct = state.products.where((x) => x.active).toList();
+          if (widget.selectedItem != null) {
+            selectedProduct = availableProduct
+                .where((x) => x.id == widget.selectedItem)
+                .firstOrNull;
+          }
         }
       },
       builder: (context, state) {
         return SizedBox(
           width: 300,
           height: 100,
-          child: ListView.builder(
-            itemCount: availableProduct.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, ind) {
-              return InventoryAvailableProductItem(
-                product: availableProduct[ind],
-                selectedItemId: widget.selectedItem,
-              );
-            },
-          ),
+          child: selectedProduct == null
+              ? ListView.builder(
+                  itemCount: availableProduct.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, ind) {
+                    return BlocConsumer<InventoryCubit, InventoryState>(
+                      listener: (context, state) {},
+                      builder: (context, state) {
+                        String id = availableProduct[ind].id;
+                        return !widget.existionInventories
+                                .map((x) => x.productId)
+                                .toList()
+                                .contains(id)
+                            ? InventoryAvailableProductItem(
+                                product: availableProduct[ind],
+                                selectedItemId: widget.selectedItem,
+                              )
+                            : SizedBox();
+                      },
+                    );
+                  },
+                )
+              : InventoryAvailableProductItem(
+                  product: selectedProduct!,
+                  selectedItemId: widget.selectedItem,
+                ),
         );
       },
     );

@@ -1,6 +1,6 @@
 class InventoryKPI {
   // Average Inventory Level
-  static double averageInventory(double beginning, double ending) =>
+  static double averageInventory(int beginning, int ending) =>
       (beginning + ending) / 2;
 
   // Inventory Turnover Rate

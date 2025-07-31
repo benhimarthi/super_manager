@@ -14,16 +14,19 @@ import 'package:super_manager/features/product/presentation/cubit/product.cubit.
 import 'package:super_manager/features/product_pricing/data/models/product.pricing.model.dart';
 import 'package:super_manager/features/product_pricing/domain/entities/product.pricing.dart';
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:uuid/uuid.dart';
 
 class InventoryMetaDataForm extends StatefulWidget {
   final Inventory? inventory;
   final InventoryMetadata? inventoryMetadata;
   final bool isBuilding;
+  final bool duplicate;
   const InventoryMetaDataForm({
     super.key,
     required this.inventory,
     this.inventoryMetadata,
     required this.isBuilding,
+    required this.duplicate,
   });
 
   @override
@@ -70,7 +73,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           ? widget.inventoryMetadata!.leadTimeInDays.toString()
           : "0",
     );
-    metaDataUid = widget.inventoryMetadata?.id ?? UniqueKey().toString();
+    metaDataUid = widget.inventoryMetadata?.id ?? Uuid().v4();
     cl = InventoryMetaDataMethods();
     inv = (widget.inventory ?? InventoryModel.empty());
     inventoryProduct = ProductModel.empty();
@@ -110,8 +113,13 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           leadTimeInDays: int.parse(_leadTime.text),
           updatedBy: SessionManager.getUserSession()!.id,
         );
-        context.read<InventoryCubit>().updateInventory(widget.inventory!);
-        context.read<InventoryMetadataCubit>().updateMetadata(metadata);
+        if (widget.duplicate) {
+          context.read<InventoryCubit>().addInventory(widget.inventory!);
+          context.read<InventoryMetadataCubit>().addMetadata(metadata);
+        } else {
+          context.read<InventoryCubit>().updateInventory(widget.inventory!);
+          context.read<InventoryMetadataCubit>().updateMetadata(metadata);
+        }
       }
     }
   }

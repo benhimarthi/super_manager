@@ -120,12 +120,18 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                             itemCount: inventoryList.length,
                             itemBuilder: (context, index) {
                               final item = inventoryList[index];
+                              final myProduct = products
+                                  .where((x) => x.id == item.productId)
+                                  .firstOrNull;
+                              final myProductId = myProduct != null
+                                  ? myProduct.id
+                                  : "";
                               return InventoryItemCard(
-                                myInventories: myInventories,
+                                myInventories: inventoryList
+                                    .where((x) => x.productId == myProductId)
+                                    .toList(),
                                 inventory: item,
-                                product: products
-                                    .where((x) => x.id == item.productId)
-                                    .firstOrNull,
+                                product: myProduct,
                                 metadata: metadatas
                                     .where((x) => x.inventoryId == item.id)
                                     .firstOrNull,

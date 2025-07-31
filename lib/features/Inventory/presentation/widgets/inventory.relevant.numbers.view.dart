@@ -13,7 +13,12 @@ import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class InventoryRelevantNumbersView extends StatefulWidget {
   final Inventory inventory;
-  const InventoryRelevantNumbersView({super.key, required this.inventory});
+  final List<Inventory> inventoryVersions;
+  const InventoryRelevantNumbersView({
+    super.key,
+    required this.inventory,
+    required this.inventoryVersions,
+  });
 
   @override
   State<InventoryRelevantNumbersView> createState() =>
@@ -86,22 +91,46 @@ class _InventoryRelevantNumbersViewState
     var saleItemsPeriod = saleItems
         .where((x) => periodSale.map((y) => y.id).contains(x.saleId))
         .toList();
+    var restockQuantity = widget.inventoryVersions
+        .where(
+          (x) =>
+              x.updatedAt.isAfter(_startDate) && x.updatedAt.isBefore(_endDate),
+        )
+        .toList();
     int saleQuantityPeriod = saleItemsPeriod
         .map((y) => y.quantity)
         .reduce((a, b) => a + b);
+    return saleQuantityPeriod;
   }
 
-  startDateSaleQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
-    var beforePeriodSales = sales
-        .where((x) => x.date.isBefore(_startDate))
+  startDateProductAvailableQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
+    final prevInventories = widget.inventoryVersions
+        .where((x) => x.updatedAt.isBefore(_startDate))
         .toList();
-    var saleItemsPeriod = saleItems
-        .where((x) => beforePeriodSales.map((y) => y.id).contains(x.saleId))
+    prevInventories.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+    final earliestRestock = prevInventories.last;
+    final salesAfterLastRestock = sales
+        .where(
+          (x) =>
+              x.date.isAfter(earliestRestock.updatedAt) &&
+              x.date.isBefore(_startDate),
+        )
         .toList();
-    int saleQuantityPeriod = saleItemsPeriod
-        .map((y) => y.quantity)
+    final salesItemsALR = saleItems
+        .where(
+          (x) => salesAfterLastRestock
+              .map((x) => x.id)
+              .toList()
+              .contains(x.saleId),
+        )
+        .toList();
+    int quantitySale = salesItemsALR
+        .map((x) => x.quantity)
+        .toList()
         .reduce((a, b) => a + b);
-    return totalUnit - saleQuantityPeriod;
+    int evailableQuantityToStartingDate =
+        earliestRestock.quantityAvailable - quantitySale;
+    //int salesDuringPeriod =
   }
 
   @override

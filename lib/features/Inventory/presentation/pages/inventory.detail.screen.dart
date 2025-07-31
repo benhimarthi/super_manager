@@ -141,6 +141,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
               return InventoryMetaDataForm(
                 inventory: inventory,
                 isBuilding: false,
+                duplicate: false,
               );
             },
           );
@@ -159,7 +160,11 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InventoryFormData(isBuilding: true, myInventories: []),
-              InventoryMetaDataForm(inventory: null, isBuilding: true),
+              InventoryMetaDataForm(
+                inventory: null,
+                isBuilding: true,
+                duplicate: false,
+              ),
               const Divider(height: 40),
               const Text(
                 'Inventory Metadata',

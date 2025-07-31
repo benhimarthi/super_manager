@@ -87,7 +87,10 @@ class InventoryItemCard extends StatelessWidget {
               // Metadata info (conditionally shown)
               if (metadata != null) ...[
                 const Divider(),
-                InventoryRelevantNumbersView(inventory: inventory),
+                InventoryRelevantNumbersView(
+                  inventory: inventory,
+                  inventoryVersions: myInventories,
+                ),
                 const Text(
                   'Metadata',
                   style: TextStyle(fontWeight: FontWeight.bold),

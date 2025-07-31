@@ -38,6 +38,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   late bool _isLowStock;
   late bool _isBlocked;
   late bool _displayWarning;
+  late bool _createCopy;
   late DateTime _lastRestockDate;
   late int page;
   late String inventoryId;
@@ -47,6 +48,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   @override
   void initState() {
     super.initState();
+    _createCopy = false;
     metadata = null;
     productId = widget.inventory != null ? widget.inventory!.productId : "";
     _displayWarning = false;
@@ -95,8 +97,17 @@ class _InventoryFormDataState extends State<InventoryFormData> {
 
   _save() {
     if (_formKey.currentState?.validate() ?? false) {
+      if (widget.inventory != null && !widget.isBuilding) {
+        final inv = widget.inventory;
+        _createCopy =
+            int.parse(_quantityAvailableController.text) !=
+                inv!.quantityAvailable ||
+            int.parse(_quantityReservedController.text) !=
+                inv.quantityReserved ||
+            int.parse(_quantitySoldController.text) != inv.quantitySold;
+      }
       final inventory = Inventory(
-        id: inventoryId,
+        id: _createCopy ? Uuid().v4() : inventoryId,
         productId: productId,
         userUid: SessionManager.getUserSession()!.id,
         warehouseId: "",
@@ -177,6 +188,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                     inventory: prod,
                     isBuilding: widget.isBuilding,
                     inventoryMetadata: metadata,
+                    duplicate: _createCopy,
                   );
                 },
               );

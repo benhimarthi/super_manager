@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
 
 import '../models/action.history.model.dart';
 
@@ -32,9 +33,13 @@ class ActionHistoryLocalDataSourceImpl implements ActionHistoryLocalDataSource {
 
   @override
   Future<void> addCreatedAction(ActionHistoryModel model) async {
-    final key = _composeKey(model.entityId, model.timestamp);
-    await _mainBox.put(key, model.toMap());
-    await _createdBox.put(key, model.toMap());
+    try {
+      final key = _composeKey(model.entityId, model.timestamp);
+      await _mainBox.put(key, model.toMap());
+      await _createdBox.put(key, model.toMap());
+    } on LocalException catch (e) {
+      throw LocalException(message: e.message, statusCode: 404);
+    }
   }
 
   @override

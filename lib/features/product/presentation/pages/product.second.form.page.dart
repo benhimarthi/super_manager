@@ -4,6 +4,10 @@ import 'package:super_manager/features/image_manager/presentation/cubit/app.imag
 import 'package:super_manager/features/product/data/models/product.model.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
+import '../../../../core/history_actions/action.create.history.dart';
+import '../../../../core/session/session.manager.dart';
+import '../../../../firebase_options.dart';
+import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../image_manager/domain/entities/app.image.dart';
 import '../../domain/entities/product.dart';
 import '../cubit/product.cubit.dart';
@@ -58,10 +62,51 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
           : (product != null ? product!.pricingId : ""),
     );
     final cubit = context.read<ProductCubit>();
+    var currentUser = SessionManager.getUserSession()!;
     if (widget.creation) {
       cubit.addProduct(finalProduct);
+
+      var history = addHistoryItem(
+        "product",
+        finalProduct.id,
+        finalProduct.name,
+        "create",
+        currentUser.id,
+        currentUser.name,
+        "create product",
+        {
+          "product": {
+            "first_version": ProductModel.fromEntity(finalProduct).toMap(),
+          },
+        },
+        {"ip": "192.72.0.0", "device": "Android", "location": "location"},
+        "product-management",
+        "none",
+        "created",
+      );
+      context.read<ActionHistoryCubit>().addHistory(history);
     } else {
       cubit.updateProduct(finalProduct);
+      var history = addHistoryItem(
+        "product",
+        finalProduct.id,
+        finalProduct.name,
+        "update",
+        currentUser.id,
+        currentUser.name,
+        "update product",
+        {
+          "product": {
+            "old_version": ProductModel.fromEntity(product!).toMap(),
+            "new_version": ProductModel.fromEntity(finalProduct).toMap(),
+          },
+        },
+        {"ip": "192.72.0.0", "device": "Android", "location": "location"},
+        "product-management",
+        "none",
+        "created",
+      );
+      context.read<ActionHistoryCubit>().addHistory(history);
     }
     Navigator.pop(context);
   }

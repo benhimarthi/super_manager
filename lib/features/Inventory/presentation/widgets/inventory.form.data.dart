@@ -107,7 +107,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
             int.parse(_quantitySoldController.text) != inv.quantitySold;
       }
       final inventory = Inventory(
-        id: _createCopy ? Uuid().v4() : inventoryId,
+        id: inventoryId,
         productId: productId,
         userUid: SessionManager.getUserSession()!.id,
         warehouseId: "",
@@ -186,6 +186,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                 builder: (context) {
                   return InventoryMetaDataForm(
                     inventory: prod,
+                    oldVersion: widget.inventory,
                     isBuilding: widget.isBuilding,
                     inventoryMetadata: metadata,
                     duplicate: _createCopy,

@@ -3,6 +3,14 @@ import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:super_manager/features/action_history/data/data_source/action.history.local.data.source.dart';
+import 'package:super_manager/features/action_history/data/data_source/action.history.remote.data.source.dart';
+import 'package:super_manager/features/action_history/data/repositories/action.history.repository.impl.dart';
+import 'package:super_manager/features/action_history/domain/repositories/action.history.repository.dart';
+import 'package:super_manager/features/action_history/domain/usecases/create.action.history.dart';
+import 'package:super_manager/features/action_history/domain/usecases/delete.action.history.dart';
+import 'package:super_manager/features/action_history/domain/usecases/get.all.action.history.dart';
+import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/image_manager/domain/usecases/get.app.image.by.id.dart';
 import 'package:super_manager/features/product/domain/usecases/get.product.by.id.dart';
 import 'package:super_manager/features/product_pricing/domain/usecases/get.product.pricing.by.id.dart';
@@ -24,8 +32,10 @@ import 'package:super_manager/features/sale_item/domain/usecases/delete.sale.ite
 import 'package:super_manager/features/sale_item/domain/usecases/get.sale.items.by.sale.id.dart';
 import 'package:super_manager/features/sale_item/domain/usecases/update.sale.item.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/action_history_synch_manager_cubit/action.history.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/action.history.sync.manager.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/sale.item.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../features/Inventory/data/data_sources/inventory.local.data.source.dart';
@@ -531,5 +541,40 @@ Future<void> setupDependencyInjection() async {
         updatedBox: updatedSaleItemBox,
         deletedBox: deletedSaleItemBox,
       ),
+    );
+  final actionHistoryBox = await Hive.openBox('actionHistory');
+  final createdActionHistoryBox = await Hive.openBox('action_history_created');
+  final deletedActionHistoryBox = await Hive.openBox<String>(
+    'action_history_deleted',
+  );
+  getIt
+    ..registerFactory(
+      () => ActionHistoryCubit(
+        getAll: getIt(),
+        create: getIt(),
+        delete: getIt(),
+        syncCubit: getIt(),
+        connectivity: getIt(),
+      ),
+    )
+    ..registerLazySingleton(() => GetAllActionHistory(getIt()))
+    ..registerLazySingleton(() => CreateActionHistory(getIt()))
+    ..registerLazySingleton(() => DeleteActionHistory(getIt()))
+    ..registerLazySingleton(() => ActionHistorySyncTriggerCubit(getIt()))
+    ..registerLazySingleton<ActionHistorySyncManager>(
+      () => ActionHistorySyncManagerImpl(getIt(), getIt()),
+    )
+    ..registerLazySingleton<ActionHistoryRepository>(
+      () => ActionHistoryRepositoryImpl(local: getIt()),
+    )
+    ..registerLazySingleton<ActionHistoryLocalDataSource>(
+      () => ActionHistoryLocalDataSourceImpl(
+        mainBox: actionHistoryBox,
+        createdBox: createdActionHistoryBox,
+        deletedBox: deletedActionHistoryBox,
+      ),
+    )
+    ..registerLazySingleton<ActionHistoryRemoteDataSource>(
+      () => ActionHistoryRemoteDataSourceImpl(getIt()),
     );
 }

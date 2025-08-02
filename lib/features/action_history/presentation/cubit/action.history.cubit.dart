@@ -45,13 +45,19 @@ class ActionHistoryCubit extends Cubit<ActionHistoryState> {
   }
 
   Future<void> addHistory(ActionHistory action) async {
+    emit(ActionHistoryManagerLoading());
     final result = await _create(action);
-    result.fold((failure) => emit(ActionHistoryManagerError(failure.message)), (
-      _,
-    ) async {
-      await loadHistory();
-      await _tryAutoSync();
-    });
+
+    result.fold(
+      (failure) {
+        emit(ActionHistoryManagerError(failure.message));
+      },
+      (_) async {
+        print("EEEEEEEEEEEEEEEEEEEEEEERRRRR");
+        await loadHistory();
+        await _tryAutoSync();
+      },
+    );
   }
 
   Future<void> deleteHistory(String entityId, DateTime timestamp) async {

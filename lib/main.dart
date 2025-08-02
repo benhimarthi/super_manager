@@ -2,8 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/action_history_synch_manager_cubit/action.history.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
@@ -100,6 +102,15 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider<SaleItemSyncTriggerCubit>(
           create: (context) => getIt<SaleItemSyncTriggerCubit>(),
+        ),
+        BlocProvider<SaleItemSyncTriggerCubit>(
+          create: (context) => getIt<SaleItemSyncTriggerCubit>(),
+        ),
+        BlocProvider<ActionHistoryCubit>(
+          create: (context) => getIt<ActionHistoryCubit>(),
+        ),
+        BlocProvider<ActionHistorySyncTriggerCubit>(
+          create: (context) => getIt<ActionHistorySyncTriggerCubit>(),
         ),
       ],
       child: Builder(

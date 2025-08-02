@@ -3,11 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/data/models/inventory.model.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
+import 'package:super_manager/features/sale/data/models/sale.model.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
+import 'package:super_manager/features/sale_item/data/models/sale.item.model.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.item.list.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.product.item.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
+import '../../../../core/history_actions/action.create.history.dart';
+import '../../../../core/session/session.manager.dart';
+import '../../../../firebase_options.dart';
+import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class ConfirmSaleView extends StatefulWidget {
@@ -61,6 +67,27 @@ class _ConfirmSaleViewState extends State<ConfirmSaleView> {
         "sale_id": n[1].id,
         "product_id": n[2].productId,
       });
+      var currentUser = SessionManager.getUserSession()!;
+      var history = addHistoryItem(
+        "sale",
+        productId,
+        n[0],
+        "create",
+        currentUser.id,
+        currentUser.name,
+        "register sale",
+        {
+          "sale": {
+            "sale": SaleModel.fromEntity(n[1]).toMap(),
+            "new_version": SaleItemModel.fromEntity(n[2]).toMap(),
+          },
+        },
+        {"ip": "192.72.0.0", "device": "Android", "location": "location"},
+        "sale-management",
+        "none",
+        "created",
+      );
+      context.read<ActionHistoryCubit>().addHistory(history);
     }
   }
 

@@ -31,10 +31,10 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
     required Box createdBox,
     required Box updatedBox,
     required Box<String> deletedBox,
-  })  : _mainBox = mainBox,
-        _createdBox = createdBox,
-        _updatedBox = updatedBox,
-        _deletedBox = deletedBox;
+  }) : _mainBox = mainBox,
+       _createdBox = createdBox,
+       _updatedBox = updatedBox,
+       _deletedBox = deletedBox;
 
   @override
   Future<void> addCreatedInventory(InventoryModel model) async {

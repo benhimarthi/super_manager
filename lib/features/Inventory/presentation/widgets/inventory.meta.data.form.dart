@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/apllication_method/inventory.meta.data.methods.dart';
+import 'package:super_manager/core/history_actions/action.create.history.dart';
 import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/Inventory/data/models/inventory.model.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
+import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/inventory_meta_data/data/models/inventory.meta.data.model.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import 'package:super_manager/features/product/data/models/product.model.dart';
@@ -16,8 +18,11 @@ import 'package:super_manager/features/product_pricing/domain/entities/product.p
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../firebase_options.dart';
+
 class InventoryMetaDataForm extends StatefulWidget {
   final Inventory? inventory;
+  final Inventory? oldVersion;
   final InventoryMetadata? inventoryMetadata;
   final bool isBuilding;
   final bool duplicate;
@@ -27,6 +32,7 @@ class InventoryMetaDataForm extends StatefulWidget {
     this.inventoryMetadata,
     required this.isBuilding,
     required this.duplicate,
+    this.oldVersion,
   });
 
   @override
@@ -57,6 +63,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
   @override
   void initState() {
     super.initState();
+
     markupPercentage = "0";
     if (widget.inventoryMetadata != null) {
       isEditing = true;
@@ -105,20 +112,77 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           createdBy: SessionManager.getUserSession()!.id,
           updatedBy: SessionManager.getUserSession()!.id,
         );
+        var currentUser = SessionManager.getUserSession()!;
+        //final info = NetworkInfo();
+        //String? wifiIP = await info.getWifiIP();
         context.read<InventoryCubit>().addInventory(widget.inventory!);
         context.read<InventoryMetadataCubit>().addMetadata(metadata);
-      } else {
-        var metadata = (widget.inventory as InventoryMetadataModel).copyWith(
-          totalStockValue: double.parse(_totalStockValue.text),
-          leadTimeInDays: int.parse(_leadTime.text),
-          updatedBy: SessionManager.getUserSession()!.id,
+        var history = addHistoryItem(
+          "inventory",
+          widget.inventory!.id,
+          widget.inventory!.productId,
+          "create",
+          currentUser.id,
+          currentUser.name,
+          "create inventory",
+          {},
+          {"ip": "192.72.0.0", "device": "Android", "location": "location"},
+          "inventory-management",
+          "none",
+          "created",
         );
-        if (widget.duplicate) {
-          context.read<InventoryCubit>().addInventory(widget.inventory!);
-          context.read<InventoryMetadataCubit>().addMetadata(metadata);
-        } else {
-          context.read<InventoryCubit>().updateInventory(widget.inventory!);
-          context.read<InventoryMetadataCubit>().updateMetadata(metadata);
+        context.read<ActionHistoryCubit>().addHistory(history);
+      } else {
+        var metadata =
+            InventoryMetadataModel.fromEntity(
+              widget.inventoryMetadata!,
+            ).copyWith(
+              totalStockValue: double.parse(_totalStockValue.text),
+              leadTimeInDays: int.parse(_leadTime.text),
+              updatedBy: SessionManager.getUserSession()!.id,
+            );
+
+        context.read<InventoryCubit>().updateInventory(widget.inventory!);
+        context.read<InventoryMetadataCubit>().updateMetadata(metadata);
+        if (widget.duplicate ||
+            metadata.totalStockValue !=
+                widget.inventoryMetadata!.totalStockValue) {
+          var currentUser = SessionManager.getUserSession()!;
+          var history = addHistoryItem(
+            "inventory",
+            widget.inventory!.id,
+            widget.inventory!.productId,
+            "update",
+            currentUser.id,
+            currentUser.name,
+            "update inventory",
+            {
+              "inventory": {
+                "old_version": InventoryModel.fromEntity(
+                  widget.oldVersion!,
+                ).toMap(),
+                "new_version": InventoryModel.fromEntity(
+                  widget.inventory!,
+                ).toMap(),
+              },
+              "inventory_meta_data": {
+                "old_version": InventoryMetadataModel.fromEntity(
+                  widget.inventoryMetadata!,
+                ).toMap(),
+                "new_version": InventoryMetadataModel.fromEntity(
+                  metadata,
+                ).toMap(),
+              },
+            },
+            {"ip": "192.72.0.0", "device": "Android", "location": "location"},
+            "inventory-management",
+            "none",
+            "updated",
+          );
+          print(
+            "@@@@@ ${widget.inventory!.quantityAvailable} - ${widget.oldVersion!.quantityAvailable}",
+          );
+          context.read<ActionHistoryCubit>().addHistory(history);
         }
       }
     }
@@ -210,67 +274,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
               ),
             ),
             SizedBox(height: 10),
-            /*BlocConsumer<ProductCubit, ProductState>(
-              listener: (context, state) {
-                if (state is GetProductByIdSuccessfully) {
-                  inventoryProduct = state.product;
-                  context.read<ProductPricingCubit>().loadPricing();
-                }
-              },
-              builder: (context, state) {
-                return Row(
-                  children: [
-                    inventoryMetaDataItem(
-                      "Cost per unit",
-                      costPerUnity.toStringAsFixed(1),
-                      "DH",
-                    ),
-                    SizedBox(width: 10),
-                    inventoryMetaDataItem("Stock turnover rate", "0.45", ""),
-                  ],
-                );
-              },
-            ),
-            BlocConsumer<ProductPricingCubit, ProductPricingState>(
-              listener: (context, state) {
-                if (state is ProductPricingManagerLoaded) {
-                  var currentP = state.pricingList
-                      .where((x) => x.productId == widget.inventory!.productId)
-                      .firstOrNull;
-                  if (currentP != null) {
-                    productPricing = currentP;
-                    markupPercentage = cl
-                        .markupPercentage(productPricing.amount, costPerUnity)
-                        .toStringAsFixed(1);
-                  }
-                }
-              },
-              builder: (context, state) {
-                return Container();
-              },
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                inventoryMetaDataItem(
-                  "Markup Percentage",
-                  markupPercentage,
-                  "%",
-                ),
-                SizedBox(width: 10),
-                inventoryMetaDataItem("Avarage Daily Sales", "0.6", "DH"),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                inventoryMetaDataItem("Demand forecast", "0.45", ""),
-                SizedBox(width: 10),
-                inventoryMetaDataItem("Seasonality Factor", "0.6", "h"),
-              ],
-            ),
-            SizedBox(height: 10),*/
             ElevatedButton(
               onPressed: _save,
               child: Text(isEditing ? 'Update' : 'Create'),

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
+import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
+import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import '../../../action_history/presentation/cubit/action.history.state.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../../product/presentation/cubit/product.state.dart';
 import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
@@ -23,6 +26,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
   late List<Product> products;
   late List<InventoryMetadata> metadatas;
   late List<Inventory> myInventories;
+  late List<ActionHistory> myInventoryHistory;
 
   @override
   void initState() {
@@ -30,9 +34,11 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
     products = [];
     metadatas = [];
     myInventories = [];
+    myInventoryHistory = [];
     context.read<InventoryCubit>().loadInventory();
     context.read<ProductCubit>().loadProducts();
     context.read<InventoryMetadataCubit>().loadMetadata();
+    context.read<ActionHistoryCubit>().loadHistory();
   }
 
   @override
@@ -45,6 +51,18 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
         //color: Colors.grey,
         child: Column(
           children: [
+            BlocConsumer<ActionHistoryCubit, ActionHistoryState>(
+              listener: (context, state) {
+                if (state is ActionHistoryManagerLoaded) {
+                  myInventoryHistory = state.historyList
+                      .where((x) => x.entityType == "inventory")
+                      .toList();
+                }
+              },
+              builder: (context, state) {
+                return Container();
+              },
+            ),
             BlocConsumer<ProductCubit, ProductState>(
               listener: (context, state) {
                 if (state is ProductManagerLoaded) {
@@ -126,12 +144,16 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                               final myProductId = myProduct != null
                                   ? myProduct.id
                                   : "";
+                              final ItemHistories = myInventoryHistory
+                                  .where((x) => x.entityId == item.id)
+                                  .toList();
                               return InventoryItemCard(
                                 myInventories: inventoryList
                                     .where((x) => x.productId == myProductId)
                                     .toList(),
                                 inventory: item,
                                 product: myProduct,
+                                myInventoryHistory: ItemHistories,
                                 metadata: metadatas
                                     .where((x) => x.inventoryId == item.id)
                                     .firstOrNull,

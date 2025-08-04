@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
+import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
@@ -8,6 +9,7 @@ import '../../domain/entities/inventory.dart';
 
 class InventoryItemCard extends StatelessWidget {
   final List<Inventory> myInventories;
+  final List<ActionHistory> myInventoryHistory;
   final Inventory inventory;
   final Product? product;
   final InventoryMetadata? metadata;
@@ -19,6 +21,7 @@ class InventoryItemCard extends StatelessWidget {
     Key? key,
     required this.myInventories,
     required this.inventory,
+    required this.myInventoryHistory,
     this.product,
     this.metadata,
     this.onTap,
@@ -90,6 +93,7 @@ class InventoryItemCard extends StatelessWidget {
                 InventoryRelevantNumbersView(
                   inventory: inventory,
                   inventoryVersions: myInventories,
+                  myInventoryHistories: myInventoryHistory,
                 ),
                 const Text(
                   'Metadata',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/sale/domain/entities/sale.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/sale_item/domain/entities/sale.item.dart';
@@ -14,10 +15,12 @@ import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 class InventoryRelevantNumbersView extends StatefulWidget {
   final Inventory inventory;
   final List<Inventory> inventoryVersions;
+  final List<ActionHistory> myInventoryHistories;
   const InventoryRelevantNumbersView({
     super.key,
     required this.inventory,
     required this.inventoryVersions,
+    required this.myInventoryHistories,
   });
 
   @override
@@ -38,6 +41,8 @@ class _InventoryRelevantNumbersViewState
     super.initState();
     saleItems = {};
     sales = [];
+    _startDate = DateTime.now();
+    _endDate = DateTime.now();
     totalUnit =
         widget.inventory.quantityAvailable +
         widget.inventory.quantityReserved +
@@ -104,18 +109,21 @@ class _InventoryRelevantNumbersViewState
   }
 
   startDateProductAvailableQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
-    final prevInventories = widget.inventoryVersions
-        .where((x) => x.updatedAt.isBefore(_startDate))
+    final prevInventories = widget.myInventoryHistories
+        .where((x) => x.timestamp.isBefore(_startDate))
         .toList();
-    prevInventories.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+    prevInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    //print(prevInventories.first.changes['inventory']!['new_version']);
+    print(prevInventories.map((x) => x.timestamp).toList());
     final earliestRestock = prevInventories.last;
     final salesAfterLastRestock = sales
         .where(
           (x) =>
-              x.date.isAfter(earliestRestock.updatedAt) &&
+              x.date.isAfter(earliestRestock.timestamp) &&
               x.date.isBefore(_startDate),
         )
         .toList();
+
     final salesItemsALR = saleItems
         .where(
           (x) => salesAfterLastRestock
@@ -124,17 +132,22 @@ class _InventoryRelevantNumbersViewState
               .contains(x.saleId),
         )
         .toList();
-    int quantitySale = salesItemsALR
-        .map((x) => x.quantity)
-        .toList()
-        .reduce((a, b) => a + b);
-    int evailableQuantityToStartingDate =
-        earliestRestock.quantityAvailable - quantitySale;
+    print(salesItemsALR);
+    int quantitySale = salesItemsALR.isNotEmpty
+        ? salesItemsALR.map((x) => x.quantity).toList().reduce((a, b) => a + b)
+        : 0;
+    int startDateSales =
+        earliestRestock
+            .changes['inventory']!['new_version']['quantityAvailable'] -
+        quantitySale;
+    //int evailableQuantityToStartingDate =
+    //earliestRestock.quantityAvailable - quantitySale;
     //int salesDuringPeriod =
   }
 
   @override
   Widget build(BuildContext context) {
+    startDateProductAvailableQuantity(sales, saleItems);
     return SizedBox(
       width: double.infinity,
       height: 100,

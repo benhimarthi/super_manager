@@ -12,7 +12,6 @@ import 'package:super_manager/features/sale_item/presentation/widgets/sale.produ
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../../core/history_actions/action.create.history.dart';
 import '../../../../core/session/session.manager.dart';
-import '../../../../firebase_options.dart';
 import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 

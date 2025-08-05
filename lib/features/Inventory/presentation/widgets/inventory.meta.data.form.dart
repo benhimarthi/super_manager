@@ -85,10 +85,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
     inv = (widget.inventory ?? InventoryModel.empty());
     inventoryProduct = ProductModel.empty();
     productPricing = ProductPricingModel.empty();
-    costPerUnity = cl.costPerUnit(
-      totalStockValue,
-      inv.quantityAvailable + inv.quantityReserved,
-    );
+    costPerUnity = cl.costPerUnit(totalStockValue, inv.quantityAvailable);
     if (widget.inventory != null) {
       context.read<ProductCubit>().getProductById(widget.inventory!.productId);
     }
@@ -125,7 +122,12 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           currentUser.id,
           currentUser.name,
           "create inventory",
-          {},
+          {
+            "inventory": InventoryModel.fromEntity(widget.inventory!).toMap(),
+            "inventory_meta_data": InventoryMetadataModel.fromEntity(
+              metadata,
+            ).toMap(),
+          },
           {"ip": "192.72.0.0", "device": "Android", "location": "location"},
           "inventory-management",
           "none",
@@ -138,6 +140,8 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
               widget.inventoryMetadata!,
             ).copyWith(
               totalStockValue: double.parse(_totalStockValue.text),
+              costPerUnit:
+                  double.parse(_totalStockValue.text) / inv.quantityAvailable,
               leadTimeInDays: int.parse(_leadTime.text),
               updatedBy: SessionManager.getUserSession()!.id,
             );
@@ -178,9 +182,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
             "inventory-management",
             "none",
             "updated",
-          );
-          print(
-            "@@@@@ ${widget.inventory!.quantityAvailable} - ${widget.oldVersion!.quantityAvailable}",
           );
           context.read<ActionHistoryCubit>().addHistory(history);
         }

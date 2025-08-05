@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
-
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class InventoryItemCardDateSelector extends StatefulWidget {
   final Inventory inventory;
-  const InventoryItemCardDateSelector({super.key, required this.inventory});
+  final List<ActionHistory> myHistories;
+  const InventoryItemCardDateSelector({
+    super.key,
+    required this.inventory,
+    required this.myHistories,
+  });
 
   @override
   State<InventoryItemCardDateSelector> createState() =>
@@ -41,11 +46,25 @@ class _InventoryItemCardDateSelectorState
       lastDate: DateTime(now.year + 10),
     );
     if (picked != null) {
+      var myInventoryHistory = widget.myHistories;
+      myInventoryHistory.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       setState(() {
         if (isStart) {
-          _startDate = picked;
+          _startDate = picked.isBefore(myInventoryHistory.first.timestamp)
+              ? myInventoryHistory.first.timestamp
+              : (picked.isAfter(DateTime.now()) ? DateTime.now() : picked);
         } else {
           _endDate = picked;
+          if (picked.isBefore(_startDate!)) {
+            _endDate = _startDate;
+            _startDate = picked.isBefore(myInventoryHistory.first.timestamp)
+                ? myInventoryHistory.first.timestamp
+                : picked;
+          } else if (picked.isAfter(DateTime.now())) {
+            _endDate = DateTime.now();
+          } else {
+            _endDate = picked;
+          }
         }
         // Optionally: filter data here or trigger callback
       });

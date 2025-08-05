@@ -58,7 +58,10 @@ class InventoryItemCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InventoryItemCardDateSelector(inventory: inventory),
+              InventoryItemCardDateSelector(
+                inventory: inventory,
+                myHistories: myInventoryHistory,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 16,
@@ -92,6 +95,7 @@ class InventoryItemCard extends StatelessWidget {
                 const Divider(),
                 InventoryRelevantNumbersView(
                   inventory: inventory,
+                  inventoryMetadata: metadata!,
                   inventoryVersions: myInventories,
                   myInventoryHistories: myInventoryHistory,
                 ),

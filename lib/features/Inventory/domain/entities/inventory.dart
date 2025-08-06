@@ -8,6 +8,7 @@ class Inventory extends Equatable {
   final int quantityAvailable;
   final int quantityReserved;
   final int quantitySold;
+  final int lostSaleOpportunitiesQuantity;
   final int reorderLevel;
   final int minimumStock;
   final int maximumStock;
@@ -35,6 +36,7 @@ class Inventory extends Equatable {
     required this.lastRestockDate,
     required this.createdAt,
     required this.updatedAt,
+    required this.lostSaleOpportunitiesQuantity,
   });
 
   @override

@@ -34,6 +34,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
   late TextEditingController _reorderLevelController;
   late TextEditingController _minimumStockController;
   late TextEditingController _maximumStockController;
+  late TextEditingController _lostSaleOpportunitiesQuantity;
   late bool _isOutOfStock;
   late bool _isLowStock;
   late bool _isBlocked;
@@ -75,6 +76,9 @@ class _InventoryFormDataState extends State<InventoryFormData> {
     _maximumStockController = TextEditingController(
       text: inv?.maximumStock.toString() ?? '0',
     );
+    _lostSaleOpportunitiesQuantity = TextEditingController(
+      text: inv?.lostSaleOpportunitiesQuantity.toString() ?? "0",
+    );
     _isOutOfStock = inv?.isOutOfStock ?? false;
     _isLowStock = inv?.isLowStock ?? false;
     _isBlocked = inv?.isBlocked ?? false;
@@ -92,6 +96,7 @@ class _InventoryFormDataState extends State<InventoryFormData> {
     _reorderLevelController.dispose();
     _minimumStockController.dispose();
     _maximumStockController.dispose();
+    _lostSaleOpportunitiesQuantity.dispose();
     super.dispose();
   }
 
@@ -123,6 +128,9 @@ class _InventoryFormDataState extends State<InventoryFormData> {
         lastRestockDate: _lastRestockDate,
         createdAt: widget.inventory?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
+        lostSaleOpportunitiesQuantity: int.parse(
+          _lostSaleOpportunitiesQuantity.text,
+        ),
       );
       return inventory;
     }

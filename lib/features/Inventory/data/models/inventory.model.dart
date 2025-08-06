@@ -20,6 +20,7 @@ class InventoryModel extends Inventory {
     required super.createdAt,
     required super.updatedAt,
     required super.userUid,
+    required super.lostSaleOpportunitiesQuantity,
   });
 
   factory InventoryModel.fromEntity(Inventory entity) {
@@ -40,6 +41,7 @@ class InventoryModel extends Inventory {
       lastRestockDate: entity.lastRestockDate,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      lostSaleOpportunitiesQuantity: entity.lostSaleOpportunitiesQuantity,
     );
   }
 
@@ -61,6 +63,7 @@ class InventoryModel extends Inventory {
       lastRestockDate: lastRestockDate,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      lostSaleOpportunitiesQuantity: lostSaleOpportunitiesQuantity,
     );
   }
 
@@ -82,6 +85,8 @@ class InventoryModel extends Inventory {
       lastRestockDate: DateTime.parse(map['lastRestockDate'] as String),
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+      lostSaleOpportunitiesQuantity:
+          map['lostSaleOpportunitiesQuantity'] as int,
     );
   }
 
@@ -102,6 +107,7 @@ class InventoryModel extends Inventory {
     DateTime? lastRestockDate,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? lostSaleOpportunitiesQuantity,
   }) {
     return InventoryModel(
       id: id ?? this.id,
@@ -120,6 +126,8 @@ class InventoryModel extends Inventory {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       userUid: userUid ?? this.userUid,
+      lostSaleOpportunitiesQuantity:
+          lostSaleOpportunitiesQuantity ?? this.lostSaleOpportunitiesQuantity,
     );
   }
 
@@ -141,6 +149,7 @@ class InventoryModel extends Inventory {
       lastRestockDate: DateTime.now(),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      lostSaleOpportunitiesQuantity: 0,
     );
   }
 
@@ -162,6 +171,7 @@ class InventoryModel extends Inventory {
       'lastRestockDate': lastRestockDate.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'lostSaleOpportunitiesQuantity': lostSaleOpportunitiesQuantity,
     };
   }
 

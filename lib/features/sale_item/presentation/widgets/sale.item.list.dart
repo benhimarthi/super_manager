@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.product.item.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 
-import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
-
 class SaleItemList extends StatefulWidget {
   final Map<String, dynamic> saleItems;
   const SaleItemList({super.key, required this.saleItems});

@@ -114,24 +114,6 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /*Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Register Sale",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            CircleAvatar(
-              radius: 15,
-              child: Center(
-                child: Icon(Icons.close, size: 16, color: Colors.red),
-              ),
-            ),
-          ],
-        ),*/
         Text(
           "Register Sale",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -191,7 +173,7 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
             DropdownButton<String>(
               underline: SizedBox(),
               value: productStatus,
-              items: ['Paid', 'Pending', 'Reserved']
+              items: ['Paid', 'Pending', 'Reserved', 'Missed']
                   .map(
                     (period) => DropdownMenuItem(
                       value: period,

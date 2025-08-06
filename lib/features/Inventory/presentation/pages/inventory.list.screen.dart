@@ -86,6 +86,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
             BlocConsumer<InventoryCubit, InventoryState>(
               listener: (context, state) {
                 if (state is InventoryManagerLoaded) {
+                  print("@@#############################))))))))))))))))))");
                   myInventories = state.inventoryList;
                 }
               },
@@ -95,6 +96,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                 } else if (state is InventoryManagerError) {
                   return Center(child: Text('Error: ${state.message}'));
                 } else if (state is InventoryManagerLoaded) {
+                  print("@@#############################))))))))))))))))))");
                   final inventoryList = state.inventoryList;
                   if (inventoryList.isEmpty) {
                     return const Center(

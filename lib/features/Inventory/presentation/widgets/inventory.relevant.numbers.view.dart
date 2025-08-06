@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/apllication_method/inventory.kpi.dart';
@@ -73,6 +74,7 @@ class _InventoryRelevantNumbersViewState
               ),
             ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
@@ -80,12 +82,16 @@ class _InventoryRelevantNumbersViewState
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
           SizedBox(height: 4),
-          Text(
-            value.toString(),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Theme.of(context).primaryColor,
+          SizedBox(
+            width: 55,
+            child: Text(
+              value.toString(),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -96,20 +102,26 @@ class _InventoryRelevantNumbersViewState
   salesQuantityDuringPeriod(List<Sale> sales, Set<SaleItem> saleItems) {
     var periodSale = sales
         .where((x) => x.date.isAfter(_startDate) && x.date.isBefore(_endDate))
+        .toList()
+        .where((x) => x.status == "Paid")
         .toList();
     var saleItemsPeriod = saleItems
         .where((x) => periodSale.map((y) => y.id).contains(x.saleId))
         .toList();
-    var restockQuantity = widget.inventoryVersions
-        .where(
-          (x) =>
-              x.updatedAt.isAfter(_startDate) && x.updatedAt.isBefore(_endDate),
-        )
+    final salePeriod = saleItemsPeriod.map((y) => y.quantity).toList();
+    int saleQuantityPeriod = salePeriod.isNotEmpty
+        ? salePeriod.reduce((a, b) => a + b)
+        : 0;
+    final salesRevenue = saleItemsPeriod
+        .map((x) => x.quantity * x.unitPrice)
         .toList();
-    int saleQuantityPeriod = saleItemsPeriod
-        .map((y) => y.quantity)
-        .reduce((a, b) => a + b);
-    return saleQuantityPeriod;
+    double amount = salesRevenue.isNotEmpty
+        ? salesRevenue.reduce((a, b) => a + b)
+        : 0;
+    return {
+      "period_quantity_sold": saleQuantityPeriod,
+      "period_quantity_revenue": amount,
+    };
   }
 
   startDateProductAvailableQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
@@ -143,7 +155,7 @@ class _InventoryRelevantNumbersViewState
               quantitySale
         : earliestRestock.changes['inventory']!['quantityAvailable'] -
               quantitySale;
-    int unitPrice = earliestRestock
+    double unitPrice = earliestRestock
         .changes['inventory_meta_data']!['new_version']['costPerUnit'];
     return {
       "start_date_quantity": res,
@@ -180,8 +192,10 @@ class _InventoryRelevantNumbersViewState
         ? salesItemsALR.map((x) => x.quantity).toList().reduce((a, b) => a + b)
         : 0;
     final result = quantityLastRestock - quantitySale;
-    double unitPrice = closetRestock!
-        .changes['inventory_meta_data']!['new_version']['costPerUnit'];
+    double unitPrice = closetRestock != null
+        ? closetRestock
+              .changes['inventory_meta_data']!['new_version']['costPerUnit']
+        : widget.inventoryMetadata.costPerUnit;
     return {
       "end_date_quantity": result,
       "end_date_unit_price": unitPrice,
@@ -208,24 +222,36 @@ class _InventoryRelevantNumbersViewState
         price += p;
       }
 
-      return {"supply_quantity": qtt, "supply_unit_price": price};
+      return {"supply_quantity": qtt, "supply_cost": price};
     } else {
-      return {"supplyQtt": 0, "supplyAmount": 0};
+      return {"supply_quantity": 0, "supply_cost": 0};
     }
   }
 
-  periodSupplyAmountValue() {
-    return periodSupplyQttValue() * widget.inventoryMetadata.costPerUnit;
+  averageInventory() {
+    return InventoryKPI.averageInventory(
+      startDateProductAvailableQuantity(sales, saleItems)['amount'],
+      endDateProductAvailableQuantity(sales, saleItems)['amount'],
+    );
   }
 
-  startPeriodAmountValue() {
-    return startDateProductAvailableQuantity(sales, saleItems)[''] *
-        widget.inventoryMetadata.costPerUnit;
+  COGS() {
+    //Cost of goods
+    return startDateProductAvailableQuantity(sales, saleItems)['amount'] +
+        periodSupplyQttValue()['supply_cost'] +
+        endDateProductAvailableQuantity(sales, saleItems)['amount'];
   }
 
-  endPeriodAmountValue() {
-    return endDateProductAvailableQuantity(sales, saleItems) *
-        widget.inventoryMetadata.costPerUnit;
+  inventoryTurnOver() {
+    return InventoryKPI.inventoryTurnover(COGS(), averageInventory());
+  }
+
+  grossMarginReturnOnInvestment() {
+    return InventoryKPI.gmroi(
+      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_revenue'],
+      COGS(),
+      averageInventory(),
+    );
   }
 
   @override
@@ -295,20 +321,19 @@ class _InventoryRelevantNumbersViewState
                   children: [
                     _inventoryNbInfos(
                       "Average inventory",
-                      InventoryKPI.averageInventory(
-                        startDateProductAvailableQuantity(
-                          sales,
-                          saleItems,
-                        )['start_date_quantity'],
-                        endDateProductAvailableQuantity(
-                          sales,
-                          saleItems,
-                        )['end_date_quantity'],
-                      ),
+                      averageInventory(),
                       false,
                     ),
-                    _inventoryNbInfos("Stock turn over rate", 0.5, false),
-                    _inventoryNbInfos("Stock turn over rate", 0.5, false),
+                    _inventoryNbInfos(
+                      "Stock turn over rate",
+                      inventoryTurnOver(),
+                      false,
+                    ),
+                    _inventoryNbInfos(
+                      "gross Margin Return On Investment",
+                      grossMarginReturnOnInvestment(),
+                      false,
+                    ),
                   ],
                 ),
               ),

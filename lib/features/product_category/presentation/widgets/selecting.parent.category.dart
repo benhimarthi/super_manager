@@ -37,7 +37,6 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
   Future<List<ProductCategory>> _loadParentOptions() async {
     imageUrl = {};
     final result = await getIt<GetAllProductCategories>()();
-
     return result.fold((_) => [], (categories) {
       // Exclude self to prevent circular parenting
       return widget.category == null

@@ -70,6 +70,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<void> addDeletedProductId(String id) async {
     try {
+      await applyDelete(id);
       await _deletedBox.put(id, true);
     } catch (_) {
       throw const LocalException(
@@ -118,6 +119,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<List<ProductModel>> getAllLocalProducts() async {
     try {
+      print(_mainBox.values);
       return _mainBox.values
           .toList()
           .where((x) => x['creatorID'] == SessionManager.getUserSession()!.id)

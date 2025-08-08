@@ -260,6 +260,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                           is SelectingProductCategorySuccessfully) {
                                         _selectedCategoryId = state.categoryuid;
                                       }
+                                      if (state is LocalCategoryManagerLoaded) {
+                                        setState(() {});
+                                      }
                                     },
                                     builder: (context, state) {
                                       return SelectingParentCategory(

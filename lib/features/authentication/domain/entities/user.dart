@@ -5,6 +5,7 @@ enum UserRole { admin, seller, inventoryManger, regular }
 class User extends Equatable {
   final String id;
   final String createdAt;
+  final String? administratorId;
   final String? createdBy;
   final String name;
   final String avatar;
@@ -17,6 +18,7 @@ class User extends Equatable {
     required this.id,
     required this.createdAt,
     this.createdBy,
+    this.administratorId,
     required this.name,
     required this.avatar,
     required this.email,
@@ -30,6 +32,7 @@ class User extends Equatable {
         id: '0',
         createdAt: "_empty.createdAt",
         createdBy: "_empty.createdBy",
+        administratorId: "_empty.adminId",
         name: "_empty.name",
         avatar: "_empty.avatar",
         email: "_empty.email",

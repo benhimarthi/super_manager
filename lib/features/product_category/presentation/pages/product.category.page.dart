@@ -1,11 +1,11 @@
-/*import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/product_category/presentation/pages/category.form.page.dart';
 import '../../../../core/service/depenedancy.injection.dart';
 import '../../../../core/util/change.screen.manager.dart';
 import '../../domain/entities/product.category.dart';
 import '../cubit/local.category.manager.cubit.dart';
 import '../cubit/local.category.manager.state.dart';
-import '../widgets/category.form.page.dart';
 import '../widgets/group.product.category.by.parent.dart';
 import '../widgets/sync.status.indicator.dart';
 
@@ -168,4 +168,3 @@ class _ProductCategoryPageState extends State<ProductCategoryPage> {
     }).toList();
   }
 }
-*/

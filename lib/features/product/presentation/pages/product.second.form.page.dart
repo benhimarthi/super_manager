@@ -6,7 +6,6 @@ import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulato
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../../../core/history_actions/action.create.history.dart';
 import '../../../../core/session/session.manager.dart';
-import '../../../../firebase_options.dart';
 import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../image_manager/domain/entities/app.image.dart';
 import '../../domain/entities/product.dart';
@@ -104,7 +103,7 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         {"ip": "192.72.0.0", "device": "Android", "location": "location"},
         "product-management",
         "none",
-        "created",
+        "updated",
       );
       context.read<ActionHistoryCubit>().addHistory(history);
     }

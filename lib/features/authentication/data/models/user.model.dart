@@ -6,6 +6,7 @@ class UserModel extends User {
     required super.id,
     required super.createdAt,
     super.createdBy,
+    super.administratorId,
     required super.name,
     required super.avatar,
     required super.email,
@@ -20,6 +21,7 @@ class UserModel extends User {
   factory UserModel.fromUser(User user) {
     return UserModel(
       id: user.id,
+      administratorId: user.administratorId,
       createdAt: user.createdAt,
       createdBy: user.createdBy,
       name: user.name,
@@ -34,6 +36,7 @@ class UserModel extends User {
   UserModel.fromMap(Map<dynamic, dynamic> map)
     : this(
         id: map['id'] as String,
+        administratorId: map['administratorId'] as String,
         createdAt: map['createdAt'] as String,
         createdBy: (map['createdBy'] ?? "") as String,
         name: map['name'] as String,
@@ -47,6 +50,7 @@ class UserModel extends User {
   const UserModel.empty()
     : this(
         id: '0',
+        administratorId: "_empty.adminId",
         createdAt: "_empty.createdAt",
         createdBy: "_empty.createdAt",
         name: "_empty.name",
@@ -59,6 +63,7 @@ class UserModel extends User {
 
   UserModel copyWith({
     String? id,
+    String? administratorId,
     String? createdAt,
     String? createdBy,
     String? name,
@@ -70,6 +75,7 @@ class UserModel extends User {
   }) {
     return UserModel(
       id: id ?? this.id,
+      administratorId: administratorId ?? this.administratorId,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
       name: name ?? this.name,
@@ -83,6 +89,7 @@ class UserModel extends User {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'administratorId': administratorId,
     'createdAt': createdAt,
     'createdBy': createdBy,
     'name': name,

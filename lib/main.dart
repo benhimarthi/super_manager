@@ -120,7 +120,7 @@ class _MyAppState extends State<MyApp> {
             theme: AppTheme.lightTheme,
             debugShowCheckedModeBanner: false,
             routerConfig: GoRouter(
-              initialLocation: "/users", // Corrected splash/splash
+              initialLocation: "/splash", // Corrected splash/splash/users
               routes: [
                 GoRoute(
                   path: '/splash',

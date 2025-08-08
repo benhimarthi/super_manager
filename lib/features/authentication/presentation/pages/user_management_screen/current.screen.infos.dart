@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/product/presentation/pages/product.page.dart';
+import 'package:super_manager/features/product_category/presentation/pages/product.category.page.dart'
+    show ProductCategoryPage;
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
@@ -22,7 +24,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "INVENTORY";
+    title = "PRODUCT_CATEGORY";
   }
 
   @override
@@ -43,6 +45,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "USER MANAGER" => UserManagement(),
           "INVENTORY" => InventoryListScreen(),
           "SALE" => SaleView(),
+          "PRODUCT_CATEGORY" => ProductCategoryPage(),
           String() => throw UnimplementedError(),
         };
       },

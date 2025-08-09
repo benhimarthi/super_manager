@@ -54,28 +54,40 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                     children: [
                       BlocBuilder<AppImageManagerCubit, AppImageState>(
                         builder: (context, state) {
-                          if (state is AppImageManagerLoaded) {
-                            final currentImage = state.images
-                                .where((x) => x.url.isNotEmpty)
-                                .lastOrNull;
-                            if (currentImage != null) {
-                              return CircleAvatar(
-                                backgroundImage: FileImage(
-                                  File(currentImage.url),
-                                ),
+                          return GestureDetector(
+                            onTap: () {
+                              context.read<WidgetManipulatorCubit>().changeMenu(
+                                targetPosition,
+                                "PROFILE",
                               );
-                            } else {
-                              return Icon(
-                                Icons.person,
-                                color: Theme.of(context).primaryColor,
-                              );
-                            }
-                          } else {
-                            return Icon(
-                              Icons.person,
-                              color: Theme.of(context).primaryColor,
-                            );
-                          }
+                            },
+                            child: Builder(
+                              builder: (context) {
+                                if (state is AppImageManagerLoaded) {
+                                  final currentImage = state.images
+                                      .where((x) => x.url.isNotEmpty)
+                                      .lastOrNull;
+                                  if (currentImage != null) {
+                                    return CircleAvatar(
+                                      backgroundImage: FileImage(
+                                        File(currentImage.url),
+                                      ),
+                                    );
+                                  } else {
+                                    return Icon(
+                                      Icons.person,
+                                      color: Theme.of(context).primaryColor,
+                                    );
+                                  }
+                                } else {
+                                  return Icon(
+                                    Icons.person,
+                                    color: Theme.of(context).primaryColor,
+                                  );
+                                }
+                              },
+                            ),
+                          );
                         },
                       ),
                       Icon(

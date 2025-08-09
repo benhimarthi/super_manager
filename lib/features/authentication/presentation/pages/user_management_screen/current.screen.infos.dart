@@ -46,6 +46,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "INVENTORY" => InventoryListScreen(),
           "SALE" => SaleView(),
           "PRODUCT_CATEGORY" => ProductCategoryPage(),
+          "PROFILE" => UserManagement(),
           String() => throw UnimplementedError(),
         };
       },

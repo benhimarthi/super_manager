@@ -30,8 +30,7 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     super.initState();
     currentUser = SessionManager.getUserSession()!;
-    //final v = (currentUser as UserModel).copyWith(avatar: "empty");
-    //SessionManager.saveUserSession(v);
+    avatar = AppImageModel.empty();
     if (currentUser.avatar.isNotEmpty && currentUser.avatar != "empty") {
       context.read<AppImageManagerCubit>().loadImages(currentUser.id);
     } else {
@@ -80,7 +79,19 @@ class _UserProfileState extends State<UserProfile> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("Edit Profile")),
+      appBar: AppBar(
+        title: Text("Edit Profile"),
+        actions: [
+          Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).primaryColor),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text("${currentUser.role.name} account"),
+          ),
+        ],
+      ),
       floatingActionButton: CircleAvatar(
         child: IconButton(
           onPressed: () {
@@ -202,7 +213,17 @@ class _UserProfileState extends State<UserProfile> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.info)),
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return EditUserDialog(user: currentUser);
+                      },
+                    );
+                  },
+                  icon: Icon(Icons.edit),
+                ),
               ],
             ),
             //const SizedBox(height: 50),
@@ -218,12 +239,12 @@ class _UserProfileState extends State<UserProfile> {
               currentUser.email,
               Icons.arrow_forward_ios_sharp,
             ),
-            listTileCustom(
+            /*listTileCustom(
               Icons.accessibility,
               "ROLE",
               currentUser.role.name,
               Icons.arrow_forward_ios_sharp,
-            ),
+            ),*/
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -235,7 +256,7 @@ class _UserProfileState extends State<UserProfile> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.security)),
+                IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
               ],
             ),
             listTileCustom(

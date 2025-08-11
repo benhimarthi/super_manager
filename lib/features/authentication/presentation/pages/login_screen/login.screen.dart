@@ -24,6 +24,13 @@ class _LoginScreenState extends State<LoginScreen> {
     viewPassword = false;
   }
 
+  @override
+  void dispose() {
+    //_emailController.dispose();
+    //_passwordController.dispose();
+    super.dispose();
+  }
+
   void _onLogin() {
     if (formKey.currentState!.validate()) {
       final email = _emailController.text.trim();
@@ -120,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _passwordController,
-                          keyboardType: TextInputType.emailAddress,
+                          //keyboardType: TextInputType.emailAddress,
                           obscureText: !viewPassword,
                           decoration: InputDecoration(
                             label: const Text("Password"),

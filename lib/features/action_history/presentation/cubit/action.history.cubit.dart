@@ -53,7 +53,6 @@ class ActionHistoryCubit extends Cubit<ActionHistoryState> {
         emit(ActionHistoryManagerError(failure.message));
       },
       (_) async {
-        print("EEEEEEEEEEEEEEEEEEEEEEERRRRR");
         await loadHistory();
         await _tryAutoSync();
       },

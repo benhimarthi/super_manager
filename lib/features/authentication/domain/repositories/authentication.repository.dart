@@ -20,4 +20,6 @@ abstract class AuthenticationRepository {
   ResultVoid deleteUser(String userId);
   ResultFuture<List<User>> getUsers(String creatorId);
   ResultVoid manageUserStatus(String userUid, bool value);
+  ResultVoid resetAccountPassword(String email);
+  ResultVoid renewEmailAccount(String email);
 }

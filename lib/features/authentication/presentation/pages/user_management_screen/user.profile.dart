@@ -11,6 +11,7 @@ import '../../../../image_manager/data/models/app.image.model.dart';
 import '../../../../image_manager/presentation/cubit/app.image.cubit.dart';
 import '../../../../image_manager/presentation/cubit/app.image.state.dart';
 import '../../../domain/entities/user.dart';
+import '../../cubit/authentication.state.dart';
 import '../../widgets/edit.user.dialog.dart';
 
 class UserProfile extends StatefulWidget {
@@ -21,7 +22,7 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  late final User currentUser;
+  late User currentUser;
   late AppImageModel avatar;
   final _uuid = const Uuid();
   File? image;
@@ -97,6 +98,7 @@ class _UserProfileState extends State<UserProfile> {
           onPressed: () {
             setState(() {
               context.read<AuthenticationCubit>().logout();
+              print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
               nextScreenReplace(context, LoginScreen());
             });
           },
@@ -213,6 +215,20 @@ class _UserProfileState extends State<UserProfile> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
+                BlocConsumer<AuthenticationCubit, AuthenticationState>(
+                  listener: (context, state) {
+                    if (state is UsersLoaded) {
+                      setState(() {
+                        //This actions is trigger right after the update of the.
+                        //name or the mail adress of the current user.
+                        currentUser = SessionManager.getUserSession()!;
+                      });
+                    }
+                  },
+                  builder: (context, state) {
+                    return Container();
+                  },
+                ),
                 IconButton(
                   onPressed: () {
                     showDialog(
@@ -232,12 +248,14 @@ class _UserProfileState extends State<UserProfile> {
               "NAME",
               currentUser.name,
               Icons.arrow_forward_ios_sharp,
+              () {},
             ),
             listTileCustom(
               Icons.email,
               "EMAIL",
               currentUser.email,
               Icons.arrow_forward_ios_sharp,
+              () {},
             ),
             /*listTileCustom(
               Icons.accessibility,
@@ -264,12 +282,14 @@ class _UserProfileState extends State<UserProfile> {
               "PASSWORD",
               "change your password",
               Icons.arrow_forward_ios,
+              () {},
             ),
             listTileCustom(
               Icons.lock,
               "ACTIVATE MFA",
               "Activate the mfa",
               Icons.arrow_forward_ios,
+              () {},
             ),
           ],
         ),
@@ -277,26 +297,31 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  listTileCustom(leadingIcon, title, subtitle, trailingIcon) {
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 10,
+  listTileCustom(leadingIcon, title, subtitle, trailingIcon, Function onTap) {
+    return GestureDetector(
+      onTap: () {
+        onTap;
+      },
+      child: ListTile(
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
         ),
-      ),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white)),
-      leading: Icon(
-        leadingIcon,
-        color: Theme.of(context).primaryColor,
-        size: 20,
-      ),
-      trailing: Icon(
-        trailingIcon,
-        size: 16,
-        color: Theme.of(context).primaryColor,
+        subtitle: Text(subtitle, style: const TextStyle(color: Colors.white)),
+        leading: Icon(
+          leadingIcon,
+          color: Theme.of(context).primaryColor,
+          size: 20,
+        ),
+        trailing: Icon(
+          trailingIcon,
+          size: 16,
+          color: Theme.of(context).primaryColor,
+        ),
       ),
     );
   }

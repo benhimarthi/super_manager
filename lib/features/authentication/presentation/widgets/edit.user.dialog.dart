@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/session/session.manager.dart';
 
 import '../../data/models/user.model.dart';
 import '../../domain/entities/user.dart';
@@ -43,8 +44,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
       role: _selectedRole,
       activated: widget.user.activated,
     );
-
     context.read<AuthenticationCubit>().updateUser(updatedUser);
+    SessionManager.saveUserSession(updatedUser);
     Navigator.pop(context);
   }
 
@@ -87,7 +88,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
             decoration: const InputDecoration(labelText: "Email"),
           ),
 
-          SizedBox(height: 10),
+          /*SizedBox(height: 10),
           DropdownButton<UserRole>(
             value: _selectedRole,
             items: const [
@@ -103,7 +104,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
             onChanged: (role) {
               setState(() => _selectedRole = role!);
             },
-          ),
+          ),*/
         ],
       ),
       actions: [

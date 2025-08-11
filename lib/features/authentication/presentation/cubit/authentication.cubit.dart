@@ -44,7 +44,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> loginWithEmail(String email, String password) async {
     emit(const AuthenticationLoading());
-
+    
     final result = await _loginUser(
       LoginUserParams(email: email, password: password),
     );

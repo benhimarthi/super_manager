@@ -6,7 +6,7 @@ class SessionManager {
   static final Box _sessionBox = Hive.box('authenticationBox');
 
   static void saveUserSession(User user) {
-    _sessionBox.put('currentUser', (user as UserModel).toMap());
+    _sessionBox.put('currentUser', UserModel.fromUser(user).toMap());
   }
 
   static User? getUserSession() {

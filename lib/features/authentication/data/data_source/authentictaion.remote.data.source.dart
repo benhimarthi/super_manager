@@ -12,6 +12,7 @@ abstract class AuthenticationRemoteDataSource {
   Future<void> updateUser(UserModel user);
   Future<void> deleteUser(String userId);
   Future<List<UserModel>> getUsers(String creatorUID);
+  Future<void> resetAccountPassword(String email);
 }
 
 class AuthenticationRemoteDataSrcImpl
@@ -34,6 +35,7 @@ class AuthenticationRemoteDataSrcImpl
           .get();
       return UserModel.fromMap(snapshot.data()!);
     } catch (e) {
+      //print("")
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
@@ -152,6 +154,15 @@ class AuthenticationRemoteDataSrcImpl
       return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+
+  @override
+  Future<void> resetAccountPassword(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 404);
     }
   }
 }

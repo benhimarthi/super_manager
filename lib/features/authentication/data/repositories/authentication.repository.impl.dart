@@ -150,7 +150,6 @@ class AuthenticationRepositoryImplementation
                 NetworkFailure(message: "No local data found", statusCode: 500),
               );
       }
-
       final remoteUser = await _remoteDataSource.loginWithEmail(
         email,
         password,
@@ -213,5 +212,11 @@ class AuthenticationRepositoryImplementation
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
+  }
+
+  @override
+  ResultVoid resetAccountPassword(String email) {
+    // TODO: implement resetAccountPassword
+    throw UnimplementedError();
   }
 }

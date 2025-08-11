@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
 import 'package:super_manager/core/session/session.manager.dart';
 import 'authentication.local.data.source.dart';
 import 'authentictaion.remote.data.source.dart';
@@ -50,6 +51,14 @@ class SyncManager {
     for (final userId in deletedUsers) {
       await _remoteDataSource.deleteUser(userId);
       await _localDataSource.clearDeletedFlag(userId);
+    }
+  }
+
+  Future<void> resetAccountPassword(String email) async {
+    try {
+      await _remoteDataSource.resetAccountPassword(email);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 404);
     }
   }
 }

@@ -50,6 +50,11 @@ class AuthenticationSyncTriggerCubit
     emit(SyncInitial());
   }
 
+  Future<void> resetAccountPassword(String email) async {
+    emit(SyncInProgress());
+    await _syncManager.resetAccountPassword(email);
+  }
+
   @override
   Future<void> close() {
     stopSyncing();

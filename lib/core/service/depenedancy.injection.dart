@@ -11,6 +11,7 @@ import 'package:super_manager/features/action_history/domain/usecases/create.act
 import 'package:super_manager/features/action_history/domain/usecases/delete.action.history.dart';
 import 'package:super_manager/features/action_history/domain/usecases/get.all.action.history.dart';
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
+import 'package:super_manager/features/authentication/domain/usecases/reset.account.password.dart';
 import 'package:super_manager/features/image_manager/domain/usecases/get.app.image.by.id.dart';
 import 'package:super_manager/features/product/domain/usecases/get.product.by.id.dart';
 import 'package:super_manager/features/product_pricing/domain/usecases/get.product.pricing.by.id.dart';
@@ -180,6 +181,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<GetUsers>(
     () => GetUsers(getIt<AuthenticationRepository>()),
+  );
+  getIt.registerLazySingleton<ResetAccountPassword>(
+    () => ResetAccountPassword(getIt<AuthenticationRepository>()),
   );
   getIt.registerLazySingleton<GetCurrentUser>(
     () => GetCurrentUser(getIt<AuthenticationRepository>()),

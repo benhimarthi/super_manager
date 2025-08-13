@@ -61,4 +61,12 @@ class SyncManager {
       throw ServerException(message: e.toString(), statusCode: 404);
     }
   }
+
+  Future<void> updateMailAddress(String email) async {
+    try {
+      await _remoteDataSource.renewAccountEmailAddress(email);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 404);
+    }
+  }
 }

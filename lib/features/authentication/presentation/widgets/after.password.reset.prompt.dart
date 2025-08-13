@@ -25,13 +25,13 @@ class AfterPasswordResetPrompt extends StatelessWidget {
             "Log out and log back in with the new password for updated session and security.",
           ),
           SizedBox(height: 10),
-          GestureDetector(
+          /*GestureDetector(
             child: Text(
               "Later",
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 10),*/
           ElevatedButton(
             onPressed: () {
               context.read<AuthenticationCubit>().logout();

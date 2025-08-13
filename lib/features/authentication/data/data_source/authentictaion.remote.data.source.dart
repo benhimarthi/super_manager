@@ -13,6 +13,7 @@ abstract class AuthenticationRemoteDataSource {
   Future<void> deleteUser(String userId);
   Future<List<UserModel>> getUsers(String creatorUID);
   Future<void> resetAccountPassword(String email);
+  Future<void> renewAccountEmailAddress(String email);
 }
 
 class AuthenticationRemoteDataSrcImpl
@@ -163,6 +164,15 @@ class AuthenticationRemoteDataSrcImpl
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 404);
+    }
+  }
+
+  @override
+  Future<void> renewAccountEmailAddress(String email) async {
+    try {
+      await _auth.currentUser!.verifyBeforeUpdateEmail(email);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 }

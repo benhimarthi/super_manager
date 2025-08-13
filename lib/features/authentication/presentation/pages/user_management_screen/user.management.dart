@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/authentication/data/models/user.model.dart';
 import 'package:super_manager/features/authentication/presentation/cubit/authentication.cubit.dart';
-import 'package:super_manager/features/authentication/presentation/widgets/add.userto.account.dart';
+import 'package:super_manager/features/authentication/presentation/widgets/add.user.to.account.dart';
 import 'package:super_manager/features/authentication/presentation/widgets/delete.user.confirmation.screen.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.state.dart';

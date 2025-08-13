@@ -10,6 +10,7 @@ import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulato
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
 import '../../../../sale_item/presentation/pages/sale.view.dart';
 import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
+import '../../widgets/after.mail.address.changed.action.dart';
 import '../../widgets/modify.account.email.address.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
@@ -45,11 +46,10 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "HOME" => Container(),
           "PROFILE" => UserProfile(),
           "PRODUCT" => ProductPage(),
-          "USER MANAGER" => UserManagement(),
+          "USERS" => UserManagement(),
           "INVENTORY" => InventoryListScreen(),
           "SALE" => SaleView(),
-          "PRODUCT_CATEGORY" =>
-            ModifyAccountEmailAddress(), //ProductCategoryPage(),
+          "PRODUCT_CATEGORY" => ProductCategoryPage(),
           "PROFILE" => UserManagement(),
           String() => throw UnimplementedError(),
         };

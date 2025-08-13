@@ -98,7 +98,6 @@ class _UserProfileState extends State<UserProfile> {
           onPressed: () {
             setState(() {
               context.read<AuthenticationCubit>().logout();
-              print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
               nextScreenReplace(context, LoginScreen());
             });
           },

@@ -36,6 +36,7 @@ class _ModifyAccountEmailAddressState extends State<ModifyAccountEmailAddress> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      contentPadding: EdgeInsets.all(0),
       title: Text(
         "Modify mail address",
         style: TextStyle(
@@ -56,81 +57,113 @@ class _ModifyAccountEmailAddressState extends State<ModifyAccountEmailAddress> {
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      "You will have to reauthenticate yourself before changing your mail address",
+                    Padding(
+                      padding: EdgeInsetsGeometry.all(10),
+                      child: Text(
+                        "You will have to reauthenticate yourself before changing your mail address",
+                      ),
                     ),
                     SizedBox(height: 10),
                     Form(
                       key: formKey,
                       child: Column(
                         children: [
-                          TextFormField(
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.person,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: "your current email address",
-                            ),
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            onChanged: (value) {},
-                            validator: (value) {
-                              final bool emailValid = RegExp(
-                                r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@'
-                                r'((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|'
-                                r'(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
-                              ).hasMatch(value!);
-                              if (!emailValid) {
-                                return "Invalid email address, insert a valid mail address!";
-                              } else if (value.isEmpty) {
-                                return "This field can not be null";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          SizedBox(height: 10),
-                          TextFormField(
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.lock,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              hintText: "password",
-                            ),
-                            validator: (value) {
-                              RegExp regex = RegExp(
-                                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
-                              );
-                              if (!regex.hasMatch(value!)) {
-                                return 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character (!@#\$&*~)';
-                              } else if (value.isEmpty) {
-                                return "This field can not be null";
-                              } else {
-                                return null;
-                              }
-                            },
-                          ),
-                          SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.person,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    hintText: "your current email address",
+                                  ),
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  onChanged: (value) {},
+                                  validator: (value) {
+                                    final bool emailValid = RegExp(
+                                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@'
+                                      r'((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|'
+                                      r'(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
+                                    ).hasMatch(value!);
+                                    if (!emailValid) {
+                                      return "Invalid email address, insert a valid mail address!";
+                                    } else if (value.isEmpty) {
+                                      return "This field can not be null";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
                                 ),
-                              ),
+                                SizedBox(height: 10),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.lock,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    hintText: "password",
+                                  ),
+                                  validator: (value) {
+                                    RegExp regex = RegExp(
+                                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+                                    );
+                                    if (!regex.hasMatch(value!)) {
+                                      return 'Password must be at least 8 characters, include uppercase, lowercase, number, and special character (!@#\$&*~)';
+                                    } else if (value.isEmpty) {
+                                      return "This field can not be null";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                ),
+                                SizedBox(height: 10),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 10),
-                          ElevatedButton(
+                          /*ElevatedButton(
                             onPressed: () {
                               onReauthenticate();
                             },
                             child: Text("Reauthenticate"),
+                          ),*/
+                          GestureDetector(
+                            onTap: () {
+                              onReauthenticate();
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Reauthenticate",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),

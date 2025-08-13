@@ -6,7 +6,8 @@ import '../../cubit/authentication.cubit.dart';
 import '../../cubit/authentication.state.dart';
 
 class RegistrationFormular extends StatefulWidget {
-  const RegistrationFormular({super.key});
+  bool? showRoles;
+  RegistrationFormular({super.key, this.showRoles = true});
 
   @override
   State<RegistrationFormular> createState() => _RegistrationFormularState();
@@ -47,7 +48,7 @@ class _RegistrationFormularState extends State<RegistrationFormular> {
         name: name,
         email: email,
         password: password,
-        role: _selectedRole,
+        role: widget.showRoles! ? _selectedRole : UserRole.regular,
       );
     }
   }
@@ -169,21 +170,24 @@ class _RegistrationFormularState extends State<RegistrationFormular> {
                 obscureText: !viewConfirmPassword,
               ),
               const SizedBox(height: 16),
-              DropdownButton<UserRole>(
-                value: _selectedRole,
-                items: const [
-                  DropdownMenuItem(
-                    value: UserRole.admin,
-                    child: Text("Administrator"),
-                  ),
-                  DropdownMenuItem(
-                    value: UserRole.regular,
-                    child: Text("Regular User"),
-                  ),
-                ],
-                onChanged: (role) {
-                  setState(() => _selectedRole = role!);
-                },
+              Visibility(
+                visible: widget.showRoles!,
+                child: DropdownButton<UserRole>(
+                  value: _selectedRole,
+                  items: const [
+                    DropdownMenuItem(
+                      value: UserRole.admin,
+                      child: Text("Administrator"),
+                    ),
+                    DropdownMenuItem(
+                      value: UserRole.regular,
+                      child: Text("Regular User"),
+                    ),
+                  ],
+                  onChanged: (role) {
+                    setState(() => _selectedRole = role!);
+                  },
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(

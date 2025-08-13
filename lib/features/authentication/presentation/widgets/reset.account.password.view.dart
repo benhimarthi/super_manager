@@ -23,6 +23,20 @@ class ResetAccountPasswordView extends StatelessWidget {
         children: [
           Text("Check your mail box for the reinitialization Link."),
           SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(Icons.warning, color: Colors.orange, size: 15),
+              SizedBox(width: 4),
+              Text(
+                "Warning",
+                style: TextStyle(color: Colors.orange, fontSize: 12),
+              ),
+            ],
+          ),
+          Text(
+            "You migth needs to check up your Spam messages.",
+            style: TextStyle(color: Colors.orange, fontSize: 12),
+          ),
           Text(
             SessionManager.getUserSession()!.email,
             style: TextStyle(

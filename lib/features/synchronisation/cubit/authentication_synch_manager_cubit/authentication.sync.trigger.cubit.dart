@@ -55,6 +55,11 @@ class AuthenticationSyncTriggerCubit
     await _syncManager.resetAccountPassword(email);
   }
 
+  Future<void> renewMailAccountMailAddress(String email) async {
+    emit(SyncInProgress());
+    await _syncManager.updateMailAddress(email);
+  }
+
   @override
   Future<void> close() {
     stopSyncing();

@@ -219,4 +219,10 @@ class AuthenticationRepositoryImplementation
     // TODO: implement resetAccountPassword
     throw UnimplementedError();
   }
+
+  @override
+  ResultVoid renewEmailAccount(String email) {
+    // TODO: implement renewEmailAccount
+    throw UnimplementedError();
+  }
 }

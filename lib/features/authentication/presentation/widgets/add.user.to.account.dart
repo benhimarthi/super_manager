@@ -17,14 +17,17 @@ class AddUserToAccount extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "ADD USER TO THIS ACCOUNT",
+                "ADD USER",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
-              IconButton(onPressed: () {}, icon: Icon(Icons.group)),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.group, color: Theme.of(context).primaryColor),
+              ),
             ],
           ),
           Container(margin: EdgeInsets.all(20), child: RegistrationFormular()),

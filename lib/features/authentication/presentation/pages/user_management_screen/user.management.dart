@@ -111,8 +111,8 @@ class _UserManagementState extends State<UserManagement> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SizedBox(
-                                  width: 110,
+                                Container(
+                                  width: 100,
                                   child: Text(
                                     currentUser.name,
                                     overflow: TextOverflow.ellipsis,
@@ -174,9 +174,7 @@ class _UserManagementState extends State<UserManagement> {
                               ],
                             ),
                             BlocConsumer<AppImageManagerCubit, AppImageState>(
-                              listener: (context, state) {
-                                // TODO: implement listener
-                              },
+                              listener: (context, state) {},
                               builder: (context, state) {
                                 if (state is AppImageManagerLoaded) {
                                   return SizedBox(

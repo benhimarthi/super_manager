@@ -64,7 +64,6 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
     var currentUser = SessionManager.getUserSession()!;
     if (widget.creation) {
       cubit.addProduct(finalProduct);
-
       var history = addHistoryItem(
         "product",
         finalProduct.id,
@@ -121,7 +120,9 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
           _active = product.active;
         }
         if (state is ElementAddedSuccessfully) {
-          princingValue = state.elementId;
+          setState(() {
+            princingValue = state.elementId;
+          });
         }
       },
       builder: (context, state) {

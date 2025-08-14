@@ -39,6 +39,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
   late List<AppImage> myProductImages;
   late List<String> myCachedImages;
   late Product? cachedProduct;
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -122,7 +123,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
           GestureDetector(
             onTap: () {
               setState(() {
-                if (page == 0) {
+                if (page == 0 && formKey.currentState!.validate()) {
                   _submit();
                   page = 1;
                   return;
@@ -279,13 +280,17 @@ class _ProductFormPageState extends State<ProductFormPage> {
                           ],
                         ),
                         SizedBox(height: 20),
-                        TextFormField(
-                          controller: _name,
-                          decoration: const InputDecoration(
-                            labelText: 'Product title',
+                        Form(
+                          key: formKey,
+                          child: TextFormField(
+                            controller: _name,
+                            decoration: const InputDecoration(
+                              labelText: 'Product title',
+                            ),
+                            validator: (val) => val == null || val.isEmpty
+                                ? 'A product title is Required!'
+                                : null,
                           ),
-                          validator: (val) =>
-                              val == null || val.isEmpty ? 'Required' : null,
                         ),
                         SizedBox(height: 20),
                         TextFormField(

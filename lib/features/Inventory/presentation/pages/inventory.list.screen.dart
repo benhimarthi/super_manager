@@ -87,9 +87,6 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
               listener: (context, state) {
                 if (state is InventoryManagerLoaded) {
                   myInventories = state.inventoryList;
-                  if (myInventories.isNotEmpty) {
-                    print("@@#############################))))))))))))))))))");
-                  }
                 }
               },
               builder: (context, state) {

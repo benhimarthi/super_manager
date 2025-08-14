@@ -38,21 +38,23 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProductCubit, ProductState>(
-      listener: (context, state) {
-        if (state is ProductManagerLoaded) {
+      listener: (context, stateP) {
+        if (stateP is ProductManagerLoaded) {
           setState(() {
-            myProduct = state.products;
-            productList = state.products;
+            myProduct = stateP.products;
+            productList = stateP.products;
+            print(
+              "@@@@@@@@@@@@@@@@@@@@@@@&&&&&&&&&&&&&((((())))) $productList",
+            );
           });
         }
       },
-      builder: (context, state) {
-        if (state is ProductManagerLoading) {
+      builder: (context, stateP) {
+        if (stateP is ProductManagerLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        if (state is ProductManagerError) {
-          return Center(child: Text('Error: ${state.message}'));
+        if (stateP is ProductManagerError) {
+          return Center(child: Text('Error: ${stateP.message}'));
         }
         return Scaffold(
           appBar: AppBar(title: const Text('Products')),
@@ -110,6 +112,9 @@ class _ProductPageState extends State<ProductPage> {
                   child: ListView.builder(
                     itemCount: productList.length,
                     itemBuilder: (context, index) {
+                      print(
+                        "INSIDERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR $productList",
+                      );
                       final product = productList[index];
                       return ProductCardItem(product: product);
                     },

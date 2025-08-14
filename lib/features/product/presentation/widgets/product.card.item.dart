@@ -78,7 +78,7 @@ class _ProductCardItemState extends State<ProductCardItem> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: 120,
+                  width: 100,
                   height: 30,
                   child: Text(
                     widget.product.name,
@@ -97,6 +97,7 @@ class _ProductCardItemState extends State<ProductCardItem> {
                     children: [TextSpan(text: widget.product.barcode)],
                   ),
                 ),
+
                 GestureDetector(
                   onTap: () {
                     _deleteProductConfirmationScreen();

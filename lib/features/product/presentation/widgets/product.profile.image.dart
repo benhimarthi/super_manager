@@ -123,56 +123,6 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                 }
               },
               builder: (context, state) {
-                /*if (state is AppImageManagerLoaded ||
-                    state is DeleteImageFromDirectorySuccessfully) {
-                  return displayable
-                      ? Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(
-                              image: FileImage(productImageFile!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.photo,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ),
-                        );
-                } else {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.photo,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                  );
-                }*/
                 return displayable
                     ? Container(
                         height: 100,
@@ -246,6 +196,16 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                             imageName,
                             deletedImage.entityType,
                           );
+                    } else {
+                      setState(() {
+                        existingIamges.remove(productImageFile!.path);
+                        if (existingIamges.isEmpty) {
+                          displayable = false;
+                        } else {
+                          listNavigator = CircularListNavigator(existingIamges);
+                          productImageFile = File(existingIamges.first);
+                        }
+                      });
                     }
                   });
                 },

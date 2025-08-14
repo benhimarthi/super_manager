@@ -30,7 +30,10 @@ class AddUserToAccount extends StatelessWidget {
               ),
             ],
           ),
-          Container(margin: EdgeInsets.all(20), child: RegistrationFormular()),
+          Container(
+            margin: EdgeInsets.all(20),
+            child: RegistrationFormular(showRoles: false),
+          ),
         ],
       ),
     );

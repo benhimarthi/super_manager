@@ -59,6 +59,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<void> addUpdatedProduct(ProductModel product) async {
     try {
+      await applyUpdate(product);
       await _updatedBox.put(product.id, product.toMap());
     } catch (_) {
       throw const LocalException(

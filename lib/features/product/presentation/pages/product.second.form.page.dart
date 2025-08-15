@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
 import 'package:super_manager/features/product/data/models/product.model.dart';
+import 'package:super_manager/features/product_pricing/presentation/cubit/product.pricing.state.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../../../core/history_actions/action.create.history.dart';
 import '../../../../core/session/session.manager.dart';
 import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../image_manager/domain/entities/app.image.dart';
+import '../../../product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import '../../domain/entities/product.dart';
 import '../cubit/product.cubit.dart';
 import '../widgets/product.pricing.view.dart';
@@ -36,6 +38,7 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
   void initState() {
     super.initState();
     var state = context.read<WidgetManipulatorCubit>().state;
+    context.read<ProductPricingCubit>().loadPricing();
     if (state is CacheProductSuccessfully) {
       product = state.product;
     } else {
@@ -129,7 +132,29 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         return SingleChildScrollView(
           child: Column(
             children: [
-              ProductPricingView(productId: product != null ? product!.id : ""),
+              /*state.pricingList
+                .where((x) => x.productId == _productId)
+                .toList();*/
+              BlocConsumer<ProductPricingCubit, ProductPricingState>(
+                listener: (context, state) {
+                  if (state is ProductPricingManagerLoaded) {
+                    if (state.pricingList.isNotEmpty && product != null) {
+                      final prices = state.pricingList
+                          .where((x) => x.productId == product!.id)
+                          .toList();
+                      if (prices.isNotEmpty) {
+                        princingValue = prices.first.id;
+                      }
+                    }
+                  }
+                },
+                builder: (context, state) {
+                  return ProductPricingView(
+                    productId: product != null ? product!.id : "",
+                  );
+                },
+              ),
+
               SizedBox(height: 10),
               TextFormField(
                 controller: _unit,

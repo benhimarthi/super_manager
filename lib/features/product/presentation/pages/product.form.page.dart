@@ -264,6 +264,19 @@ class _ProductFormPageState extends State<ProductFormPage> {
                                       if (state is LocalCategoryManagerLoaded) {
                                         setState(() {});
                                       }
+                                      if (state
+                                          is EmitRandomElementSuccessfully) {
+                                        try {
+                                          final data =
+                                              state.element
+                                                  as Map<String, dynamic>;
+                                          if (data['id'] == "image_del") {
+                                            myProductImages.removeWhere(
+                                              (x) => x.url == data['image_url'],
+                                            );
+                                          }
+                                        } catch (e) {}
+                                      }
                                     },
                                     builder: (context, state) {
                                       return SelectingParentCategory(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/util/circular.list.navigator.dart';
+import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../image_manager/domain/entities/app.image.dart';
 import '../../../image_manager/presentation/cubit/app.image.cubit.dart';
 import '../../../image_manager/presentation/cubit/app.image.state.dart';
@@ -26,7 +27,7 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
   late bool isUpdated;
   late File? productImageFile;
   late List<String> myProductImages;
-  late List<String> existingIamges;
+  late Set<String> existingIamges;
   late CircularListNavigator listNavigator;
   late bool addProductProfileImage = false;
   late List<AppImage> myAppProductImages;
@@ -38,9 +39,11 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
     productId = widget.productId;
     myProductImages = [];
     myAppProductImages = [];
-    existingIamges = widget.cahedImages != null ? widget.cahedImages! : [];
+    existingIamges = widget.cahedImages != null
+        ? widget.cahedImages!.toSet()
+        : {};
     if (existingIamges.isNotEmpty) {
-      listNavigator = CircularListNavigator(existingIamges);
+      listNavigator = CircularListNavigator(existingIamges.toList());
       productImageFile = File(existingIamges.first);
       displayable = true;
     }
@@ -87,9 +90,11 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                       .toList();
                   if (myImages.isNotEmpty) {
                     myAppProductImages = myImages;
-                    existingIamges = myImages.map((x) => x.url).toList();
+                    existingIamges.addAll(myImages.map((x) => x.url).toSet());
                     displayable = true;
-                    listNavigator = CircularListNavigator(existingIamges);
+                    listNavigator = CircularListNavigator(
+                      existingIamges.toList(),
+                    );
                     productImageFile = File(existingIamges.first);
                   }
                 }
@@ -100,7 +105,9 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                       displayable = state.imageLink!.path.isNotEmpty;
                       myProductImages.add(state.imageLink!.path);
                       existingIamges.add(state.imageLink!.path);
-                      listNavigator = CircularListNavigator(existingIamges);
+                      listNavigator = CircularListNavigator(
+                        existingIamges.toList(),
+                      );
                       addProductProfileImage = false;
                     });
                   }
@@ -116,7 +123,9 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                     if (existingIamges.isEmpty) {
                       displayable = false;
                     } else {
-                      listNavigator = CircularListNavigator(existingIamges);
+                      listNavigator = CircularListNavigator(
+                        existingIamges.toList(),
+                      );
                       productImageFile = File(existingIamges.first);
                     }
                   });
@@ -180,10 +189,15 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
               visible: existingIamges.isNotEmpty,
               child: GestureDetector(
                 onTap: () {
+                  context.read<WidgetManipulatorCubit>().emitRandomElement({
+                    'id': 'image_del',
+                    'image_url': productImageFile!.path,
+                  });
                   setState(() {
                     var deletedImage = myAppProductImages
                         .where((x) => x.url == productImageFile!.path)
                         .firstOrNull;
+
                     if (deletedImage != null) {
                       context.read<AppImageManagerCubit>().deleteImage(
                         deletedImage.id,
@@ -202,7 +216,9 @@ class _ProductProfileImageState extends State<ProductProfileImage> {
                         if (existingIamges.isEmpty) {
                           displayable = false;
                         } else {
-                          listNavigator = CircularListNavigator(existingIamges);
+                          listNavigator = CircularListNavigator(
+                            existingIamges.toList(),
+                          );
                           productImageFile = File(existingIamges.first);
                         }
                       });

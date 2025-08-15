@@ -43,9 +43,6 @@ class _ProductPageState extends State<ProductPage> {
           setState(() {
             myProduct = stateP.products;
             productList = stateP.products;
-            print(
-              "@@@@@@@@@@@@@@@@@@@@@@@&&&&&&&&&&&&&((((())))) $productList",
-            );
           });
         }
       },
@@ -112,9 +109,6 @@ class _ProductPageState extends State<ProductPage> {
                   child: ListView.builder(
                     itemCount: productList.length,
                     itemBuilder: (context, index) {
-                      print(
-                        "INSIDERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR $productList",
-                      );
                       final product = productList[index];
                       return ProductCardItem(product: product);
                     },

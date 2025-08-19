@@ -137,7 +137,6 @@ class _InventoryRelevantNumbersViewState
               x.date.isBefore(_startDate),
         )
         .toList();
-
     final salesItemsALR = saleItems
         .where(
           (x) => salesAfterLastRestock
@@ -155,8 +154,10 @@ class _InventoryRelevantNumbersViewState
               quantitySale
         : earliestRestock.changes['inventory']!['quantityAvailable'] -
               quantitySale;
-    double unitPrice = earliestRestock
-        .changes['inventory_meta_data']!['new_version']['costPerUnit'];
+    double unitPrice = earliestRestock.action == "update"
+        ? earliestRestock
+              .changes['inventory_meta_data']!['new_version']['costPerUnit']
+        : earliestRestock.changes['inventory_meta_data']!['costPerUnit'];
     return {
       "start_date_quantity": res,
       "start_date_unit_cost": unitPrice,
@@ -228,6 +229,14 @@ class _InventoryRelevantNumbersViewState
     }
   }
 
+  int daysBetween(DateTime from, DateTime to) {
+    // Normalize the dates to ignore time components
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+
+    return to.difference(from).inDays;
+  }
+
   averageInventory() {
     return InventoryKPI.averageInventory(
       startDateProductAvailableQuantity(sales, saleItems)['amount'],
@@ -251,6 +260,30 @@ class _InventoryRelevantNumbersViewState
       salesQuantityDuringPeriod(sales, saleItems)['period_quantity_revenue'],
       COGS(),
       averageInventory(),
+    );
+  }
+
+  stockToSalesRatio() {
+    return InventoryKPI.stockToSalesRatio(
+      startDateProductAvailableQuantity(sales, saleItems)['amount'] +
+          periodSupplyQttValue()['supply_cost'] -
+          COGS(),
+      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_revenue'],
+    );
+  }
+
+  daysOfInventoryOnHand() {
+    return InventoryKPI.daysOfInventoryOnHand(
+      averageInventory(),
+      COGS(),
+      daysBetween(_startDate, _endDate),
+    );
+  }
+
+  sellThroughRate() {
+    return InventoryKPI.sellThroughRate(
+      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_sold'],
+      periodSupplyQttValue()['supply_quantity'],
     );
   }
 
@@ -330,8 +363,26 @@ class _InventoryRelevantNumbersViewState
                       false,
                     ),
                     _inventoryNbInfos(
-                      "gross Margin Return On Investment",
+                      "Gross Margin Return On Investment",
                       grossMarginReturnOnInvestment(),
+                      false,
+                    ),
+                    //stockToSalesRatio
+                    _inventoryNbInfos(
+                      "Stock to sales ratio",
+                      stockToSalesRatio(),
+                      false,
+                    ),
+                    //daysOfInventoryOnHand
+                    _inventoryNbInfos(
+                      "Days of inventory on hand",
+                      daysOfInventoryOnHand(),
+                      false,
+                    ),
+                    //sellThroughRate
+                    _inventoryNbInfos(
+                      "Sell through rate",
+                      sellThroughRate(),
                       false,
                     ),
                   ],

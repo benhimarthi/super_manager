@@ -40,4 +40,25 @@ class InventoryKPI {
     double cogs,
     int daysInPeriod,
   ) => (avgInventory / cogs) * daysInPeriod;
+
+  static double stockToSalesRatio(double inventoryValue, double salesValue) {
+    if (salesValue == 0) return 0;
+    return inventoryValue / salesValue;
+  }
+
+  // Days of Inventory on Hand (DOH)
+  static double daysOfInventoryOnHand(
+    double averageInventory,
+    double costOfGoodsSold,
+    int periodDays,
+  ) {
+    if (costOfGoodsSold == 0) return 0;
+    return (averageInventory / costOfGoodsSold) * periodDays;
+  }
+
+  // Sell-through Rate (%)
+  static double sellThroughRate(int unitsSold, int unitsReceived) {
+    if (unitsReceived == 0) return 0;
+    return (unitsSold / unitsReceived) * 100;
+  }
 }

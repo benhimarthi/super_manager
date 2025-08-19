@@ -127,14 +127,26 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
             princingValue = state.elementId;
           });
         }
+        if (state is EmitRandomElementSuccessfully) {
+          try {
+            final data = state.element as Map<dynamic, dynamic>;
+            if (data['id'] == 'select_product_pricing') {
+              setState(() {
+                princingValue = data['pricing_id']!;
+                var prod = ProductModel.fromEntity(
+                  product!,
+                ).copyWith(pricingId: princingValue);
+                context.read<ProductCubit>().updateProduct(prod);
+              });
+            }
+            // ignore: empty_catches
+          } catch (e) {}
+        }
       },
       builder: (context, state) {
         return SingleChildScrollView(
           child: Column(
             children: [
-              /*state.pricingList
-                .where((x) => x.productId == _productId)
-                .toList();*/
               BlocConsumer<ProductPricingCubit, ProductPricingState>(
                 listener: (context, state) {
                   if (state is ProductPricingManagerLoaded) {
@@ -142,6 +154,7 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
                       final prices = state.pricingList
                           .where((x) => x.productId == product!.id)
                           .toList();
+
                       if (prices.isNotEmpty) {
                         princingValue = prices.first.id;
                       }

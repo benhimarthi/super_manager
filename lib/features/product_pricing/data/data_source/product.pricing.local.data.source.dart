@@ -1,7 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:super_manager/core/errors/custom.exception.dart';
-import 'package:super_manager/core/session/session.manager.dart';
-
 import '../models/product.pricing.model.dart';
 
 abstract class ProductPricingLocalDataSource {
@@ -75,11 +73,7 @@ class ProductPricingLocalDataSourceImpl
   @override
   List<ProductPricingModel> getAllLocalPricing() {
     try {
-      final userUid = SessionManager.getUserSession();
-
       var res = _mainBox.values
-          .toList()
-          .where((x) => x['creatorId'] == userUid!.id)
           .toList()
           .map((m) => ProductPricingModel.fromMap(Map<String, dynamic>.from(m)))
           .toList();

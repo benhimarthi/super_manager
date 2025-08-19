@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/kpi.chart.widget.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 
@@ -104,28 +105,18 @@ class InventoryItemCard extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Cost Per Unit: \$${metadata!.costPerUnit.toStringAsFixed(2)}',
-                ),
-                Text(
-                  'Total Stock Value: \$${metadata!.totalStockValue.toStringAsFixed(2)}',
-                ),
-                Text(
-                  'Markup: ${metadata!.markupPercentage.toStringAsFixed(2)}%',
-                ),
-                Text(
-                  'Avg Daily Sales: ${metadata!.averageDailySales.toStringAsFixed(2)}',
-                ),
-                Text(
-                  'Stock Turnover Rate: ${metadata!.stockTurnoverRate.toStringAsFixed(2)}',
-                ),
-                Text('Lead Time (Days): ${metadata!.leadTimeInDays}'),
-                Text(
-                  'Demand Forecast: ${metadata!.demandForecast.toStringAsFixed(2)}',
-                ),
-                Text(
-                  'Seasonality Factor: ${metadata!.seasonalityFactor.toStringAsFixed(2)}',
-                ),
+                /*KpiChartWidget(
+                  kpiData: [
+                    KPIValue("val1", 0.0),
+                    KPIValue("val1", 10.0),
+                    KPIValue("val1", 20.0),
+                    KPIValue("val1", 05.0),
+                    KPIValue("val1", 06.0),
+                    KPIValue("val1", 100.0),
+                    KPIValue("val1", 50.0),
+                  ],
+                  chartTitle: "chart title",
+                ),*/
               ] else
                 const Text(
                   'No metadata available',
@@ -154,7 +145,7 @@ class InventoryItemCard extends StatelessWidget {
                           icon: const Icon(
                             Icons.delete,
                             size: 18,
-                            color: Colors.red,
+                            color: Color.fromARGB(255, 98, 244, 54),
                           ),
                           label: const Text(
                             'Delete',

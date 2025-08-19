@@ -7,7 +7,7 @@ class KpiChartWidget extends StatefulWidget {
   final List<KPIValue> kpiData; // Assume your data is already filtered by KPI
   final String chartTitle;
 
-  KpiChartWidget({required this.kpiData, required this.chartTitle});
+  const KpiChartWidget({required this.kpiData, required this.chartTitle});
 
   @override
   _KpiChartWidgetState createState() => _KpiChartWidgetState();

@@ -60,6 +60,11 @@ class _ProductPricingViewState extends State<ProductPricingView> {
           children: [
             BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
               listener: (context, state) {
+                if (state is ElementAddedSuccessfully) {
+                  setState(() {
+                    selectedPricing = state.elementId;
+                  });
+                }
                 if (state is EmitRandomElementSuccessfully) {
                   try {
                     final data = state.element as Map<dynamic, dynamic>;
@@ -67,7 +72,18 @@ class _ProductPricingViewState extends State<ProductPricingView> {
                       setState(() {
                         selectedPricing = data['pricing_id']!;
                       });
+                      for (var x in myProductPricing) {
+                        final pricingMod = ProductPricingModel.fromEntity(x);
+                        if (x.id == selectedPricing) {
+                          final cp = pricingMod.copyWith(active: true);
+                          context.read<ProductPricingCubit>().updatePricing(cp);
+                        } else {
+                          final cp = pricingMod.copyWith(active: false);
+                          context.read<ProductPricingCubit>().updatePricing(cp);
+                        }
+                      }
                     }
+                    // ignore: empty_catches
                   } catch (e) {}
                 }
               },
@@ -94,105 +110,98 @@ class _ProductPricingViewState extends State<ProductPricingView> {
               listener: (context, state) {},
               builder: (context, state) {
                 return myProductPricing.isNotEmpty
-                    ? Row(
-                        children: myProductPricing.map((x) {
-                          final pricingMod = ProductPricingModel.fromEntity(x);
-                          if (x.id == selectedPricing) {
-                            final cp = pricingMod.copyWith(active: true);
-                            context.read<ProductPricingCubit>().updatePricing(
-                              cp,
-                            );
-                          } else {
-                            final cp = pricingMod.copyWith(active: false);
-                            context.read<ProductPricingCubit>().updatePricing(
-                              cp,
-                            );
-                          }
-                          return GestureDetector(
-                            onTap: () {
-                              context
-                                  .read<WidgetManipulatorCubit>()
-                                  .emitRandomElement({
-                                    "id": "select_product_pricing",
-                                    "pricing_id": x.id,
-                                  });
-                            },
-                            child: Container(
-                              width: 80,
-                              height: 45,
-                              padding: EdgeInsets.all(5),
-                              margin: EdgeInsets.symmetric(horizontal: 5),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: selectedPricing == x.id
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.transparent,
+                    ? Container(
+                        width: 220,
+                        height: 55,
+                        //decoration: BoxDecoration(color: Colors.amber),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: myProductPricing.map((x) {
+                            return GestureDetector(
+                              onTap: () {
+                                context
+                                    .read<WidgetManipulatorCubit>()
+                                    .emitRandomElement({
+                                      "id": "select_product_pricing",
+                                      "pricing_id": x.id,
+                                    });
+                              },
+                              child: Container(
+                                width: 80,
+                                height: 45,
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: selectedPricing == x.id
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.transparent,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    ListView(
-                                      scrollDirection: Axis.horizontal,
-                                      children: [
-                                        Text.rich(
-                                          TextSpan(
-                                            text: x.amount.toString(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            children: [
-                                              TextSpan(
-                                                text: " DH",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
+                                child: Center(
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          Text.rich(
+                                            TextSpan(
+                                              text: x.amount.toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          _addProductPricing(x);
-                                        },
-                                        child: Container(
-                                          width: 17,
-                                          height: 17,
-                                          decoration: BoxDecoration(
-                                            color: Colors.green,
-                                            borderRadius: BorderRadius.circular(
-                                              15,
+                                              children: [
+                                                TextSpan(
+                                                  text: " DH",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: Colors.white,
-                                              size: 12,
+                                        ],
+                                      ),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _addProductPricing(x);
+                                          },
+                                          child: Container(
+                                            width: 17,
+                                            height: 17,
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: Colors.white,
+                                                size: 12,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
+                            );
+                          }).toList(),
+                        ),
                       )
                     : BlocConsumer<
                         WidgetManipulatorCubit,

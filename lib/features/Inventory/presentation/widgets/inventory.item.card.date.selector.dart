@@ -27,13 +27,20 @@ class _InventoryItemCardDateSelectorState
   @override
   void initState() {
     super.initState();
-    selectedPeriod = "Weekly";
-    _endDate = DateTime.now();
-    _startDate = getPeriodStart(_endDate!, selectedPeriod);
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "filter_sales_by_date",
-      "start_date": _startDate,
-      "end_date": _endDate,
+    selectedPeriod = "Monthly";
+    Future.delayed(Duration(seconds: 3), () {
+      _endDate = DateTime.now();
+      _startDate = getPeriodStart(_endDate!, selectedPeriod);
+      context
+          .read<WidgetManipulatorCubit>()
+          .emitRandomElement({
+            "id": "filter_sales_by_date",
+            "start_date": _startDate,
+            "end_date": _endDate,
+          })
+          .whenComplete(() {
+            setState(() {});
+          });
     });
   }
 
@@ -68,22 +75,41 @@ class _InventoryItemCardDateSelectorState
         }
         // Optionally: filter data here or trigger callback
       });
+      context.read<WidgetManipulatorCubit>().emitRandomElement({
+        "id": "filter_sales_by_date",
+        "start_date": _startDate,
+        "end_date": _endDate,
+      });
     }
   }
 
   DateTime getPeriodStart(DateTime now, String period) {
+    var myInventoryHistory = widget.myHistories;
+    myInventoryHistory.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     switch (period) {
       case 'Weekly':
         // Monday as first day of week
-        return now.subtract(Duration(days: now.weekday - 1));
+        final today = now.subtract(Duration(days: now.weekday - 1));
+        return today.isBefore(myInventoryHistory.first.timestamp)
+            ? myInventoryHistory.first.timestamp
+            : today;
       case 'Monthly':
-        return DateTime(now.year, now.month, 1);
+        final month = DateTime(now.year, now.month, 1);
+        return month.isBefore(myInventoryHistory.first.timestamp)
+            ? myInventoryHistory.first.timestamp
+            : month;
       case 'Semestrial':
-        return now.month <= 6
+        final period = now.month <= 6
             ? DateTime(now.year, 1, 1)
             : DateTime(now.year, 7, 1);
+        return period.isBefore(myInventoryHistory.first.timestamp)
+            ? myInventoryHistory.first.timestamp
+            : period;
       case 'Yearly':
-        return DateTime(now.year, 1, 1);
+        final year = DateTime(now.year, 1, 1);
+        return year.isBefore(myInventoryHistory.first.timestamp)
+            ? myInventoryHistory.first.timestamp
+            : year;
       default:
         return now;
     }

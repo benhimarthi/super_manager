@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.kpi.chart.view.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/kpi.chart.widget.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
@@ -105,18 +106,7 @@ class InventoryItemCard extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                /*KpiChartWidget(
-                  kpiData: [
-                    KPIValue("val1", 0.0),
-                    KPIValue("val1", 10.0),
-                    KPIValue("val1", 20.0),
-                    KPIValue("val1", 05.0),
-                    KPIValue("val1", 06.0),
-                    KPIValue("val1", 100.0),
-                    KPIValue("val1", 50.0),
-                  ],
-                  chartTitle: "chart title",
-                ),*/
+                InventoryItemKpiChartView(),
               ] else
                 const Text(
                   'No metadata available',
@@ -145,7 +135,7 @@ class InventoryItemCard extends StatelessWidget {
                           icon: const Icon(
                             Icons.delete,
                             size: 18,
-                            color: Color.fromARGB(255, 98, 244, 54),
+                            color: Color.fromARGB(255, 244, 54, 54),
                           ),
                           label: const Text(
                             'Delete',

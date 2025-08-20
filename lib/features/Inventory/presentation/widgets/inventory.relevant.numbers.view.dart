@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/apllication_method/inventory.kpi.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/get.sub.intervals.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/period.informations.datas.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import 'package:super_manager/features/sale/domain/entities/sale.dart';
@@ -99,156 +100,46 @@ class _InventoryRelevantNumbersViewState
     );
   }
 
-  salesQuantityDuringPeriod(List<Sale> sales, Set<SaleItem> saleItems) {
-    var periodSale = sales
-        .where((x) => x.date.isAfter(_startDate) && x.date.isBefore(_endDate))
-        .toList()
-        .where((x) => x.status == "Paid")
-        .toList();
-    var saleItemsPeriod = saleItems
-        .where((x) => periodSale.map((y) => y.id).contains(x.saleId))
-        .toList();
-    final salePeriod = saleItemsPeriod.map((y) => y.quantity).toList();
-    int saleQuantityPeriod = salePeriod.isNotEmpty
-        ? salePeriod.reduce((a, b) => a + b)
-        : 0;
-    final salesRevenue = saleItemsPeriod
-        .map((x) => x.quantity * x.unitPrice)
-        .toList();
-    double amount = salesRevenue.isNotEmpty
-        ? salesRevenue.reduce((a, b) => a + b)
-        : 0;
-    return {
-      "period_quantity_sold": saleQuantityPeriod,
-      "period_quantity_revenue": amount,
-    };
-  }
-
-  startDateProductAvailableQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
-    final prevInventories = widget.myInventoryHistories
-        .where((x) => x.timestamp.isBefore(_startDate))
-        .toList();
-    prevInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    final earliestRestock = prevInventories.lastOrNull;
-    final salesAfterLastRestock = sales
-        .where(
-          (x) =>
-              x.date.isAfter(earliestRestock!.timestamp) &&
-              x.date.isBefore(_startDate),
-        )
-        .toList();
-    final salesItemsALR = saleItems
-        .where(
-          (x) => salesAfterLastRestock
-              .map((x) => x.id)
-              .toList()
-              .contains(x.saleId),
-        )
-        .toList();
-    int quantitySale = salesItemsALR.isNotEmpty
-        ? salesItemsALR.map((x) => x.quantity).toList().reduce((a, b) => a + b)
-        : 0;
-    final res = earliestRestock!.action == "update"
-        ? earliestRestock
-                  .changes['inventory']!['new_version']['quantityAvailable'] -
-              quantitySale
-        : earliestRestock.changes['inventory']!['quantityAvailable'] -
-              quantitySale;
-    double unitPrice = earliestRestock.action == "update"
-        ? earliestRestock
-              .changes['inventory_meta_data']!['new_version']['costPerUnit']
-        : earliestRestock.changes['inventory_meta_data']!['costPerUnit'];
-    return {
-      "start_date_quantity": res,
-      "start_date_unit_cost": unitPrice,
-      "amount": res * unitPrice,
-    };
-  }
-
-  endDateProductAvailableQuantity(List<Sale> sales, Set<SaleItem> saleItems) {
-    final nextInventories = widget.myInventoryHistories
-        .where((x) => x.timestamp.isAfter(_endDate))
-        .toList();
-    nextInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    final closetRestock = nextInventories.firstOrNull;
-    DateTime refDate = DateTime.now();
-    int quantityLastRestock = widget.inventory.quantityAvailable;
-    if (closetRestock != null) {
-      refDate = closetRestock.timestamp;
-      quantityLastRestock = closetRestock
-          .changes['inventory']!['old_version']['quantityAvailable'];
-    }
-    final salesAfterLastRestock = sales
-        .where((x) => x.date.isAfter(_endDate) && x.date.isBefore(refDate))
-        .toList();
-    final salesItemsALR = saleItems
-        .where(
-          (x) => salesAfterLastRestock
-              .map((x) => x.id)
-              .toList()
-              .contains(x.saleId),
-        )
-        .toList();
-    int quantitySale = salesItemsALR.isNotEmpty
-        ? salesItemsALR.map((x) => x.quantity).toList().reduce((a, b) => a + b)
-        : 0;
-    final result = quantityLastRestock - quantitySale;
-    double unitPrice = closetRestock != null
-        ? closetRestock
-              .changes['inventory_meta_data']!['new_version']['costPerUnit']
-        : widget.inventoryMetadata.costPerUnit;
-    return {
-      "end_date_quantity": result,
-      "end_date_unit_price": unitPrice,
-      "amount": result * unitPrice,
-    };
-  }
-
-  periodSupplyQttValue() {
-    final supply = widget.myInventoryHistories.where(
-      (x) => x.timestamp.isBefore(_endDate) && x.timestamp.isAfter(_startDate),
-    );
-    final supplies = supply.where((x) => x.action != "update").toList();
-    if (supplies.isNotEmpty) {
-      int qtt = 0;
-      double price = 0;
-      for (var n in supplies) {
-        int nV = n.changes['inventory']!['new_version']['quantityAvailable'];
-        int oV = n.changes['inventory']!['old_version']['quantityAvailable'];
-        int diffV = (nV - oV).abs();
-        qtt += diffV;
-        final p =
-            diffV *
-            n.changes['inventory_meta_data']!['new_version']['costPerUnit'];
-        price += p;
-      }
-
-      return {"supply_quantity": qtt, "supply_cost": price};
-    } else {
-      return {"supply_quantity": 0, "supply_cost": 0};
-    }
-  }
-
-  int daysBetween(DateTime from, DateTime to) {
-    // Normalize the dates to ignore time components
-    from = DateTime(from.year, from.month, from.day);
-    to = DateTime(to.year, to.month, to.day);
-
-    return to.difference(from).inDays;
-  }
-
   averageInventory() {
     return InventoryKPI.averageInventory(
-      startDateProductAvailableQuantity(sales, saleItems)['amount'],
-      endDateProductAvailableQuantity(sales, saleItems)['amount'],
+      PeriodInformationsDatas.startDateProductAvailableQuantity(
+        sales,
+        saleItems,
+        widget.myInventoryHistories,
+        _startDate,
+      )['amount'],
+      PeriodInformationsDatas.endDateProductAvailableQuantity(
+        sales,
+        saleItems,
+        widget.myInventoryHistories,
+        widget.inventory,
+        widget.inventoryMetadata,
+        _endDate,
+      )['amount'],
     );
   }
 
   COGS() {
     //Cost of goods
-    return startDateProductAvailableQuantity(sales, saleItems)['amount'] +
-        periodSupplyQttValue()['supply_cost'] +
-        endDateProductAvailableQuantity(sales, saleItems)['amount'];
+    return PeriodInformationsDatas.startDateProductAvailableQuantity(
+          sales,
+          saleItems,
+          widget.myInventoryHistories,
+          _startDate,
+        )['amount'] +
+        PeriodInformationsDatas.periodSupplyQttValue(
+          widget.myInventoryHistories,
+          _startDate,
+          _endDate,
+        )['supply_cost'] +
+        PeriodInformationsDatas.endDateProductAvailableQuantity(
+          sales,
+          saleItems,
+          widget.myInventoryHistories,
+          widget.inventory,
+          widget.inventoryMetadata,
+          _endDate,
+        )['amount'];
   }
 
   inventoryTurnOver() {
@@ -257,7 +148,12 @@ class _InventoryRelevantNumbersViewState
 
   grossMarginReturnOnInvestment() {
     return InventoryKPI.gmroi(
-      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_revenue'],
+      PeriodInformationsDatas.salesQuantityDuringPeriod(
+        sales,
+        saleItems,
+        _startDate,
+        _endDate,
+      )['period_quantity_revenue'],
       COGS(),
       averageInventory(),
     );
@@ -265,10 +161,24 @@ class _InventoryRelevantNumbersViewState
 
   stockToSalesRatio() {
     return InventoryKPI.stockToSalesRatio(
-      startDateProductAvailableQuantity(sales, saleItems)['amount'] +
-          periodSupplyQttValue()['supply_cost'] -
+      PeriodInformationsDatas.startDateProductAvailableQuantity(
+            sales,
+            saleItems,
+            widget.myInventoryHistories,
+            _startDate,
+          )['amount'] +
+          PeriodInformationsDatas.periodSupplyQttValue(
+            widget.myInventoryHistories,
+            _startDate,
+            _endDate,
+          )['supply_cost'] -
           COGS(),
-      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_revenue'],
+      PeriodInformationsDatas.salesQuantityDuringPeriod(
+        sales,
+        saleItems,
+        _startDate,
+        _endDate,
+      )['period_quantity_revenue'],
     );
   }
 
@@ -276,20 +186,30 @@ class _InventoryRelevantNumbersViewState
     return InventoryKPI.daysOfInventoryOnHand(
       averageInventory(),
       COGS(),
-      daysBetween(_startDate, _endDate),
+      PeriodInformationsDatas.daysBetween(_startDate, _endDate),
     );
   }
 
   sellThroughRate() {
+    final ints = getSubIntervals(DateTime(2025, 07, 01), _endDate, "months");
+    print(ints);
     return InventoryKPI.sellThroughRate(
-      salesQuantityDuringPeriod(sales, saleItems)['period_quantity_sold'],
-      periodSupplyQttValue()['supply_quantity'],
+      PeriodInformationsDatas.salesQuantityDuringPeriod(
+        sales,
+        saleItems,
+        _startDate,
+        _endDate,
+      )['period_quantity_sold'],
+      PeriodInformationsDatas.periodSupplyQttValue(
+        widget.myInventoryHistories,
+        _startDate,
+        _endDate,
+      )['supply_quantity'],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    startDateProductAvailableQuantity(sales, saleItems);
     return SizedBox(
       width: double.infinity,
       height: 100,
@@ -300,8 +220,10 @@ class _InventoryRelevantNumbersViewState
             try {
               var data = (state.element as Map<String, dynamic>);
               if (data['id'] == "filter_sales_by_date") {
-                _startDate = data['start_date'];
-                _endDate = data['end_date'];
+                setState(() {
+                  _startDate = data['start_date'];
+                  _endDate = data['end_date'];
+                });
               }
             } catch (e) {}
           }

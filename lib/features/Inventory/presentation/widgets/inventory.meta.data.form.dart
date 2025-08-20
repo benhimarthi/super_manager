@@ -18,8 +18,6 @@ import 'package:super_manager/features/product_pricing/domain/entities/product.p
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../firebase_options.dart';
-
 class InventoryMetaDataForm extends StatefulWidget {
   final Inventory? inventory;
   final Inventory? oldVersion;

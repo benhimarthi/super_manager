@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/apllication_method/inventory.kpi.dart';
+import 'package:super_manager/core/apllication_method/inventory.kpi.information.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
-import 'package:super_manager/features/Inventory/presentation/widgets/get.sub.intervals.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/component.info.dialog.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.kpi.chart.view.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/period.informations.datas.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
@@ -11,7 +13,6 @@ import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/sale_item/domain/entities/sale.item.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
-
 import '../../../sale/presentation/cubit/sale.state.dart';
 import '../../../sale_item/presentation/cubit/sale.item.state.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
@@ -41,6 +42,8 @@ class _InventoryRelevantNumbersViewState
   late DateTime _startDate;
   late DateTime _endDate;
   late int totalUnit = 0;
+  late String currentKpiTitle;
+  late double currentKpiValue;
 
   @override
   void initState() {
@@ -53,49 +56,65 @@ class _InventoryRelevantNumbersViewState
         widget.inventory.quantityAvailable +
         widget.inventory.quantityReserved +
         widget.inventory.quantitySold;
+    currentKpiTitle = "Average inventory";
+    currentKpiValue = averageInventory();
     context.read<SaleCubit>().loadSales();
   }
 
   Widget _inventoryNbInfos(String title, double value, bool selected) {
-    return Container(
-      height: 60,
-      width: 100,
-      padding: EdgeInsets.all(3),
-      margin: EdgeInsets.symmetric(horizontal: 3),
-      decoration: selected
-          ? BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(color: Colors.amber, width: 2),
-            )
-          : BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: const Color.fromARGB(255, 88, 88, 88),
-                width: 2,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          currentKpiTitle = title;
+          currentKpiValue = value;
+        });
+        context.read<WidgetManipulatorCubit>().emitRandomElement({
+          "id": "select_inventory_kpi",
+          "kpi": title,
+        });
+      },
+      child: Container(
+        height: 60,
+        width: 100,
+        padding: EdgeInsets.all(3),
+        margin: EdgeInsets.symmetric(horizontal: 3),
+        decoration: selected
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.amber, width: 2),
+              )
+            : BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(
+                  color: currentKpiTitle == title
+                      ? Colors.green
+                      : const Color.fromARGB(255, 88, 88, 88),
+                  width: currentKpiTitle == title ? 5 : 2,
+                ),
               ),
-            ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          SizedBox(height: 4),
-          SizedBox(
-            width: 55,
-            child: Text(
-              value.toString(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Theme.of(context).primaryColor,
-              ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
               overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
-          ),
-        ],
+            SizedBox(height: 4),
+            SizedBox(
+              width: 55,
+              child: Text(
+                value.toString(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Theme.of(context).primaryColor,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,8 +210,6 @@ class _InventoryRelevantNumbersViewState
   }
 
   sellThroughRate() {
-    final ints = getSubIntervals(DateTime(2025, 07, 01), _endDate, "months");
-    print(ints);
     return InventoryKPI.sellThroughRate(
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         sales,
@@ -212,7 +229,7 @@ class _InventoryRelevantNumbersViewState
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 100,
+      //height: 100,
       //color: Colors.green,
       child: BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
         listener: (context, state) {
@@ -262,10 +279,41 @@ class _InventoryRelevantNumbersViewState
                   return Container();
                 },
               ),
-              Text(
-                "Stock turn over rate",
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.amber),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: 170,
+                    child: Text(
+                      currentKpiTitle,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.amber,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    '$currentKpiValue',
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  SizedBox(width: 10),
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ComponentInfoDialog(
+                            title: currentKpiTitle,
+                            message: inventoryKPIInfos[currentKpiTitle]!,
+                          );
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.help, size: 18, color: Colors.white),
+                  ),
+                ],
               ),
               SizedBox(height: 10),
               SizedBox(
@@ -309,6 +357,14 @@ class _InventoryRelevantNumbersViewState
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 8),
+              InventoryItemKpiChartView(
+                inventory: widget.inventory,
+                inventoryMetadata: widget.inventoryMetadata,
+                myInventoryHistories: widget.myInventoryHistories,
+                sales: sales,
+                saleItems: saleItems,
               ),
             ],
           );

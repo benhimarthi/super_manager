@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
-import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.kpi.chart.view.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
-import 'package:super_manager/features/Inventory/presentation/widgets/kpi.chart.widget.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
-
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../domain/entities/inventory.dart';
 
@@ -60,6 +57,10 @@ class InventoryItemCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                product!.name,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
               InventoryItemCardDateSelector(
                 inventory: inventory,
                 myHistories: myInventoryHistory,
@@ -101,12 +102,6 @@ class InventoryItemCard extends StatelessWidget {
                   inventoryVersions: myInventories,
                   myInventoryHistories: myInventoryHistory,
                 ),
-                const Text(
-                  'Metadata',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                InventoryItemKpiChartView(),
               ] else
                 const Text(
                   'No metadata available',

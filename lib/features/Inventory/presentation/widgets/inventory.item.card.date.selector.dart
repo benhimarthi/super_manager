@@ -151,7 +151,7 @@ class _InventoryItemCardDateSelectorState
                 });
               },
             ),
-            SizedBox(width: 8),
+            //SizedBox(width: 8),
             Container(
               padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -168,9 +168,9 @@ class _InventoryItemCardDateSelectorState
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            //SizedBox(width: 8),
             Text("->", style: TextStyle(color: Colors.white)),
-            SizedBox(width: 8),
+            //SizedBox(width: 8),
             Container(
               padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -185,6 +185,13 @@ class _InventoryItemCardDateSelectorState
                       : _endDate.toString().split(' ')[0],
                   style: TextStyle(color: Colors.white),
                 ),
+              ),
+            ),
+            GestureDetector(
+              child: Icon(
+                Icons.help,
+                size: 18,
+                color: Colors.white, //Theme.of(context).primaryColor,
               ),
             ),
           ],

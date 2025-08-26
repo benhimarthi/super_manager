@@ -171,40 +171,79 @@ class _InventoryItemKpiChartViewState extends State<InventoryItemKpiChartView> {
       case "Average inventory":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(averageInventory),
         });
         break;
       case "Stock turn over rate":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(inventoryTurnOver),
         });
         break;
       case "Gross Margin Return On Investment":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(grossMarginReturnOnInvestment),
         });
         break;
       case "Stock to sales ratio":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(stockToSalesRatio),
         });
         break;
       case "Days of inventory on hand":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(daysOfInventoryOnHand),
         });
         break;
       case "Sell through rate":
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "change_chart_kpi_data",
+          "inv_id": widget.inventory.id,
           "data": calculatePediodKPI(sellThroughRate),
         });
         break;
     }
+  }
+
+  emitChartKPI() {
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(averageInventory),
+    });
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(inventoryTurnOver),
+    });
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(grossMarginReturnOnInvestment),
+    });
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(stockToSalesRatio),
+    });
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(daysOfInventoryOnHand),
+    });
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "change_chart_kpi_data",
+      "inv_id": widget.inventory.id,
+      "data": calculatePediodKPI(sellThroughRate),
+    });
   }
 
   @override

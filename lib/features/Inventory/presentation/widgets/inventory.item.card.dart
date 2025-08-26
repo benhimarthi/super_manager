@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
+import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../domain/entities/inventory.dart';
 
-class InventoryItemCard extends StatelessWidget {
+class InventoryItemCard extends StatefulWidget {
   final List<Inventory> myInventories;
   final List<ActionHistory> myInventoryHistory;
   final Inventory inventory;
@@ -15,12 +17,14 @@ class InventoryItemCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final bool isInfoDisplayer;
 
   const InventoryItemCard({
     Key? key,
     required this.myInventories,
     required this.inventory,
     required this.myInventoryHistory,
+    required this.isInfoDisplayer,
     this.product,
     this.metadata,
     this.onTap,
@@ -28,17 +32,36 @@ class InventoryItemCard extends StatelessWidget {
     this.onDelete,
   }) : super(key: key);
 
+  @override
+  State<InventoryItemCard> createState() => _InventoryItemCardState();
+}
+
+class _InventoryItemCardState extends State<InventoryItemCard> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      "id": "activity_numbers",
+      "inv_id": widget.inventory.id,
+      "datas": {
+        "available_quantity": widget.inventory.quantityAvailable,
+        "reserved_quantity": widget.inventory.quantityReserved,
+        "sold_quantity": widget.inventory.quantitySold,
+      },
+    });
+  }
+
   Color get stockStatusColor {
-    if (inventory.isBlocked) return Colors.grey;
-    if (inventory.isOutOfStock) return Colors.red;
-    if (inventory.isLowStock) return Colors.orange;
+    if (widget.inventory.isBlocked) return Colors.grey;
+    if (widget.inventory.isOutOfStock) return Colors.red;
+    if (widget.inventory.isLowStock) return Colors.orange;
     return Colors.green;
   }
 
   String get stockStatusText {
-    if (inventory.isBlocked) return 'Blocked';
-    if (inventory.isOutOfStock) return 'Out of Stock';
-    if (inventory.isLowStock) return 'Low Stock';
+    if (widget.inventory.isBlocked) return 'Blocked';
+    if (widget.inventory.isOutOfStock) return 'Out of Stock';
+    if (widget.inventory.isLowStock) return 'Low Stock';
     return 'In Stock';
   }
 
@@ -51,19 +74,18 @@ class InventoryItemCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                product!.name,
+                widget.product!.name,
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               InventoryItemCardDateSelector(
-                inventory: inventory,
-                myHistories: myInventoryHistory,
+                myHistories: widget.myInventoryHistory,
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -72,15 +94,19 @@ class InventoryItemCard extends StatelessWidget {
                 children: [
                   _buildQuantityInfo(
                     'Available',
-                    inventory.quantityAvailable,
+                    widget.inventory.quantityAvailable,
                     context,
                   ),
                   _buildQuantityInfo(
                     'Reserved',
-                    inventory.quantityReserved,
+                    widget.inventory.quantityReserved,
                     context,
                   ),
-                  _buildQuantityInfo('Sold', inventory.quantitySold, context),
+                  _buildQuantityInfo(
+                    'Sold',
+                    widget.inventory.quantitySold,
+                    context,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -94,13 +120,14 @@ class InventoryItemCard extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Metadata info (conditionally shown)
-              if (metadata != null) ...[
+              if (widget.metadata != null) ...[
                 const Divider(),
                 InventoryRelevantNumbersView(
-                  inventory: inventory,
-                  inventoryMetadata: metadata!,
-                  inventoryVersions: myInventories,
-                  myInventoryHistories: myInventoryHistory,
+                  inventory: widget.inventory,
+                  inventoryMetadata: widget.metadata!,
+                  inventoryVersions: widget.myInventories,
+                  myInventoryHistories: widget.myInventoryHistory,
+                  infoDisplayer: widget.isInfoDisplayer,
                 ),
               ] else
                 const Text(
@@ -112,21 +139,21 @@ class InventoryItemCard extends StatelessWidget {
                 ),
 
               // Actions
-              if (onEdit != null || onDelete != null)
+              if (widget.onEdit != null || widget.onDelete != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (onEdit != null)
+                      if (widget.onEdit != null)
                         TextButton.icon(
-                          onPressed: onEdit,
+                          onPressed: widget.onEdit,
                           icon: const Icon(Icons.edit, size: 18),
                           label: const Text('Edit'),
                         ),
-                      if (onDelete != null)
+                      if (widget.onDelete != null)
                         TextButton.icon(
-                          onPressed: onDelete,
+                          onPressed: widget.onDelete,
                           icon: const Icon(
                             Icons.delete,
                             size: 18,

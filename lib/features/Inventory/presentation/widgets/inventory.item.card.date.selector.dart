@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 
 class InventoryItemCardDateSelector extends StatefulWidget {
-  final Inventory inventory;
   final List<ActionHistory> myHistories;
-  const InventoryItemCardDateSelector({
-    super.key,
-    required this.inventory,
-    required this.myHistories,
-  });
+  const InventoryItemCardDateSelector({super.key, required this.myHistories});
 
   @override
   State<InventoryItemCardDateSelector> createState() =>

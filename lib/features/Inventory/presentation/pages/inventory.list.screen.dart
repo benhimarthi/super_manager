@@ -148,6 +148,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                                   .where((x) => x.entityId == item.id)
                                   .toList();
                               return InventoryItemCard(
+                                isInfoDisplayer: false,
                                 myInventories: inventoryList
                                     .where((x) => x.productId == myProductId)
                                     .toList(),

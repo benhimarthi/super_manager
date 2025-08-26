@@ -22,12 +22,14 @@ class InventoryRelevantNumbersView extends StatefulWidget {
   final InventoryMetadata inventoryMetadata;
   final List<Inventory> inventoryVersions;
   final List<ActionHistory> myInventoryHistories;
+  final bool infoDisplayer;
   const InventoryRelevantNumbersView({
     super.key,
     required this.inventory,
     required this.inventoryVersions,
     required this.myInventoryHistories,
     required this.inventoryMetadata,
+    this.infoDisplayer = false,
   });
 
   @override
@@ -225,6 +227,57 @@ class _InventoryRelevantNumbersViewState
     );
   }
 
+  emitKPI() {
+    context.read<WidgetManipulatorCubit>().emitRandomElement({
+      'id': "inventory_kpi",
+      "inv_id": widget.inventory.id,
+      "datas": {
+        'totalAvgInventory': averageInventory(),
+        'totalStockTurnOver': inventoryTurnOver(),
+        'totalGrossMarginReturnOnInv': grossMarginReturnOnInvestment(),
+        'totalStockToSalesRatio': stockToSalesRatio(),
+        'totalDaysOfInvOnHand': daysOfInventoryOnHand(),
+        'totalSellThroughRate': sellThroughRate(),
+        'COGS': COGS(),
+        'period_days': PeriodInformationsDatas.daysBetween(
+          _startDate,
+          _endDate,
+        ),
+        'period_amount_revenu':
+            PeriodInformationsDatas.salesQuantityDuringPeriod(
+              sales,
+              saleItems,
+              _startDate,
+              _endDate,
+            )['period_quantity_revenue'],
+        "period_stock_value":
+            PeriodInformationsDatas.startDateProductAvailableQuantity(
+              sales,
+              saleItems,
+              widget.myInventoryHistories,
+              _startDate,
+            )['amount'] +
+            PeriodInformationsDatas.periodSupplyQttValue(
+              widget.myInventoryHistories,
+              _startDate,
+              _endDate,
+            )['supply_cost'] -
+            COGS(),
+        'unitsSold': PeriodInformationsDatas.salesQuantityDuringPeriod(
+          sales,
+          saleItems,
+          _startDate,
+          _endDate,
+        )['period_quantity_sold'],
+        'unitsReceive': PeriodInformationsDatas.periodSupplyQttValue(
+          widget.myInventoryHistories,
+          _startDate,
+          _endDate,
+        )['supply_quantity'],
+      },
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -256,6 +309,9 @@ class _InventoryRelevantNumbersViewState
                     for (var n in sales) {
                       context.read<SaleItemCubit>().loadSaleItems(n.id);
                     }
+                    if (widget.infoDisplayer) {
+                      emitKPI();
+                    }
                   }
                 },
                 builder: (context, state) {
@@ -279,93 +335,106 @@ class _InventoryRelevantNumbersViewState
                   return Container();
                 },
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 170,
-                    child: Text(
-                      currentKpiTitle,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.amber,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    '$currentKpiValue',
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-                  ),
-                  SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return ComponentInfoDialog(
-                            title: currentKpiTitle,
-                            message: inventoryKPIInfos[currentKpiTitle]!,
-                          );
-                        },
-                      );
-                    },
-                    icon: Icon(Icons.help, size: 18, color: Colors.white),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 65,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _inventoryNbInfos(
-                      "Average inventory",
-                      averageInventory(),
-                      false,
-                    ),
-                    _inventoryNbInfos(
-                      "Stock turn over rate",
-                      inventoryTurnOver(),
-                      false,
-                    ),
-                    _inventoryNbInfos(
-                      "Gross Margin Return On Investment",
-                      grossMarginReturnOnInvestment(),
-                      false,
-                    ),
-                    //stockToSalesRatio
-                    _inventoryNbInfos(
-                      "Stock to sales ratio",
-                      stockToSalesRatio(),
-                      false,
-                    ),
-                    //daysOfInventoryOnHand
-                    _inventoryNbInfos(
-                      "Days of inventory on hand",
-                      daysOfInventoryOnHand(),
-                      false,
-                    ),
-                    //sellThroughRate
-                    _inventoryNbInfos(
-                      "Sell through rate",
-                      sellThroughRate(),
-                      false,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              InventoryItemKpiChartView(
-                inventory: widget.inventory,
-                inventoryMetadata: widget.inventoryMetadata,
-                myInventoryHistories: widget.myInventoryHistories,
-                sales: sales,
-                saleItems: saleItems,
-              ),
+              !widget.infoDisplayer
+                  ? Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 170,
+                              child: Text(
+                                currentKpiTitle,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.amber,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              '$currentKpiValue',
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ComponentInfoDialog(
+                                      title: currentKpiTitle,
+                                      message:
+                                          inventoryKPIInfos[currentKpiTitle]!,
+                                    );
+                                  },
+                                );
+                              },
+                              icon: Icon(
+                                Icons.help,
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 65,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              _inventoryNbInfos(
+                                "Average inventory",
+                                averageInventory(),
+                                false,
+                              ),
+                              _inventoryNbInfos(
+                                "Stock turn over rate",
+                                inventoryTurnOver(),
+                                false,
+                              ),
+                              _inventoryNbInfos(
+                                "Gross Margin Return On Investment",
+                                grossMarginReturnOnInvestment(),
+                                false,
+                              ),
+                              //stockToSalesRatio
+                              _inventoryNbInfos(
+                                "Stock to sales ratio",
+                                stockToSalesRatio(),
+                                false,
+                              ),
+                              //daysOfInventoryOnHand
+                              _inventoryNbInfos(
+                                "Days of inventory on hand",
+                                daysOfInventoryOnHand(),
+                                false,
+                              ),
+                              //sellThroughRate
+                              _inventoryNbInfos(
+                                "Sell through rate",
+                                sellThroughRate(),
+                                false,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        InventoryItemKpiChartView(
+                          inventory: widget.inventory,
+                          inventoryMetadata: widget.inventoryMetadata,
+                          myInventoryHistories: widget.myInventoryHistories,
+                          sales: sales,
+                          saleItems: saleItems,
+                        ),
+                      ],
+                    )
+                  : SizedBox(),
             ],
           );
         },

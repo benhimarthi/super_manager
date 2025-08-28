@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/apllication_method/inventory.kpi.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import 'kpi.chart.widget.dart';
@@ -13,15 +14,33 @@ class AssessmentKpiChartView extends StatefulWidget {
 }
 
 class _AssessmentKpiChartViewState extends State<AssessmentKpiChartView> {
-  late Set<KPIValue> totalAvgInventory = {};
-  late Set<KPIValue> totalStockTurnOver = {};
-  late Set<KPIValue> totalGrossMarginReturnOnInv = {};
-  late Set<KPIValue> totalStockToSalesRatio = {};
-  late Set<KPIValue> totalDaysOfInvOnHand = {};
-  late Set<KPIValue> totalSellThroughRate = {};
   late DateTime startDate = DateTime.now();
   late DateTime endDate = DateTime.now();
   late String periodicity = "days";
+
+  late Set<Map<String, dynamic>> avgInventorySet = {};
+  late Set<Map<String, dynamic>> stockTurnOverSet = {};
+  late Set<Map<String, dynamic>> grossMarginReturnOnInvSet = {};
+  late Set<Map<String, dynamic>> stockToSalesRatioSet = {};
+  late Set<Map<String, dynamic>> daysOfInvOnHandSet = {};
+  late Set<Map<String, dynamic>> sellThroughRateSet = {};
+  late Set<Map<String, dynamic>> periodsAmountSales = {};
+  late Set<Map<String, dynamic>> periodsStockValue = {};
+  late Set<Map<String, dynamic>> COGSSet = {};
+  late Set<Map<String, dynamic>> unitsSoldSet = {};
+  late Set<Map<String, dynamic>> unitsReceiveSet = {};
+
+  late List<KPIValue> totalAvgInventory = [];
+  late List<KPIValue> totalStockTurnOver = [];
+  late List<KPIValue> totalGrossMarginReturnOnInv = [];
+  late List<KPIValue> totalStockToSalesRatio = [];
+  late List<KPIValue> totalDaysOfInvOnHand = [];
+  late List<KPIValue> totalSellThroughRate = [];
+  late List<KPIValue> totalPeriodAmountRevenu = [];
+  late List<KPIValue> totalPeriodStockValue = [];
+  late List<KPIValue> totalCOGS = [];
+  late List<KPIValue> totalUnitSold = [];
+  late List<KPIValue> totalUnitsReceive = [];
 
   changeKpi(String kpiTitle) {
     switch (kpiTitle) {
@@ -64,6 +83,95 @@ class _AssessmentKpiChartViewState extends State<AssessmentKpiChartView> {
     }
   }
 
+  List<KPIValue> calculateKPI(dt) {
+    List<List<KPIValue>> value = dt.map((x) => x.values).toList();
+    value.sort((a, b) => a.length.compareTo(b.length));
+    List<KPIValue> longestChain = value.last;
+    List<KPIValue> result = [];
+    for (String n in longestChain.map((x) => x.label).toList()) {
+      List<KPIValue?> currentDateData = value
+          .map((x) => x.where((i) => i.label == n).firstOrNull)
+          .toList()
+          .where((x) => x != null)
+          .toList();
+      result.add(
+        KPIValue(
+          n,
+          currentDateData.map((x) => x!.value).toList().reduce((a, b) => a + b),
+        ),
+      );
+    }
+    return result;
+  }
+
+  totSellThroughRate(
+    List<KPIValue> totalUnitSold,
+    List<KPIValue> totalUnitReceive,
+  ) {
+    int cnt = 0;
+    for (var n in totalUnitSold) {
+      totalSellThroughRate.add(
+        KPIValue(
+          n.label,
+          InventoryKPI.sellThroughRate(
+            int.parse(n.value.toString()),
+            int.parse(totalUnitReceive[cnt].value.toString()),
+          ),
+        ),
+      );
+      cnt++;
+    }
+  }
+
+  daysOfInvOnHand(List<KPIValue> totAvgInv, List<KPIValue> totCOGS) {
+    int cnt = 0;
+    int periodDays = 1;
+    switch (periodicity) {
+      case "days":
+        periodDays = 1;
+        break;
+      case "weeks":
+        periodDays = 7;
+      case "months":
+        periodDays = 30;
+      case "years":
+        periodDays = 360;
+      default:
+    }
+    for (var n in totAvgInv) {
+      totalDaysOfInvOnHand.add(
+        KPIValue(
+          n.label,
+          InventoryKPI.daysOfInventoryOnHand(
+            n.value,
+            totCOGS[cnt].value,
+            periodDays,
+          ),
+        ),
+      );
+      cnt++;
+    }
+  }
+
+  stockToSalesRatio(
+    List<KPIValue> totPeriodStockValue,
+    List<KPIValue> totPeriodAmountRev,
+  ) {
+    int cnt = 0;
+    for (var n in totPeriodStockValue) {
+      totalStockToSalesRatio.add(
+        KPIValue(
+          n.label,
+          InventoryKPI.stockToSalesRatio(
+            n.value,
+            totPeriodAmountRev[cnt].value,
+          ),
+        ),
+      );
+    }
+    cnt++;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
@@ -82,6 +190,53 @@ class _AssessmentKpiChartViewState extends State<AssessmentKpiChartView> {
               });
             } else if (data['id'] == "select_inventory_kpi") {
               changeKpi(data['kpi']);
+            } else if (data['id'] == 'emit_chart_kpi_data') {
+              setState(() {
+                avgInventorySet.add({
+                  data["inv_id"]: data["datas"]["totalAvgInventory"],
+                });
+                totalAvgInventory = calculateKPI(avgInventorySet);
+                stockTurnOverSet.add({
+                  data["inv_id"]: data["datas"]["totalStockTurnOver"],
+                });
+                totalStockTurnOver = calculateKPI(stockTurnOverSet);
+                grossMarginReturnOnInvSet.add({
+                  data["inv_id"]: data["datas"]["totalGrossMarginReturnOnInv"],
+                });
+                totalGrossMarginReturnOnInv = calculateKPI(
+                  grossMarginReturnOnInvSet,
+                );
+                stockToSalesRatioSet.add({
+                  data["inv_id"]: data["datas"]["totalStockToSalesRatio"],
+                });
+                totalStockToSalesRatio = calculateKPI(stockToSalesRatioSet);
+                daysOfInvOnHandSet.add({
+                  data["inv_id"]: data["datas"]["totalDaysOfInvOnHand"],
+                });
+                periodsAmountSales.add({
+                  data["inv_id"]: data["datas"]["period_amount_revenu"],
+                });
+                totalPeriodAmountRevenu = calculateKPI(periodsAmountSales);
+                periodsStockValue.add({
+                  data["inv_id"]: data["datas"]["period_stock_value"],
+                });
+                totalPeriodStockValue = calculateKPI(periodsStockValue);
+                COGSSet.add({data["inv_id"]: data["datas"]["COGS"]});
+                totalCOGS = calculateKPI(COGSSet);
+                unitsSoldSet.add({data["inv_id"]: data["datas"]["unitsSold"]});
+                totalUnitSold = calculateKPI(unitsSoldSet);
+                unitsReceiveSet.add({
+                  data["inv_id"]: data["datas"]["unitsReceive"],
+                });
+                totalUnitsReceive = calculateKPI(unitsReceiveSet);
+                print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@**");
+                totSellThroughRate(totalUnitSold, totalUnitsReceive);
+                daysOfInvOnHand(totalAvgInventory, totalCOGS);
+                stockToSalesRatio(
+                  totalPeriodStockValue,
+                  totalPeriodAmountRevenu,
+                );
+              });
             }
           } catch (e) {}
         }

@@ -213,36 +213,67 @@ class _InventoryItemKpiChartViewState extends State<InventoryItemKpiChartView> {
     }
   }
 
+  saleRevenuDuringPeriod(startDate, endDate) {
+    return PeriodInformationsDatas.salesQuantityDuringPeriod(
+      widget.sales,
+      widget.saleItems,
+      startDate,
+      endDate,
+    )['period_quantity_revenue'];
+  }
+
+  startDateProductAvailableQtt(startDate, endDate) {
+    return PeriodInformationsDatas.startDateProductAvailableQuantity(
+          widget.sales,
+          widget.saleItems,
+          widget.myInventoryHistories,
+          startDate,
+        )['amount'] +
+        PeriodInformationsDatas.periodSupplyQttValue(
+          widget.myInventoryHistories,
+          startDate,
+          endDate,
+        )['supply_cost'] -
+        COGS(startDate, endDate);
+  }
+
+  saleQuantityDuringPeriod(startDate, endDate) {
+    return PeriodInformationsDatas.salesQuantityDuringPeriod(
+      widget.sales,
+      widget.saleItems,
+      startDate,
+      endDate,
+    )['period_quantity_sold'];
+  }
+
+  periodSupplyQuantity(startDate, endDate) {
+    return PeriodInformationsDatas.periodSupplyQttValue(
+      widget.myInventoryHistories,
+      startDate,
+      endDate,
+    )['supply_quantity'];
+  }
+
   emitChartKPI() {
     context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
+      "id": "emit_chart_kpi_data",
       "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(averageInventory),
-    });
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
-      "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(inventoryTurnOver),
-    });
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
-      "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(grossMarginReturnOnInvestment),
-    });
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
-      "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(stockToSalesRatio),
-    });
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
-      "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(daysOfInventoryOnHand),
-    });
-    context.read<WidgetManipulatorCubit>().emitRandomElement({
-      "id": "change_chart_kpi_data",
-      "inv_id": widget.inventory.id,
-      "data": calculatePediodKPI(sellThroughRate),
+      "datas": {
+        'totalAvgInventory': calculatePediodKPI(averageInventory),
+        'totalStockTurnOver': calculatePediodKPI(inventoryTurnOver),
+        'totalGrossMarginReturnOnInv': calculatePediodKPI(
+          grossMarginReturnOnInvestment,
+        ),
+        'totalStockToSalesRatio': calculatePediodKPI(stockToSalesRatio),
+        'totalDaysOfInvOnHand': calculatePediodKPI(daysOfInventoryOnHand),
+        'totalSellThroughRate': calculatePediodKPI(sellThroughRate),
+        'COGS': calculatePediodKPI(COGS),
+        'period_days': calculatePediodKPI(PeriodInformationsDatas.daysBetween),
+        'period_amount_revenu': calculatePediodKPI(saleRevenuDuringPeriod),
+        "period_stock_value": calculatePediodKPI(startDateProductAvailableQtt),
+        'unitsSold': calculatePediodKPI(saleQuantityDuringPeriod),
+        'unitsReceive': calculatePediodKPI(periodSupplyQuantity),
+      },
     });
   }
 

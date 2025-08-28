@@ -13,6 +13,7 @@ import '../../../product/presentation/cubit/product.state.dart';
 import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
 import '../cubit/inventory.cubit.dart';
 import '../cubit/inventory.state.dart';
+import '../widgets/add.inventory.item.options.dart';
 import '../widgets/inventory.item.card.dart';
 
 class InventoryListScreen extends StatefulWidget {
@@ -197,10 +198,25 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
           showDialog(
             context: context,
             builder: (context) {
-              return InventoryFormData(
+              return addItemOptions(
+                title: "Add inventory item",
+                onAdd: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return InventoryFormData(
+                        isBuilding: true,
+                        myInventories: myInventories,
+                      );
+                    },
+                  );
+                },
+                context: context,
+              );
+              /*InventoryFormData(
                 isBuilding: true,
                 myInventories: myInventories,
-              );
+              );*/
             },
           );
         },

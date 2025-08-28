@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/add.inventory.item.options.dart';
 import 'package:super_manager/features/product/presentation/widgets/product.card.item.dart';
 import 'package:super_manager/features/product_category/presentation/widgets/product.category.view.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
@@ -120,7 +121,18 @@ class _ProductPageState extends State<ProductPage> {
           floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.add),
             onPressed: () {
-              _addProduct();
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return addItemOptions(
+                    title: "Add product item",
+                    onAdd: () {
+                      _addProduct();
+                    },
+                    context: context,
+                  );
+                },
+              );
             },
           ),
         );

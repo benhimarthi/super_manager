@@ -8,6 +8,7 @@ import 'package:super_manager/features/product_category/presentation/pages/produ
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
+import '../../../../Inventory/presentation/widgets/add.inventory.item.options.dart';
 import '../../../../Inventory/presentation/widgets/assessment.view.dart';
 import '../../../../sale_item/presentation/pages/sale.view.dart';
 import '../../../../sale_item/presentation/widgets/sale.item.list.dart';

@@ -59,6 +59,9 @@ dependencies:
   flutter_chart: 
   charts_flutter_new: 
   network_info_plus:
+  file_picker: 
+  xml: 
+  excel: 
 
 dev_dependencies:
   flutter_test:

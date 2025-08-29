@@ -241,7 +241,7 @@ class _AssessmentViewState extends State<AssessmentView> {
                                 return Visibility(
                                   visible: true,
                                   child: InventoryItemCard(
-                                    isInfoDisplayer: false,
+                                    isInfoDisplayer: true,
                                     myInventories: inventoryList
                                         .where(
                                           (x) => x.productId == myProductId,

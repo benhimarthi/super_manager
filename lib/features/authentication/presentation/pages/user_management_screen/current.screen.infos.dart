@@ -14,6 +14,7 @@ import '../../../../sale_item/presentation/pages/sale.view.dart';
 import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
 import '../../widgets/after.mail.address.changed.action.dart';
 import '../../widgets/modify.account.email.address.dart';
+import 'item.more.informations.view.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
 
@@ -53,7 +54,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "SALE" => SaleView(),
           "PRODUCT_CATEGORY" => ProductCategoryPage(),
           "PROFILE" => UserManagement(),
-          "FINANCE" => AssessmentView(),
+          "FINANCE" => ItemMoreInformationsView(), //AssessmentView(),
           String() => throw UnimplementedError(),
         };
       },

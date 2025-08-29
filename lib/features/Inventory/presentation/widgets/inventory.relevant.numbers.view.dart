@@ -310,6 +310,7 @@ class _InventoryRelevantNumbersViewState
                       context.read<SaleItemCubit>().loadSaleItems(n.id);
                     }
                     if (widget.infoDisplayer) {
+                      print("TTTTTTTTTTTTTTYYYYYYYYYYYYYYY");
                       emitKPI();
                     }
                   }

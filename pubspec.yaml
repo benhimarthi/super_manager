@@ -62,6 +62,7 @@ dependencies:
   file_picker: 
   xml: 
   excel: 
+  flutter_local_notifications: 
 
 dev_dependencies:
   flutter_test:

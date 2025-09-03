@@ -107,30 +107,110 @@ class _UserManagementState extends State<UserManagement> {
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
-                                  width: 100,
+                                  //color: Colors.amber,
+                                  width: 70,
                                   child: Text(
                                     currentUser.name,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 16,
-                                      //fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
                                 ),
-                                Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: Theme.of(context).primaryColor,
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        //_onDeletion(currentUser);
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          radius: 10,
+                                          child: Center(
+                                            child: Icon(Icons.edit, size: 12),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _onDeletion(currentUser);
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          radius: 10,
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.delete,
+                                              size: 12,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            Text("role: ${users[index].role.name}"),
+                            Text(
+                              "role : ${users[index].role.name}",
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            BlocConsumer<AppImageManagerCubit, AppImageState>(
+                              listener: (context, state) {},
+                              builder: (context, state) {
+                                if (state is AppImageManagerLoaded) {
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: CircleAvatar(
+                                      backgroundColor: const Color.fromARGB(
+                                        136,
+                                        255,
+                                        255,
+                                        255,
+                                      ),
+                                      radius: 35,
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: img,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: CircleAvatar(
+                                      backgroundColor: const Color.fromARGB(
+                                        136,
+                                        255,
+                                        255,
+                                        255,
+                                      ),
+                                      radius: 35,
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: img,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -173,66 +253,7 @@ class _UserManagementState extends State<UserManagement> {
                                 ),
                               ],
                             ),
-                            BlocConsumer<AppImageManagerCubit, AppImageState>(
-                              listener: (context, state) {},
-                              builder: (context, state) {
-                                if (state is AppImageManagerLoaded) {
-                                  return SizedBox(
-                                    width: double.infinity,
-                                    child: CircleAvatar(
-                                      backgroundColor: const Color.fromARGB(
-                                        136,
-                                        255,
-                                        255,
-                                        255,
-                                      ),
-                                      radius: 35,
-                                      child: CircleAvatar(
-                                        radius: 25,
-                                        backgroundImage: img,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  return SizedBox(
-                                    width: double.infinity,
-                                    child: CircleAvatar(
-                                      backgroundColor: const Color.fromARGB(
-                                        136,
-                                        255,
-                                        255,
-                                        255,
-                                      ),
-                                      radius: 35,
-                                      child: CircleAvatar(
-                                        radius: 25,
-                                        backgroundImage: img,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
                           ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _onDeletion(currentUser);
-                        },
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 10,
-                            child: Center(
-                              child: Icon(
-                                Icons.delete,
-                                size: 12,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],

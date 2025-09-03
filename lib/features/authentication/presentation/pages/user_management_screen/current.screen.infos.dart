@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/authentication/presentation/widgets/after.password.reset.prompt.dart';
 import 'package:super_manager/features/authentication/presentation/widgets/reset.account.password.view.dart';
 import 'package:super_manager/features/product/presentation/pages/product.page.dart';
@@ -15,6 +16,7 @@ import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
 import '../../widgets/after.mail.address.changed.action.dart';
 import '../../widgets/modify.account.email.address.dart';
 import 'item.more.informations.view.dart';
+import 'user.activities.manager.dart';
 import 'user.management.dart';
 import 'user.profile.dart';
 
@@ -54,7 +56,9 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "SALE" => SaleView(),
           "PRODUCT_CATEGORY" => ProductCategoryPage(),
           "PROFILE" => UserManagement(),
-          "FINANCE" => ItemMoreInformationsView(), //AssessmentView(),
+          "FINANCE" => UserActivitiesManager(
+            user: SessionManager.getUserSession()!,
+          ), //AssessmentView(),
           String() => throw UnimplementedError(),
         };
       },

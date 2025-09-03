@@ -67,7 +67,7 @@ class ResetAccountPasswordView extends StatelessWidget {
                 "password resting",
                 {},
                 {},
-                "Authentication service",
+                "authentication-service",
                 "statusBefore",
                 "statusAfter",
               );

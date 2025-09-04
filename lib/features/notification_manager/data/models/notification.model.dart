@@ -1,0 +1,108 @@
+import '../../domain/entities/notification.dart';
+
+class NotificationModel extends Notifications {
+  const NotificationModel({
+    required super.id,
+    required super.title,
+    required super.body,
+    required super.type,
+    required super.priority,
+    required super.status,
+    required super.recipientId,
+    required super.senderId,
+    super.groupId,
+    required super.createdAt,
+    required super.sentAt,
+    super.readAt,
+    required super.expiresAt,
+    required super.channel,
+    required super.isDelivered,
+    required super.deviceToken,
+    required super.actionUrl,
+    required super.actions,
+    required super.metadata,
+    required super.retriesCount,
+    super.errorMessage,
+    required super.readCount,
+  });
+
+  factory NotificationModel.fromEntity(Notifications entity) {
+    return NotificationModel(
+      id: entity.id,
+      title: entity.title,
+      body: entity.body,
+      type: entity.type,
+      priority: entity.priority,
+      status: entity.status,
+      recipientId: entity.recipientId,
+      senderId: entity.senderId,
+      groupId: entity.groupId,
+      createdAt: entity.createdAt,
+      sentAt: entity.sentAt,
+      readAt: entity.readAt,
+      expiresAt: entity.expiresAt,
+      channel: entity.channel,
+      isDelivered: entity.isDelivered,
+      deviceToken: entity.deviceToken,
+      actionUrl: entity.actionUrl,
+      actions: entity.actions,
+      metadata: entity.metadata,
+      retriesCount: entity.retriesCount,
+      errorMessage: entity.errorMessage,
+      readCount: entity.readCount,
+    );
+  }
+
+  Notifications toEntity() => this;
+
+  factory NotificationModel.fromMap(Map<String, dynamic> map) =>
+      NotificationModel(
+        id: map['id'],
+        title: map['title'],
+        body: map['body'],
+        type: map['type'],
+        priority: map['priority'],
+        status: map['status'],
+        recipientId: map['recipient_id'],
+        senderId: map['sender_id'],
+        groupId: map['group_id'],
+        createdAt: DateTime.parse(map['created_at']),
+        sentAt: DateTime.parse(map['sent_at']),
+        readAt: map['read_at'] == null ? null : DateTime.parse(map['read_at']),
+        expiresAt: DateTime.parse(map['expires_at']),
+        channel: map['channel'],
+        isDelivered: map['is_delivered'],
+        deviceToken: map['device_token'],
+        actionUrl: map['action_url'],
+        actions: List<String>.from(map['actions']),
+        metadata: Map<String, dynamic>.from(map['metadata']),
+        retriesCount: map['retries_count'],
+        errorMessage: map['error_message'],
+        readCount: map['read_count'],
+      );
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'title': title,
+    'body': body,
+    'type': type,
+    'priority': priority,
+    'status': status,
+    'recipient_id': recipientId,
+    'sender_id': senderId,
+    'group_id': groupId,
+    'created_at': createdAt.toIso8601String(),
+    'sent_at': sentAt.toIso8601String(),
+    'read_at': readAt?.toIso8601String(),
+    'expires_at': expiresAt.toIso8601String(),
+    'channel': channel,
+    'is_delivered': isDelivered,
+    'device_token': deviceToken,
+    'action_url': actionUrl,
+    'actions': actions,
+    'metadata': metadata,
+    'retries_count': retriesCount,
+    'error_message': errorMessage,
+    'read_count': readCount,
+  };
+}

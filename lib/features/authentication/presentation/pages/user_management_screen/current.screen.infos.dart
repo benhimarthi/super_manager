@@ -11,6 +11,7 @@ import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulato
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
 import '../../../../Inventory/presentation/widgets/add.inventory.item.options.dart';
 import '../../../../Inventory/presentation/widgets/assessment.view.dart';
+import '../../../../notification_manager/notification.page.dart';
 import '../../../../sale_item/presentation/pages/sale.view.dart';
 import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
 import '../../widgets/after.mail.address.changed.action.dart';
@@ -59,6 +60,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "FINANCE" => UserActivitiesManager(
             user: SessionManager.getUserSession()!,
           ), //AssessmentView(),
+          "NOTIFICATIONS" => NotificationPage(),
           String() => throw UnimplementedError(),
         };
       },

@@ -30,7 +30,7 @@ class _NotificationPageState extends State<NotificationPage> {
               // When a new document is added, trigger a local notification
               showNotification(
                 title: change.doc['action'] ?? 'New Notification',
-                body: change.doc['body'] ?? 'You have a new notification',
+                body: 'You have a new notification', //change.doc['body'] ??
               );
             }
           }
@@ -43,9 +43,8 @@ class _NotificationPageState extends State<NotificationPage> {
   }) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-          'your_channel_id',
-          'your_channel_name',
-          channelDescription: 'Your channel description',
+          'default_channel', // Use the actual channel ID you created
+          '', // Leave the channel name empty here, as it cannot be changed here
           importance: Importance.high,
           priority: Priority.high,
         );

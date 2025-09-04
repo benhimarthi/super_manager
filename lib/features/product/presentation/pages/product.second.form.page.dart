@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
+import 'package:super_manager/features/notification_manager/domain/entities/notification.dart';
+import 'package:super_manager/features/notification_manager/presentation/cubit/notification.cubit.dart';
 import 'package:super_manager/features/product/data/models/product.model.dart';
 import 'package:super_manager/features/product_pricing/presentation/cubit/product.pricing.state.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.state.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../core/history_actions/action.create.history.dart';
+import '../../../../core/notification_service/notification.params.dart';
 import '../../../../core/session/session.manager.dart';
 import '../../../action_history/presentation/cubit/action.history.cubit.dart';
 import '../../../image_manager/domain/entities/app.image.dart';
@@ -86,6 +90,31 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         "created",
       );
       context.read<ActionHistoryCubit>().addHistory(history);
+      final adminUid = SessionManager.getUserSession()!.administratorId;
+      final date = DateTime.now();
+      var notif = Notifications(
+        id: Uuid().v4(),
+        title: "Product creation",
+        body:
+            "The user ${SessionManager.getUserSession()!.name} created the product ${product!.name}",
+        type: NotificationCategory.alert.name,
+        priority: NotificationPriority.high.name,
+        status: NotificationStatus.unread.name,
+        recipientId: adminUid ?? "",
+        senderId: SessionManager.getUserSession()!.id,
+        createdAt: date,
+        sentAt: date,
+        expiresAt: DateTime(3000),
+        channel: NotificationChannel.inApp.name,
+        isDelivered: false,
+        deviceToken: "notification",
+        actionUrl: "PRODUCTS",
+        actions: ["read"],
+        metadata: {"product_id": product!.id},
+        retriesCount: 0,
+        readCount: 0,
+      );
+      context.read<NotificationCubit>().addNotification(notif);
     } else {
       cubit.updateProduct(finalProduct);
       var history = addHistoryItem(

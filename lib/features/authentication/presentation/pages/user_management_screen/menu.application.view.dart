@@ -90,9 +90,17 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                           );
                         },
                       ),
-                      Icon(
-                        Icons.notifications,
-                        color: Theme.of(context).primaryColor,
+                      GestureDetector(
+                        onTap: () {
+                          context.read<WidgetManipulatorCubit>().changeMenu(
+                            targetPosition,
+                            "NOTIFICATIONS",
+                          );
+                        },
+                        child: Icon(
+                          Icons.notifications,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
                     ],
                   ),

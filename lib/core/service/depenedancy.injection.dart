@@ -13,6 +13,14 @@ import 'package:super_manager/features/action_history/domain/usecases/get.all.ac
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/authentication/domain/usecases/reset.account.password.dart';
 import 'package:super_manager/features/image_manager/domain/usecases/get.app.image.by.id.dart';
+import 'package:super_manager/features/notification_manager/data/data_source/notification.local.data.source.dart';
+import 'package:super_manager/features/notification_manager/data/data_source/notification.remote.data.source.dart';
+import 'package:super_manager/features/notification_manager/data/repository/notification.repository.impl.dart';
+import 'package:super_manager/features/notification_manager/domain/usecases/create.notification.dart';
+import 'package:super_manager/features/notification_manager/domain/usecases/delete.notification.dart';
+import 'package:super_manager/features/notification_manager/domain/usecases/get.all.notifications.dart';
+import 'package:super_manager/features/notification_manager/domain/usecases/update.notification.dart';
+import 'package:super_manager/features/notification_manager/presentation/cubit/notification.cubit.dart';
 import 'package:super_manager/features/product/domain/usecases/get.product.by.id.dart';
 import 'package:super_manager/features/product_pricing/domain/usecases/get.product.pricing.by.id.dart';
 import 'package:super_manager/features/sale/data/data_source/sale.local.data.source.dart';
@@ -34,9 +42,11 @@ import 'package:super_manager/features/sale_item/domain/usecases/get.sale.items.
 import 'package:super_manager/features/sale_item/domain/usecases/update.sale.item.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/action_history_synch_manager_cubit/action.history.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/notification_synch_manager_cubit/notification.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/action.history.sync.manager.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/notification.sync.manager.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/sale.item.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../features/Inventory/data/data_sources/inventory.local.data.source.dart';
@@ -580,5 +590,50 @@ Future<void> setupDependencyInjection() async {
     )
     ..registerLazySingleton<ActionHistoryRemoteDataSource>(
       () => ActionHistoryRemoteDataSourceImpl(getIt()),
+    );
+
+  final notificationItemBox = await Hive.openBox('notification_item');
+  final createNotificationItemBox = await Hive.openBox(
+    'notification_item_created',
+  );
+  final updateNotificationItemBox = await Hive.openBox(
+    'notification_item_updated',
+  );
+  final deleteNotificationItemBox = await Hive.openBox<String>(
+    'notification_item_deleted',
+  );
+
+  getIt
+    ..registerFactory(
+      () => NotificationCubit(
+        getAll: getIt(),
+        create: getIt(),
+        update: getIt(),
+        delete: getIt(),
+        syncCubit: getIt(),
+        connectivity: getIt(),
+      ),
+    )
+    ..registerLazySingleton(() => GetAllNotifications(getIt()))
+    ..registerLazySingleton(() => CreateNotification(getIt()))
+    ..registerLazySingleton(() => UpdateNotification(getIt()))
+    ..registerLazySingleton(() => DeleteNotification(getIt()))
+    ..registerLazySingleton(() => NotificationSyncTriggerCubit(getIt()))
+    ..registerLazySingleton<NotificationSyncManager>(
+      () => NotificationSyncManagerImpl(getIt(), getIt()),
+    )
+    ..registerLazySingleton<NotificationRemoteDataSource>(
+      () => NotificationRemoteDataSourceImpl(getIt()),
+    )
+    ..registerLazySingleton(
+      () => NotificationLocalDataSourceImpl(
+        mainBox: notificationItemBox,
+        createdBox: createNotificationItemBox,
+        updatedBox: updateNotificationItemBox,
+        deletedBox: deleteNotificationItemBox,
+      ),
+    )
+    ..registerLazySingleton(
+      () => NotificationRepositoryImpl(local: getIt(), remote: getIt()),
     );
 }

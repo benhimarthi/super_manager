@@ -18,6 +18,10 @@ import 'package:super_manager/features/product_pricing/domain/entities/product.p
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/notification_service/notification.params.dart';
+import '../../../notification_manager/domain/entities/notification.dart';
+import '../../../notification_manager/presentation/cubit/notification.cubit.dart';
+
 class InventoryMetaDataForm extends StatefulWidget {
   final Inventory? inventory;
   final Inventory? oldVersion;
@@ -132,6 +136,31 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           "created",
         );
         context.read<ActionHistoryCubit>().addHistory(history);
+        final adminUid = SessionManager.getUserSession()!.administratorId;
+        final date = DateTime.now();
+        var notif = Notifications(
+          id: Uuid().v4(),
+          title: "Inventory creation",
+          body:
+              "The user ${SessionManager.getUserSession()!.name} Create the inventory of the product ${inventoryProduct.name}",
+          type: NotificationCategory.alert.name,
+          priority: NotificationPriority.high.name,
+          status: NotificationStatus.unread.name,
+          recipientId: adminUid ?? "",
+          senderId: SessionManager.getUserSession()!.id,
+          createdAt: date,
+          sentAt: date,
+          expiresAt: DateTime(3000),
+          channel: NotificationChannel.inApp.name,
+          isDelivered: false,
+          deviceToken: "notification",
+          actionUrl: "INVENTORY",
+          actions: ["read"],
+          metadata: {"inventory_id": inv.id},
+          retriesCount: 0,
+          readCount: 0,
+        );
+        context.read<NotificationCubit>().addNotification(notif);
       } else {
         var metadata =
             InventoryMetadataModel.fromEntity(
@@ -143,7 +172,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
               leadTimeInDays: int.parse(_leadTime.text),
               updatedBy: SessionManager.getUserSession()!.id,
             );
-
         context.read<InventoryCubit>().updateInventory(widget.inventory!);
         context.read<InventoryMetadataCubit>().updateMetadata(metadata);
         if (widget.duplicate ||
@@ -182,6 +210,31 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
             "updated",
           );
           context.read<ActionHistoryCubit>().addHistory(history);
+          final adminUid = SessionManager.getUserSession()!.administratorId;
+          final date = DateTime.now();
+          var notif = Notifications(
+            id: Uuid().v4(),
+            title: "Inventory update",
+            body:
+                "The user ${SessionManager.getUserSession()!.name} updated the inventory of the product ${inventoryProduct.name}",
+            type: NotificationCategory.alert.name,
+            priority: NotificationPriority.high.name,
+            status: NotificationStatus.unread.name,
+            recipientId: adminUid ?? "",
+            senderId: SessionManager.getUserSession()!.id,
+            createdAt: date,
+            sentAt: date,
+            expiresAt: DateTime(3000),
+            channel: NotificationChannel.inApp.name,
+            isDelivered: false,
+            deviceToken: "notification",
+            actionUrl: "INVENTORY",
+            actions: ["read"],
+            metadata: {"inventory_id": inv.id},
+            retriesCount: 0,
+            readCount: 0,
+          );
+          context.read<NotificationCubit>().addNotification(notif);
         }
       }
     }

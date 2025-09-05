@@ -20,7 +20,7 @@ class InventoryItemCard extends StatefulWidget {
   final bool isInfoDisplayer;
 
   const InventoryItemCard({
-    Key? key,
+    super.key,
     required this.myInventories,
     required this.inventory,
     required this.myInventoryHistory,
@@ -30,7 +30,7 @@ class InventoryItemCard extends StatefulWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   State<InventoryItemCard> createState() => _InventoryItemCardState();

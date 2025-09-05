@@ -16,6 +16,7 @@ import 'package:super_manager/features/image_manager/domain/usecases/get.app.ima
 import 'package:super_manager/features/notification_manager/data/data_source/notification.local.data.source.dart';
 import 'package:super_manager/features/notification_manager/data/data_source/notification.remote.data.source.dart';
 import 'package:super_manager/features/notification_manager/data/repository/notification.repository.impl.dart';
+import 'package:super_manager/features/notification_manager/domain/repositories/notification.repository.dart';
 import 'package:super_manager/features/notification_manager/domain/usecases/create.notification.dart';
 import 'package:super_manager/features/notification_manager/domain/usecases/delete.notification.dart';
 import 'package:super_manager/features/notification_manager/domain/usecases/get.all.notifications.dart';
@@ -625,7 +626,7 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton<NotificationRemoteDataSource>(
       () => NotificationRemoteDataSourceImpl(getIt()),
     )
-    ..registerLazySingleton(
+    ..registerLazySingleton<NotificationLocalDataSource>(
       () => NotificationLocalDataSourceImpl(
         mainBox: notificationItemBox,
         createdBox: createNotificationItemBox,
@@ -633,7 +634,7 @@ Future<void> setupDependencyInjection() async {
         deletedBox: deleteNotificationItemBox,
       ),
     )
-    ..registerLazySingleton(
+    ..registerLazySingleton<NotificationRepository>(
       () => NotificationRepositoryImpl(local: getIt(), remote: getIt()),
     );
 }

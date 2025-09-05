@@ -137,6 +137,31 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         "updated",
       );
       context.read<ActionHistoryCubit>().addHistory(history);
+      final adminUid = SessionManager.getUserSession()!.administratorId;
+      final date = DateTime.now();
+      var notif = Notifications(
+        id: Uuid().v4(),
+        title: "Product updated",
+        body:
+            "The user ${SessionManager.getUserSession()!.name} updated the product ${product!.name}",
+        type: NotificationCategory.alert.name,
+        priority: NotificationPriority.high.name,
+        status: NotificationStatus.unread.name,
+        recipientId: adminUid ?? "",
+        senderId: SessionManager.getUserSession()!.id,
+        createdAt: date,
+        sentAt: date,
+        expiresAt: DateTime(3000),
+        channel: NotificationChannel.inApp.name,
+        isDelivered: false,
+        deviceToken: "notification",
+        actionUrl: "PRODUCTS",
+        actions: ["read"],
+        metadata: {"product_id": product!.id},
+        retriesCount: 0,
+        readCount: 0,
+      );
+      context.read<NotificationCubit>().addNotification(notif);
     }
     Navigator.pop(context);
   }

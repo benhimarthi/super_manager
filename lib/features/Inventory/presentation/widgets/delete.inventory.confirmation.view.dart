@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/notification_service/notification.params.dart';
 import '../../../../core/session/session.manager.dart';
 import '../../../notification_manager/domain/entities/notification.dart';
 import '../../../notification_manager/presentation/cubit/notification.cubit.dart';
-import '../cubit/product.cubit.dart';
+import '../../../product/presentation/cubit/product.cubit.dart';
 
-class DeleteProductConfirmationScreen extends StatelessWidget {
-  final Product deletedProduct;
-  const DeleteProductConfirmationScreen({
+class DeleteInventoryConfirmationView extends StatelessWidget {
+  final Inventory deletedInventory;
+  const DeleteInventoryConfirmationView({
     super.key,
-    required this.deletedProduct,
+    required this.deletedInventory,
   });
 
   @override
@@ -29,29 +31,24 @@ class DeleteProductConfirmationScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Do your really wish to remove, this Product ?"),
-          ListTile(
-            //leading: CircleAvatar(),
-            title: Text(
-              deletedProduct.name,
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            //subtitle: Text(deletedProduct.role.name),
-          ),
+          Text("Do your really wish to remove, this Inventory ?"),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
                 onTap: () {
-                  context.read<ProductCubit>().deleteProduct(deletedProduct.id);
+                  context.read<InventoryCubit>().deleteInventory(
+                    deletedInventory.id,
+                  );
                   final adminUid =
                       SessionManager.getUserSession()!.administratorId;
                   final date = DateTime.now();
                   var notif = Notifications(
                     id: Uuid().v4(),
-                    title: "Product deletion",
+                    title: "Inventory deletion",
                     body:
-                        "The user ${SessionManager.getUserSession()!.name} deleted the product ${deletedProduct.name}",
+                        "The user ${SessionManager.getUserSession()!.name} deleted An Inventory",
                     type: NotificationCategory.alert.name,
                     priority: NotificationPriority.high.name,
                     status: NotificationStatus.unread.name,
@@ -63,9 +60,9 @@ class DeleteProductConfirmationScreen extends StatelessWidget {
                     channel: NotificationChannel.inApp.name,
                     isDelivered: false,
                     deviceToken: "notification",
-                    actionUrl: "PRODUCTS",
+                    actionUrl: "INVENTORY",
                     actions: ["read"],
-                    metadata: {"product_id": deletedProduct.id},
+                    metadata: {"product_id": deletedInventory.id},
                     retriesCount: 0,
                     readCount: 0,
                   );

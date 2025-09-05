@@ -282,8 +282,6 @@ class _InventoryRelevantNumbersViewState
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      //height: 100,
-      //color: Colors.green,
       child: BlocConsumer<WidgetManipulatorCubit, WidgetManipulatorState>(
         listener: (context, state) {
           if (state is EmitRandomElementSuccessfully) {
@@ -310,7 +308,6 @@ class _InventoryRelevantNumbersViewState
                       context.read<SaleItemCubit>().loadSaleItems(n.id);
                     }
                     if (widget.infoDisplayer) {
-                      print("TTTTTTTTTTTTTTYYYYYYYYYYYYYYY");
                       emitKPI();
                     }
                   }

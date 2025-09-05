@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/delete.inventory.confirmation.view.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
@@ -17,7 +18,7 @@ import '../widgets/add.inventory.item.options.dart';
 import '../widgets/inventory.item.card.dart';
 
 class InventoryListScreen extends StatefulWidget {
-  const InventoryListScreen({Key? key}) : super(key: key);
+  const InventoryListScreen({super.key});
 
   @override
   State<InventoryListScreen> createState() => _InventoryListScreenState();
@@ -175,7 +176,14 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                                   );
                                 },
                                 onDelete: () {
-                                  // Trigger delete action
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return DeleteInventoryConfirmationView(
+                                        deletedInventory: inventoryList[index],
+                                      );
+                                    },
+                                  );
                                 },
                               );
                             },

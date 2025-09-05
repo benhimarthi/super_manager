@@ -57,38 +57,48 @@ class PeriodInformationsDatas {
         .toList();
     prevInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     final earliestRestock = prevInventories.lastOrNull;
-    final salesAfterLastRestock = sales
-        .where(
-          (x) =>
-              x.date.isAfter(earliestRestock!.timestamp) &&
-              x.date.isBefore(startDate),
-        )
-        .toList();
-    final salesItemsALR = saleItems
-        .where(
-          (x) => salesAfterLastRestock
-              .map((x) => x.id)
-              .toList()
-              .contains(x.saleId),
-        )
-        .toList();
-    int quantitySale = salesItemsALR.isNotEmpty
-        ? salesItemsALR.map((x) => x.quantity).toList().reduce((a, b) => a + b)
-        : 0;
-    final res = earliestRestock!.action == "update"
-        ? earliestRestock
-                  .changes['inventory']!['new_version']['quantityAvailable'] -
-              quantitySale
-        : earliestRestock.changes['inventory']!['quantityAvailable'] -
-              quantitySale;
-    double unitPrice = earliestRestock.action == "update"
-        ? earliestRestock
-              .changes['inventory_meta_data']!['new_version']['costPerUnit']
-        : earliestRestock.changes['inventory_meta_data']!['costPerUnit'];
+    if (earliestRestock != null) {
+      final salesAfterLastRestock = sales
+          .where(
+            (x) =>
+                x.date.isAfter(earliestRestock.timestamp) &&
+                x.date.isBefore(startDate),
+          )
+          .toList();
+      final salesItemsALR = saleItems
+          .where(
+            (x) => salesAfterLastRestock
+                .map((x) => x.id)
+                .toList()
+                .contains(x.saleId),
+          )
+          .toList();
+      int quantitySale = salesItemsALR.isNotEmpty
+          ? salesItemsALR
+                .map((x) => x.quantity)
+                .toList()
+                .reduce((a, b) => a + b)
+          : 0;
+      final res = earliestRestock.action == "update"
+          ? earliestRestock
+                    .changes['inventory']!['new_version']['quantityAvailable'] -
+                quantitySale
+          : earliestRestock.changes['inventory']!['quantityAvailable'] -
+                quantitySale;
+      double unitPrice = earliestRestock.action == "update"
+          ? earliestRestock
+                .changes['inventory_meta_data']!['new_version']['costPerUnit']
+          : earliestRestock.changes['inventory_meta_data']!['costPerUnit'];
+      return {
+        "start_date_quantity": res,
+        "start_date_unit_cost": unitPrice,
+        "amount": res * unitPrice,
+      };
+    }
     return {
-      "start_date_quantity": res,
-      "start_date_unit_cost": unitPrice,
-      "amount": res * unitPrice,
+      "start_date_quantity": 0,
+      "start_date_unit_cost": 0.0,
+      "amount": 0.0,
     };
   }
 
@@ -105,8 +115,8 @@ class PeriodInformationsDatas {
         .toList();
     nextInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     final closetRestock = nextInventories.firstOrNull;
-    DateTime refDate = DateTime.now();
     int quantityLastRestock = inventory.quantityAvailable;
+    DateTime refDate = DateTime.now();
     if (closetRestock != null) {
       refDate = closetRestock.timestamp;
       quantityLastRestock = closetRestock
@@ -146,7 +156,7 @@ class PeriodInformationsDatas {
     final supply = myInventoryHistories.where(
       (x) => x.timestamp.isBefore(endDate) && x.timestamp.isAfter(startDate),
     );
-    final supplies = supply.where((x) => x.action != "update").toList();
+    final supplies = supply.where((x) => x.action == "update").toList();
     if (supplies.isNotEmpty) {
       int qtt = 0;
       double price = 0;
@@ -160,10 +170,9 @@ class PeriodInformationsDatas {
             n.changes['inventory_meta_data']!['new_version']['costPerUnit'];
         price += p;
       }
-
       return {"supply_quantity": qtt, "supply_cost": price};
     } else {
-      return {"supply_quantity": 0, "supply_cost": 0};
+      return {"supply_quantity": 0, "supply_cost": 0.0};
     }
   }
 

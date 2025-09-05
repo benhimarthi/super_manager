@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path/path.dart';
 import 'package:super_manager/core/notification_service/flutter.local.notifications.plugin.dart';
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
+import 'package:super_manager/features/notification_manager/data/models/notification.model.dart';
 import 'package:super_manager/features/notification_manager/presentation/cubit/notification.cubit.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.cubit.dart';
 import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cubit.dart';
@@ -47,16 +49,24 @@ Future<void> main() async {
   runApp(const MyApp());
   // Listen to Firestore collection called 'action_history'
   _subscription = FirebaseFirestore.instance
-      .collection('action_history')
+      .collection('notifications')
       .snapshots()
       .listen((snapshot) {
         for (var change in snapshot.docChanges) {
           if (change.type == DocumentChangeType.added) {
-            // When a new document is added, trigger a local notification
-            showNotification(
-              title: change.doc['action'] ?? 'New Notification',
-              body: 'You have a new notification', //change.doc['body'] ??
+            var notif = NotificationModel.fromMap(
+              change.doc as Map<String, dynamic>,
             );
+
+            var updatedNotif = notif.copyWith(isDelivered: true);
+            getIt<NotificationCubit>().updateNotification(updatedNotif);
+            // When a new document is added, trigger a local notification
+            if (!notif.isDelivered) {
+              showNotification(
+                title: change.doc['title'] ?? 'New Notification',
+                body: change.doc['body'] ?? 'You have a new notification',
+              );
+            }
           }
         }
       });

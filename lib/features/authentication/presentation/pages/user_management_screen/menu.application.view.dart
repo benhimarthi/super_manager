@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/authorization_management/authorization.service.dart';
 import 'package:super_manager/core/authorization_management/permissions.dart';
+import 'package:super_manager/core/notification_service/notification.params.dart';
 import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/image_manager/domain/entities/app.image.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.cubit.dart';
 import 'package:super_manager/features/image_manager/presentation/cubit/app.image.state.dart';
+import 'package:super_manager/features/notification_manager/domain/entities/notification.dart';
+import 'package:super_manager/features/notification_manager/presentation/cubit/notification.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
+
+import '../../../../notification_manager/presentation/cubit/notification.state.dart';
 
 class MenuApplicationView extends StatefulWidget {
   const MenuApplicationView({super.key});
@@ -22,10 +27,12 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
   final currentUser = SessionManager.getUserSession();
   late final AppImage avatar;
   late String selectedMenu = "HOME";
+  late List<Notifications> myNotifications;
 
   @override
   void initState() {
     super.initState();
+    myNotifications = [];
     context.read<AppImageManagerCubit>().loadImages(currentUser!.id);
   }
 
@@ -90,17 +97,98 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                           );
                         },
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          context.read<WidgetManipulatorCubit>().changeMenu(
-                            targetPosition,
-                            "NOTIFICATIONS",
+                      BlocConsumer<NotificationCubit, NotificationState>(
+                        listener: (context, state) {
+                          if (state is NotificationManagerLoaded) {
+                            setState(() {
+                              myNotifications = state.notifications;
+                            });
+                          }
+                        },
+                        builder: (context, state) {
+                          return GestureDetector(
+                            onTap: () {
+                              context.read<WidgetManipulatorCubit>().changeMenu(
+                                targetPosition,
+                                "NOTIFICATIONS",
+                              );
+                            },
+                            child: Stack(
+                              alignment: Alignment.topCenter,
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: SizedBox(
+                                    width: 15,
+                                    height: 25,
+                                    child: Icon(
+                                      Icons.notifications,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Visibility(
+                                    visible: myNotifications
+                                        .where(
+                                          (x) =>
+                                              x.status ==
+                                              NotificationStatus.unread.name,
+                                        )
+                                        .toList()
+                                        .isNotEmpty,
+                                    child: CircleAvatar(
+                                      radius: 6,
+                                      backgroundColor: const Color.fromARGB(
+                                        255,
+                                        255,
+                                        17,
+                                        0,
+                                      ),
+                                    ) /*Container(
+                                      width: 20,
+                                      height: 15,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          255,
+                                          17,
+                                          0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          myNotifications
+                                              .where(
+                                                (x) =>
+                                                    x.status ==
+                                                    NotificationStatus
+                                                        .unread
+                                                        .name,
+                                              )
+                                              .toList()
+                                              .length
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),*/,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         },
-                        child: Icon(
-                          Icons.notifications,
-                          color: Theme.of(context).primaryColor,
-                        ),
                       ),
                     ],
                   ),

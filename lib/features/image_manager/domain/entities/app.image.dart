@@ -12,6 +12,7 @@ class AppImage extends Equatable {
   final bool active;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String adminId;
 
   const AppImage({
     required this.id,
@@ -25,20 +26,21 @@ class AppImage extends Equatable {
     this.active = true,
     required this.createdAt,
     required this.updatedAt,
+    required this.adminId,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        url,
-        entityId,
-        entityType,
-        label,
-        altText,
-        position,
-        uploadedBy,
-        active,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    url,
+    entityId,
+    entityType,
+    label,
+    altText,
+    position,
+    uploadedBy,
+    active,
+    createdAt,
+    updatedAt,
+  ];
 }

@@ -113,6 +113,9 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         metadata: {"product_id": product!.id},
         retriesCount: 0,
         readCount: 0,
+        adminId: SessionManager.getUserSession()!.administratorId != null
+            ? SessionManager.getUserSession()!.administratorId!
+            : SessionManager.getUserSession()!.id,
       );
       context.read<NotificationCubit>().addNotification(notif);
     } else {
@@ -160,6 +163,9 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         metadata: {"product_id": product!.id},
         retriesCount: 0,
         readCount: 0,
+        adminId: SessionManager.getUserSession()!.administratorId != null
+            ? SessionManager.getUserSession()!.administratorId!
+            : SessionManager.getUserSession()!.id,
       );
       context.read<NotificationCubit>().addNotification(notif);
     }

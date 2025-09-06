@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/session/session.manager.dart';
@@ -72,6 +70,9 @@ class _ProductPricingFormPageState extends State<ProductPricingFormPage> {
       active: _active,
       createdAt: widget.pricing?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
 
     final cubit = context.read<ProductPricingCubit>();

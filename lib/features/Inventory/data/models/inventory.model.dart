@@ -21,6 +21,7 @@ class InventoryModel extends Inventory {
     required super.updatedAt,
     required super.userUid,
     required super.lostSaleOpportunitiesQuantity,
+    required super.adminId,
   });
 
   factory InventoryModel.fromEntity(Inventory entity) {
@@ -42,6 +43,7 @@ class InventoryModel extends Inventory {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       lostSaleOpportunitiesQuantity: entity.lostSaleOpportunitiesQuantity,
+      adminId: entity.adminId,
     );
   }
 
@@ -64,6 +66,7 @@ class InventoryModel extends Inventory {
       createdAt: createdAt,
       updatedAt: updatedAt,
       lostSaleOpportunitiesQuantity: lostSaleOpportunitiesQuantity,
+      adminId: adminId,
     );
   }
 
@@ -87,6 +90,7 @@ class InventoryModel extends Inventory {
       updatedAt: DateTime.parse(map['updatedAt'] as String),
       lostSaleOpportunitiesQuantity:
           map['lostSaleOpportunitiesQuantity'] as int,
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -108,6 +112,7 @@ class InventoryModel extends Inventory {
     DateTime? createdAt,
     DateTime? updatedAt,
     int? lostSaleOpportunitiesQuantity,
+    String? adminId,
   }) {
     return InventoryModel(
       id: id ?? this.id,
@@ -128,21 +133,22 @@ class InventoryModel extends Inventory {
       userUid: userUid ?? this.userUid,
       lostSaleOpportunitiesQuantity:
           lostSaleOpportunitiesQuantity ?? this.lostSaleOpportunitiesQuantity,
+      adminId: adminId ?? this.adminId,
     );
   }
 
   factory InventoryModel.empty() {
     return InventoryModel(
       id: Uuid().v4(),
-      productId: "productId",
-      warehouseId: "warehouseId",
-      userUid: "_",
-      quantityAvailable: 15,
-      quantityReserved: 5,
-      quantitySold: 6,
-      reorderLevel: 3,
-      minimumStock: 3,
-      maximumStock: 120,
+      productId: "",
+      warehouseId: "",
+      userUid: "",
+      quantityAvailable: 0,
+      quantityReserved: 0,
+      quantitySold: 0,
+      reorderLevel: 0,
+      minimumStock: 0,
+      maximumStock: 0,
       isOutOfStock: false,
       isLowStock: false,
       isBlocked: false,
@@ -150,6 +156,7 @@ class InventoryModel extends Inventory {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       lostSaleOpportunitiesQuantity: 0,
+      adminId: "",
     );
   }
 
@@ -172,6 +179,7 @@ class InventoryModel extends Inventory {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'lostSaleOpportunitiesQuantity': lostSaleOpportunitiesQuantity,
+      'adminID': adminId,
     };
   }
 

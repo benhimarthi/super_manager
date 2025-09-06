@@ -13,6 +13,7 @@ class Sale extends Equatable {
   final String? notes; // Optional comment
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String adminId;
 
   const Sale({
     required this.id,
@@ -27,21 +28,22 @@ class Sale extends Equatable {
     this.notes,
     required this.createdAt,
     required this.updatedAt,
+    required this.adminId,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        customerId,
-        date,
-        status,
-        totalAmount,
-        totalTax,
-        discountAmount,
-        paymentMethod,
-        currency,
-        notes,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    customerId,
+    date,
+    status,
+    totalAmount,
+    totalTax,
+    discountAmount,
+    paymentMethod,
+    currency,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
 }

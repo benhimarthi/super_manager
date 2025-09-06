@@ -57,6 +57,11 @@ class OpenImageFromGalerySuccessfully extends AppImageState {
   const OpenImageFromGalerySuccessfully(this.imageLink);
 }
 
+class OpenProfileImageFromGalerySuccessfully extends AppImageState {
+  final File? imageLink;
+  const OpenProfileImageFromGalerySuccessfully(this.imageLink);
+}
+
 class AppImageManagerError extends AppImageState {
   final String message;
 

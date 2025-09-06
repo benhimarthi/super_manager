@@ -32,10 +32,10 @@ class InventoryMetadataLocalDataSourceImpl
     required Box createdBox,
     required Box updatedBox,
     required Box<String> deletedBox,
-  })  : _mainBox = mainBox,
-        _createdBox = createdBox,
-        _updatedBox = updatedBox,
-        _deletedBox = deletedBox;
+  }) : _mainBox = mainBox,
+       _createdBox = createdBox,
+       _updatedBox = updatedBox,
+       _deletedBox = deletedBox;
 
   @override
   Future<void> addCreatedMetadata(InventoryMetadataModel model) async {
@@ -74,7 +74,8 @@ class InventoryMetadataLocalDataSourceImpl
   List<InventoryMetadataModel> getAllLocalMetadata() {
     return _mainBox.values
         .map(
-            (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)))
+          (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)),
+        )
         .toList();
   }
 
@@ -82,7 +83,8 @@ class InventoryMetadataLocalDataSourceImpl
   List<InventoryMetadataModel> getPendingCreates() {
     return _createdBox.values
         .map(
-            (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)))
+          (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)),
+        )
         .toList();
   }
 
@@ -90,7 +92,8 @@ class InventoryMetadataLocalDataSourceImpl
   List<InventoryMetadataModel> getPendingUpdates() {
     return _updatedBox.values
         .map(
-            (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)))
+          (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)),
+        )
         .toList();
   }
 

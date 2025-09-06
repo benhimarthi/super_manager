@@ -1,21 +1,15 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:super_manager/core/util/change.screen.manager.dart';
-import 'package:super_manager/features/authentication/data/models/user.model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:super_manager/features/authentication/presentation/cubit/authentication.cubit.dart';
-import 'package:super_manager/features/authentication/presentation/pages/login_screen/login.screen.dart';
-import 'package:uuid/uuid.dart';
+import 'package:super_manager/features/image_manager/presentation/widgets/profile.image.dart';
 import '../../../../../core/session/session.manager.dart';
-import '../../../../image_manager/data/models/app.image.model.dart';
-import '../../../../image_manager/presentation/cubit/app.image.cubit.dart';
-import '../../../../image_manager/presentation/cubit/app.image.state.dart';
 import '../../../domain/entities/user.dart';
 import '../../cubit/authentication.state.dart';
 import '../../widgets/edit.user.dialog.dart';
 
 class UserProfile extends StatefulWidget {
-  const UserProfile({Key? key}) : super(key: key);
+  const UserProfile({super.key});
 
   @override
   State<UserProfile> createState() => _UserProfileState();
@@ -23,55 +17,10 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   late User currentUser;
-  late AppImageModel avatar;
-  final _uuid = const Uuid();
-  File? image;
-
   @override
   void initState() {
     super.initState();
     currentUser = SessionManager.getUserSession()!;
-    avatar = AppImageModel.empty();
-    if (currentUser.avatar.isNotEmpty && currentUser.avatar != "empty") {
-      context.read<AppImageManagerCubit>().loadImages(currentUser.id);
-    } else {
-      avatar = AppImageModel(
-        id: _uuid.v4(),
-        url: "",
-        entityId: currentUser.id,
-        entityType: "profile",
-        position: 0,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        uploadedBy: currentUser.id,
-      );
-      context.read<AppImageManagerCubit>().createImage(avatar);
-    }
-  }
-
-  void _onEditUser(User user) {
-    showDialog(
-      context: context,
-      builder: (context) => EditUserDialog(user: user),
-    );
-  }
-
-  updateProfileImge(String url) {
-    final newAvatar = AppImageModel(
-      id: _uuid.v4(),
-      url: url,
-      entityId: currentUser.id,
-      entityType: "profile",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      position: (avatar.position ?? 0) + 1,
-      uploadedBy: currentUser.id,
-    );
-    context.read<AppImageManagerCubit>().createImage(newAvatar).whenComplete(
-      () {
-        setState(() {});
-      },
-    );
   }
 
   @override
@@ -97,8 +46,9 @@ class _UserProfileState extends State<UserProfile> {
         child: IconButton(
           onPressed: () {
             setState(() {
-              context.read<AuthenticationCubit>().logout();
-              nextScreenReplace(context, LoginScreen());
+              context.read<AuthenticationCubit>().logout().whenComplete(() {
+                GoRouter.of(context).go("/login");
+              });
             });
           },
           icon: Icon(Icons.logout),
@@ -109,7 +59,12 @@ class _UserProfileState extends State<UserProfile> {
         child: ListView(
           children: [
             const SizedBox(height: 50),
-            Center(
+            ProfileImage(
+              itemId: currentUser.id,
+              entityType: "profile",
+              name: currentUser.name,
+            ),
+            /*Center(
               child: Stack(
                 children: [
                   BlocConsumer<AppImageManagerCubit, AppImageState>(
@@ -200,8 +155,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ],
               ),
-            ),
-
+            ),*/
             const SizedBox(height: 50),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

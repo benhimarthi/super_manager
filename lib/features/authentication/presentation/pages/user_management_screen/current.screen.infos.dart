@@ -11,9 +11,10 @@ import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulato
 import '../../../../Inventory/presentation/pages/inventory.list.screen.dart';
 import '../../../../Inventory/presentation/widgets/add.inventory.item.options.dart';
 import '../../../../Inventory/presentation/widgets/assessment.view.dart';
-import '../../../../notification_manager/notification.page.dart';
+import '../../../../notification_manager/presentation/pages/notification.page.dart';
 import '../../../../sale_item/presentation/pages/sale.view.dart';
 import '../../../../sale_item/presentation/widgets/sale.item.list.dart';
+import '../../../../synchronisation/refresh.datas.from.remote.storage.dart';
 import '../../widgets/after.mail.address.changed.action.dart';
 import '../../widgets/modify.account.email.address.dart';
 import 'item.more.informations.view.dart';
@@ -57,9 +58,11 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "SALE" => SaleView(),
           "PRODUCT_CATEGORY" => ProductCategoryPage(),
           "PROFILE" => UserManagement(),
-          "FINANCE" => UserActivitiesManager(
+          "FINANCE" => RefreshDatasFromRemoteStorage(),
+          /*UserActivitiesManager(
             user: SessionManager.getUserSession()!,
-          ), //AssessmentView(),
+          ),*/
+          //AssessmentView(),
           "NOTIFICATIONS" => NotificationPage(),
           String() => throw UnimplementedError(),
         };

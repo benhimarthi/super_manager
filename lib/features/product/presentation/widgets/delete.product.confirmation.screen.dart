@@ -68,6 +68,10 @@ class DeleteProductConfirmationScreen extends StatelessWidget {
                     metadata: {"product_id": deletedProduct.id},
                     retriesCount: 0,
                     readCount: 0,
+                    adminId:
+                        SessionManager.getUserSession()!.administratorId != null
+                        ? SessionManager.getUserSession()!.administratorId!
+                        : SessionManager.getUserSession()!.id,
                   );
                   context.read<NotificationCubit>().addNotification(notif);
                   Navigator.pop(context);

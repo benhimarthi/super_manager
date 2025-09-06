@@ -27,8 +27,8 @@ class ImageStorageService {
   /// Returns the saved File (or null if user cancels)
   Future<File?> pickAndSaveImage(String dirName) async {
     try {
-      final isGranted = await _requestGalleryPermission();
-      if (!isGranted) return null;
+      //final isGranted = await _requestGalleryPermission();
+      //if (!isGranted) return null;
 
       final picked = await _picker.pickImage(source: ImageSource.gallery);
       if (picked == null) return null;

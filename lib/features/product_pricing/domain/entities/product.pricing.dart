@@ -11,6 +11,7 @@ class ProductPricing extends Equatable {
   final bool active;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String adminId;
 
   const ProductPricing({
     required this.id,
@@ -23,6 +24,7 @@ class ProductPricing extends Equatable {
     required this.active,
     required this.createdAt,
     required this.updatedAt,
+    required this.adminId,
   });
 
   @override

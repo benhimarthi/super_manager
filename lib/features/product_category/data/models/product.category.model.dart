@@ -12,6 +12,7 @@ class ProductCategoryModel extends ProductCategory {
     required super.isActive,
     required super.createdAt,
     required super.updatedAt,
+    required super.adminId,
   });
 
   // ✅ Create from JSON
@@ -26,6 +27,7 @@ class ProductCategoryModel extends ProductCategory {
       isActive: map['isActive'] as bool,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -41,6 +43,7 @@ class ProductCategoryModel extends ProductCategory {
       'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'adminId': adminId,
     };
   }
 
@@ -56,6 +59,7 @@ class ProductCategoryModel extends ProductCategory {
       isActive: category.isActive,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
+      adminId: category.adminId,
     );
   }
   static ProductCategoryModel empty = ProductCategoryModel(
@@ -68,5 +72,6 @@ class ProductCategoryModel extends ProductCategory {
     isActive: false,
     createdAt: DateTime.fromMillisecondsSinceEpoch(0),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(0),
+    adminId: "",
   );
 }

@@ -13,6 +13,7 @@ class AppImageModel extends AppImage {
     super.active = true,
     required super.createdAt,
     required super.updatedAt,
+    required super.adminId,
   });
 
   factory AppImageModel.fromMap(Map<String, dynamic> map) {
@@ -28,6 +29,7 @@ class AppImageModel extends AppImage {
       active: map['active'] ?? true,
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -39,6 +41,7 @@ class AppImageModel extends AppImage {
       entityType: "",
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: "",
     );
   }
 
@@ -53,6 +56,7 @@ class AppImageModel extends AppImage {
     bool? active,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? adminId,
   }) {
     return AppImageModel(
       id: id,
@@ -65,6 +69,7 @@ class AppImageModel extends AppImage {
       position: position ?? this.position,
       uploadedBy: uploadedBy ?? this.uploadedBy,
       active: active ?? this.active,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -97,6 +102,7 @@ class AppImageModel extends AppImage {
       active: image.active,
       createdAt: image.createdAt,
       updatedAt: image.updatedAt,
+      adminId: image.adminId,
     );
   }
 }

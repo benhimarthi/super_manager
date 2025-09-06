@@ -12,6 +12,7 @@ class ProductPricingModel extends ProductPricing {
     required super.createdAt,
     required super.updatedAt,
     required super.creatorId,
+    required super.adminId,
   });
 
   factory ProductPricingModel.fromEntity(ProductPricing entity) {
@@ -26,6 +27,7 @@ class ProductPricingModel extends ProductPricing {
       active: entity.active,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      adminId: entity.adminId,
     );
   }
 
@@ -41,21 +43,23 @@ class ProductPricingModel extends ProductPricing {
       active: active,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      adminId: adminId,
     );
   }
 
   factory ProductPricingModel.empty() {
     return ProductPricingModel(
-      id: "id",
-      productId: "productId",
-      currency: "MAD",
-      country: "country",
-      amount: 100,
-      discountPercent: .5,
-      active: true,
+      id: "",
+      productId: "",
+      currency: "",
+      country: "",
+      amount: 0,
+      discountPercent: 0,
+      active: false,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      creatorId: "creatorId",
+      creatorId: "",
+      adminId: "",
     );
   }
 
@@ -69,6 +73,7 @@ class ProductPricingModel extends ProductPricing {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? creatorId,
+    String? adminId,
   }) {
     return ProductPricing(
       id: id,
@@ -81,6 +86,7 @@ class ProductPricingModel extends ProductPricing {
       active: active ?? this.active,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -96,6 +102,7 @@ class ProductPricingModel extends ProductPricing {
       active: map['active'] as bool,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -111,6 +118,7 @@ class ProductPricingModel extends ProductPricing {
       'createdAt': createdAt.toIso8601String(),
       'creatorId': creatorId,
       'updatedAt': updatedAt.toIso8601String(),
+      'adminId': adminId,
     };
   }
 

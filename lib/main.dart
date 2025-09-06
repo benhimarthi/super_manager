@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 import 'package:super_manager/core/notification_service/flutter.local.notifications.plugin.dart';
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/notification_manager/data/models/notification.model.dart';
@@ -55,7 +54,7 @@ Future<void> main() async {
         for (var change in snapshot.docChanges) {
           if (change.type == DocumentChangeType.added) {
             var notif = NotificationModel.fromMap(
-              change.doc as Map<String, dynamic>,
+              change.doc.data() as Map<String, dynamic>,
             );
 
             var updatedNotif = notif.copyWith(isDelivered: true);

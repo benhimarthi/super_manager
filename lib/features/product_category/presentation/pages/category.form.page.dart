@@ -8,6 +8,7 @@ import 'package:super_manager/features/image_manager/presentation/cubit/app.imag
 import 'package:super_manager/features/product_category/presentation/widgets/selecting.parent.category.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/session/session.manager.dart';
 import '../../../image_manager/presentation/cubit/app.image.state.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/product.category.dart';
@@ -98,6 +99,9 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
       isActive: true,
       createdAt: widget.category?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
     if (isUpdated &&
         categoryImageFile != null &&
@@ -118,15 +122,6 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
 
   updateCategoryImage(String imageUrl) {
     if (categoryImage != null) {
-      /*context.read<AppImageManagerCubit>().deleteImage(
-        categoryImage!.id,
-        categoryImage!.entityId,
-      );
-      String imageName = categoryImage!.url.split("/").last;
-      context.read<AppImageManagerCubit>().removeImageFromDirectory(
-        imageName,
-        categoryImage!.entityType,
-      );*/
       var updatedImage = (categoryImage as AppImageModel).copyWith(
         url: imageUrl,
       );
@@ -139,6 +134,9 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
         entityType: "product",
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        adminId: SessionManager.getUserSession()!.administratorId != null
+            ? SessionManager.getUserSession()!.administratorId!
+            : SessionManager.getUserSession()!.id,
       );
     }
   }
@@ -266,31 +264,6 @@ class _CategoryFormPageState extends State<CategoryFormPage> {
                                 ),
                               ),
                             );
-                      /*if (state is AppImageManagerLoaded ||
-                          state is OpenImageFromGalerySuccessfully) {
-                      } else {
-                        return GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color.fromARGB(149, 158, 158, 158),
-                                width: 2,
-                              ),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.add,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ),
-                        );
-                      }*/
                     },
                   ),
                   SizedBox(height: 10),

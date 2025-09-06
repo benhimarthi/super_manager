@@ -18,6 +18,7 @@ class Inventory extends Equatable {
   final DateTime lastRestockDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String adminId;
 
   const Inventory({
     required this.id,
@@ -37,6 +38,7 @@ class Inventory extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     required this.lostSaleOpportunitiesQuantity,
+    required this.adminId,
   });
 
   @override

@@ -66,6 +66,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
       entityType: "product_item",
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
   }
 
@@ -93,6 +96,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
       creatorID: SessionManager.getUserSession()!.id,
       createdAt: widget.product?.createdAt ?? now,
       updatedAt: now,
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
     setState(() {
       cachedProduct = product;

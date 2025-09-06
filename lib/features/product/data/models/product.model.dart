@@ -14,6 +14,7 @@ class ProductModel extends Product {
     required super.creatorID,
     required super.createdAt,
     required super.updatedAt,
+    required super.adminId,
   });
 
   factory ProductModel.fromEntity(Product entity) {
@@ -30,23 +31,25 @@ class ProductModel extends Product {
       creatorID: entity.creatorID,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      adminId: entity.adminId,
     );
   }
 
   factory ProductModel.empty() {
     return ProductModel(
-      id: "id",
-      name: "name",
-      description: "description",
-      categoryId: "categoryId",
-      unit: "unit",
-      barcode: "barcode",
-      imageUrl: "imageUrl",
-      pricingId: "pricingId",
+      id: "",
+      name: "",
+      description: "",
+      categoryId: "",
+      unit: "",
+      barcode: "",
+      imageUrl: "",
+      pricingId: "",
       active: false,
-      creatorID: "creatorID",
+      creatorID: "",
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: "",
     );
   }
 
@@ -63,6 +66,7 @@ class ProductModel extends Product {
     creatorID: creatorID,
     createdAt: createdAt,
     updatedAt: updatedAt,
+    adminId: adminId,
   );
 
   ProductModel copyWith({
@@ -77,6 +81,7 @@ class ProductModel extends Product {
     String? creatorId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? adminId,
   }) {
     return ProductModel(
       id: id,
@@ -91,6 +96,7 @@ class ProductModel extends Product {
       creatorID: creatorId ?? creatorID,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -108,6 +114,7 @@ class ProductModel extends Product {
       creatorID: map['creatorID'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -125,6 +132,7 @@ class ProductModel extends Product {
       'creatorID': creatorID,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'adminId': adminId,
     };
   }
 }

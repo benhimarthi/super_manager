@@ -131,6 +131,9 @@ class _InventoryFormDataState extends State<InventoryFormData> {
         lostSaleOpportunitiesQuantity: int.parse(
           _lostSaleOpportunitiesQuantity.text,
         ),
+        adminId: SessionManager.getUserSession()!.administratorId != null
+            ? SessionManager.getUserSession()!.administratorId!
+            : SessionManager.getUserSession()!.id,
       );
       return inventory;
     }

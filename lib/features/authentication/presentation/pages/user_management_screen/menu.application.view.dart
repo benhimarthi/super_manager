@@ -34,6 +34,7 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
     super.initState();
     myNotifications = [];
     context.read<AppImageManagerCubit>().loadImages(currentUser!.id);
+    context.read<NotificationCubit>().loadNotifications();
   }
 
   @override
@@ -146,43 +147,7 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                                         17,
                                         0,
                                       ),
-                                    ) /*Container(
-                                      width: 20,
-                                      height: 15,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          255,
-                                          17,
-                                          0,
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          myNotifications
-                                              .where(
-                                                (x) =>
-                                                    x.status ==
-                                                    NotificationStatus
-                                                        .unread
-                                                        .name,
-                                              )
-                                              .toList()
-                                              .length
-                                              .toString(),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),*/,
+                                    ),
                                   ),
                                 ),
                               ],

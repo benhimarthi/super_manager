@@ -66,6 +66,9 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
       currency: widget.productPricing.currency,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
     saleItem = SaleItem(
       id: saleItemUid,
@@ -76,6 +79,9 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
       totalPrice: widget.inventoryMetadata.costPerUnit * quantity,
       taxAmount: 0,
       discountApplied: discountAmount,
+      adminId: SessionManager.getUserSession()!.administratorId != null
+          ? SessionManager.getUserSession()!.administratorId!
+          : SessionManager.getUserSession()!.id,
     );
     context.read<WidgetManipulatorCubit>().emitRandomElement({
       "id": "sale",

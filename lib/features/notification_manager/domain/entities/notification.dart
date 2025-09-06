@@ -23,6 +23,7 @@ class Notifications extends Equatable {
   final int retriesCount;
   final String? errorMessage;
   final int readCount;
+  final String adminId;
 
   const Notifications({
     required this.id,
@@ -47,6 +48,7 @@ class Notifications extends Equatable {
     required this.retriesCount,
     this.errorMessage,
     required this.readCount,
+    required this.adminId,
   });
 
   @override

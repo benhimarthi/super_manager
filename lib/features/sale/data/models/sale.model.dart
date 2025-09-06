@@ -14,6 +14,7 @@ class SaleModel extends Sale {
     super.notes,
     required super.createdAt,
     required super.updatedAt,
+    required super.adminId,
   });
 
   factory SaleModel.fromEntity(Sale entity) {
@@ -30,6 +31,7 @@ class SaleModel extends Sale {
       notes: entity.notes,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      adminId: entity.adminId,
     );
   }
 
@@ -47,6 +49,7 @@ class SaleModel extends Sale {
       notes: notes,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      adminId: adminId,
     );
   }
 
@@ -63,6 +66,7 @@ class SaleModel extends Sale {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? adminId,
   }) {
     return SaleModel(
       id: id ?? this.id,
@@ -75,6 +79,7 @@ class SaleModel extends Sale {
       currency: currency ?? this.currency,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -92,6 +97,7 @@ class SaleModel extends Sale {
       notes: map['notes'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -109,6 +115,7 @@ class SaleModel extends Sale {
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'adminId': adminId,
     };
   }
 

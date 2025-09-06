@@ -24,6 +24,7 @@ class NotificationModel extends Notifications {
     required super.retriesCount,
     super.errorMessage,
     required super.readCount,
+    required super.adminId,
   });
 
   factory NotificationModel.fromEntity(Notifications entity) {
@@ -50,6 +51,7 @@ class NotificationModel extends Notifications {
       retriesCount: entity.retriesCount,
       errorMessage: entity.errorMessage,
       readCount: entity.readCount,
+      adminId: entity.adminId,
     );
   }
 
@@ -79,6 +81,7 @@ class NotificationModel extends Notifications {
         retriesCount: map['retries_count'],
         errorMessage: map['error_message'],
         readCount: map['read_count'],
+        adminId: map['adminId'],
       );
 
   Map<String, dynamic> toMap() => {
@@ -104,6 +107,7 @@ class NotificationModel extends Notifications {
     'retries_count': retriesCount,
     'error_message': errorMessage,
     'read_count': readCount,
+    'adminId': adminId,
   };
 
   NotificationModel copyWith({
@@ -129,6 +133,7 @@ class NotificationModel extends Notifications {
     int? retriesCount,
     String? errorMessage,
     int? readCount,
+    String? adminId,
   }) {
     return NotificationModel(
       id: id ?? this.id,
@@ -153,6 +158,7 @@ class NotificationModel extends Notifications {
       retriesCount: retriesCount ?? this.retriesCount,
       errorMessage: errorMessage ?? this.errorMessage,
       readCount: readCount ?? this.readCount,
+      adminId: adminId ?? this.adminId,
     );
   }
 }

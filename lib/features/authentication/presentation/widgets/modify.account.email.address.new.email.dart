@@ -11,7 +11,6 @@ class ModifyAccountEmailAddressNewEmail extends StatelessWidget {
     final TextEditingController _emailController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
-    onRenewMailAddess() {}
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

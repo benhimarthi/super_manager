@@ -9,6 +9,7 @@ class SaleItem extends Equatable {
   final double totalPrice; // quantity * unitPrice
   final double taxAmount;
   final double discountApplied; // Optional per item
+  final String adminId;
 
   const SaleItem({
     required this.id,
@@ -19,17 +20,18 @@ class SaleItem extends Equatable {
     required this.totalPrice,
     required this.taxAmount,
     required this.discountApplied,
+    required this.adminId,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        saleId,
-        productId,
-        quantity,
-        unitPrice,
-        totalPrice,
-        taxAmount,
-        discountApplied,
-      ];
+    id,
+    saleId,
+    productId,
+    quantity,
+    unitPrice,
+    totalPrice,
+    taxAmount,
+    discountApplied,
+  ];
 }

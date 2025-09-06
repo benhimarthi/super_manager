@@ -10,6 +10,7 @@ class SaleItemModel extends SaleItem {
     required super.totalPrice,
     required super.taxAmount,
     required super.discountApplied,
+    required super.adminId,
   });
 
   factory SaleItemModel.fromEntity(SaleItem entity) {
@@ -22,6 +23,7 @@ class SaleItemModel extends SaleItem {
       totalPrice: entity.totalPrice,
       taxAmount: entity.taxAmount,
       discountApplied: entity.discountApplied,
+      adminId: entity.adminId,
     );
   }
 
@@ -35,6 +37,7 @@ class SaleItemModel extends SaleItem {
       totalPrice: totalPrice,
       taxAmount: taxAmount,
       discountApplied: discountApplied,
+      adminId: adminId,
     );
   }
 
@@ -47,6 +50,7 @@ class SaleItemModel extends SaleItem {
     double? totalPrice,
     double? taxAmount,
     double? discountApplied,
+    String? adminId,
   }) {
     return SaleItem(
       id: id ?? this.id,
@@ -57,6 +61,7 @@ class SaleItemModel extends SaleItem {
       totalPrice: totalPrice ?? this.totalPrice,
       taxAmount: taxAmount ?? this.taxAmount,
       discountApplied: discountApplied ?? this.discountApplied,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -70,6 +75,7 @@ class SaleItemModel extends SaleItem {
       totalPrice: (map['totalPrice'] as num).toDouble(),
       taxAmount: (map['taxAmount'] as num).toDouble(),
       discountApplied: (map['discountApplied'] as num).toDouble(),
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -83,6 +89,7 @@ class SaleItemModel extends SaleItem {
       'totalPrice': totalPrice,
       'taxAmount': taxAmount,
       'discountApplied': discountApplied,
+      'adminId': adminId,
     };
   }
 

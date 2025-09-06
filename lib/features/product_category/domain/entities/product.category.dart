@@ -10,6 +10,8 @@ class ProductCategory extends Equatable {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String adminId;
+
   const ProductCategory({
     required this.id,
     required this.name,
@@ -20,18 +22,19 @@ class ProductCategory extends Equatable {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.adminId,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        parentId,
-        imageUrl,
-        iconCodePoint,
-        isActive,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    name,
+    description,
+    parentId,
+    imageUrl,
+    iconCodePoint,
+    isActive,
+    createdAt,
+    updatedAt,
+  ];
 }

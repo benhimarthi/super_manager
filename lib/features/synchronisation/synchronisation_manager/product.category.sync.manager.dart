@@ -36,7 +36,20 @@ class ProductCategorySyncManager {
       return const Right(null);
     } catch (e) {
       return const Left(
-          ServerFailure(message: 'Failed to sync changes', statusCode: 500));
+        ServerFailure(message: 'Failed to sync changes', statusCode: 500),
+      );
     }
+  }
+
+  Future<void> pullRemoteData() async {
+    final remoteList = await _remote.getAllCategories();
+    await _local.clearAll();
+    for (final pricing in remoteList) {
+      await _local.applyCreate(pricing);
+    }
+  }
+
+  Future<void> refreshFromRemote() async {
+    await pullRemoteData();
   }
 }

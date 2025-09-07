@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
+import 'package:super_manager/core/errors/failure.dart';
 import '../../../../core/session/session.manager.dart';
 import '../models/inventory.model.dart';
 
@@ -25,15 +27,20 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
 
   @override
   Future<List<InventoryModel>> getAllInventory() async {
-    final uid = SessionManager.getUserSession()!.id;
-    final snapshot = await _firestore
-        .collection(_collection)
-        .where('creatorId', isEqualTo: uid)
-        .get();
-
-    return snapshot.docs
-        .map((doc) => InventoryModel.fromMap(doc.data()))
-        .toList();
+    try {
+      final uid =
+          SessionManager.getUserSession()!.administratorId ??
+          SessionManager.getUserSession()!.id;
+      final snapshot = await _firestore
+          .collection(_collection)
+          .where('adminId', isEqualTo: uid)
+          .get();
+      return snapshot.docs
+          .map((doc) => InventoryModel.fromMap(doc.data()))
+          .toList();
+    } on ServerException catch (e) {
+      throw ServerFailure(message: e.message, statusCode: 500);
+    }
   }
 
   @override

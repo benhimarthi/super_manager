@@ -53,4 +53,14 @@ class ProductCategorySyncTriggerCubit
   Future<void> triggerManualSync() async {
     await _triggerSync();
   }
+
+  Future<void> refreshFromRemote() async {
+    try {
+      emit(SyncInProgress());
+      await _syncManager.refreshFromRemote();
+      emit(SyncSuccess());
+    } catch (e) {
+      emit(SyncFailure(e.toString()));
+    }
+  }
 }

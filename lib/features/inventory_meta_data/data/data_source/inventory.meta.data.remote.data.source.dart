@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
+import 'package:super_manager/core/errors/failure.dart';
 
 import '../../../../core/session/session.manager.dart';
 import '../models/inventory.meta.data.model.dart';
@@ -27,15 +29,20 @@ class InventoryMetadataRemoteDataSourceImpl
 
   @override
   Future<List<InventoryMetadataModel>> getAllMetadata() async {
-    final uid = SessionManager.getUserSession()!.id;
-    final snapshot = await _firestore
-        .collection(_collection)
-        .where('creatorId', isEqualTo: uid)
-        .get();
-
-    return snapshot.docs
-        .map((doc) => InventoryMetadataModel.fromMap(doc.data()))
-        .toList();
+    try {
+      final uid =
+          SessionManager.getUserSession()!.administratorId ??
+          SessionManager.getUserSession()!.id;
+      final snapshot = await _firestore
+          .collection(_collection)
+          .where('adminId', isEqualTo: uid)
+          .get();
+      return snapshot.docs
+          .map((doc) => InventoryMetadataModel.fromMap(doc.data()))
+          .toList();
+    } on ServerException catch (e) {
+      throw ServerFailure(message: e.message, statusCode: 500);
+    }
   }
 
   @override

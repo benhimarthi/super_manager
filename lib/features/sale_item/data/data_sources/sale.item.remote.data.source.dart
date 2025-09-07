@@ -26,12 +26,19 @@ class SaleItemRemoteDataSourceImpl implements SaleItemRemoteDataSource {
 
   @override
   Future<List<SaleItemModel>> getSaleItemsBySaleId(String saleId) async {
-    final uid = SessionManager.getUserSession()!.id;
-    final snapshot = await _firestore
-        .collection(_collection)
-        .where('creatorId', isEqualTo: uid)
-        .where('saleId', isEqualTo: saleId)
-        .get();
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
+    final snapshot = saleId != ""
+        ? await _firestore
+              .collection(_collection)
+              .where('adminId', isEqualTo: uid)
+              .where('saleId', isEqualTo: saleId)
+              .get()
+        : await _firestore
+              .collection(_collection)
+              .where('adminId', isEqualTo: uid)
+              .get();
 
     return snapshot.docs
         .map((doc) => SaleItemModel.fromMap(doc.data()))

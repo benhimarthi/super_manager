@@ -3,11 +3,6 @@ import '../../../../core/file_reader/file_data_reader.dart';
 
 void openFile() async {
   Map<String, dynamic>? data = await FileDataReader.pickAndReadFile();
-  if (data != null) {
-    print('File data: $data');
-  } else {
-    print('No file selected or unsupported file type');
-  }
 }
 
 addItemOptions({
@@ -33,7 +28,6 @@ addItemOptions({
           children: [
             GestureDetector(
               onTap: () {
-                print("###########################3");
                 onAdd();
               },
               child: Container(
@@ -48,7 +42,6 @@ addItemOptions({
             ),
             GestureDetector(
               onTap: () {
-                print("^^^^^^^^^^^^^^^^^^^^^^^^#!!!!!");
                 openFile();
               },
               child: Container(
@@ -65,7 +58,6 @@ addItemOptions({
         ),
         GestureDetector(
           onTap: () {
-            print("###########################3");
             Navigator.pop(context);
           },
           child: Padding(

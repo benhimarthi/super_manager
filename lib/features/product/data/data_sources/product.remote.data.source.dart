@@ -25,10 +25,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<List<ProductModel>> getAllProducts() async {
-    final uid = SessionManager.getUserSession()!.id;
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
     final snapshot = await _firestore
         .collection(_collection)
-        .where('creatorId', isEqualTo: uid)
+        .where('adminId', isEqualTo: uid)
         .get();
 
     return snapshot.docs

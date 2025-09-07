@@ -14,6 +14,7 @@ class ActionHistory extends Equatable {
   final String module;
   final String statusBefore;
   final String statusAfter;
+  final String adminId;
 
   const ActionHistory({
     required this.timestamp,
@@ -29,6 +30,7 @@ class ActionHistory extends Equatable {
     required this.module,
     required this.statusBefore,
     required this.statusAfter,
+    required this.adminId,
   });
 
   @override

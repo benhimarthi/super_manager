@@ -1,3 +1,5 @@
+import 'package:super_manager/core/session/session.manager.dart';
+
 import '../../features/action_history/domain/entities/action.history.dart';
 
 ActionHistory addHistoryItem(
@@ -28,5 +30,8 @@ ActionHistory addHistoryItem(
     module: module,
     statusBefore: statusBefore,
     statusAfter: statusAfter,
+    adminId:
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id,
   );
 }

@@ -35,7 +35,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
   @override
   void initState() {
     super.initState();
-    title = "FINANCE";
+    title = "SALE";
   }
 
   @override
@@ -50,7 +50,7 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
       },
       builder: (context, state) {
         return switch (title) {
-          "HOME" => Container(),
+          "HOME" => SaleView(),
           "PROFILE" => UserProfile(),
           "PRODUCT" => ProductPage(),
           "USERS" => UserManagement(),
@@ -58,10 +58,9 @@ class _CurrentSCreenInfosState extends State<CurrentSCreenInfos> {
           "SALE" => SaleView(),
           "PRODUCT_CATEGORY" => ProductCategoryPage(),
           "PROFILE" => UserManagement(),
-          "FINANCE" => RefreshDatasFromRemoteStorage(),
-          /*UserActivitiesManager(
+          "FINANCE" => UserActivitiesManager(
             user: SessionManager.getUserSession()!,
-          ),*/
+          ),
           //AssessmentView(),
           "NOTIFICATIONS" => NotificationPage(),
           String() => throw UnimplementedError(),

@@ -69,4 +69,22 @@ class SyncManager {
       throw ServerException(message: e.toString(), statusCode: 404);
     }
   }
+
+  Future<void> pullRemoteData() async {
+    // For simplicity, pull all sale items (could be optimized by saleId)
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
+    final remoteList = await _remoteDataSource.getUsers(
+      uid,
+    ); // or implement method to get all
+    await _localDataSource.clearAll();
+    for (final item in remoteList) {
+      await _localDataSource.cacheUser(item);
+    }
+  }
+
+  Future<void> refreshFromRemote() async {
+    await pullRemoteData();
+  }
 }

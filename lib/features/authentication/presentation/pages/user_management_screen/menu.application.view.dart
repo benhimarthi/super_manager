@@ -44,12 +44,12 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            color: Colors.black,
+            color: const Color.fromARGB(255, 0, 0, 0),
             width: MediaQuery.of(context).size.width * .88,
             height: double.infinity,
           ),
           SizedBox(
-            width: 49,
+            width: MediaQuery.of(context).size.width * .11,
             height: double.infinity,
             child: Column(
               children: [

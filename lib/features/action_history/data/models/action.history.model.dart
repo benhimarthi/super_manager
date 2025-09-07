@@ -15,6 +15,7 @@ class ActionHistoryModel extends ActionHistory {
     required super.module,
     required super.statusBefore,
     required super.statusAfter,
+    required super.adminId,
   });
 
   factory ActionHistoryModel.fromEntity(ActionHistory entity) {
@@ -32,6 +33,7 @@ class ActionHistoryModel extends ActionHistory {
       module: entity.module,
       statusBefore: entity.statusBefore,
       statusAfter: entity.statusAfter,
+      adminId: entity.adminId,
     );
   }
 
@@ -56,6 +58,7 @@ class ActionHistoryModel extends ActionHistory {
       module: map['module'],
       statusBefore: map['statusBefore'],
       statusAfter: map['statusAfter'],
+      adminId: map['adminId'] as String,
     );
   }
 
@@ -73,6 +76,7 @@ class ActionHistoryModel extends ActionHistory {
     'module': module,
     'statusBefore': statusBefore,
     'statusAfter': statusAfter,
+    'adminId': adminId,
   };
 
   @override

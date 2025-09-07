@@ -29,14 +29,14 @@ class _SelectedOptionState extends State<SelectedOption> {
       },
       builder: (context, state) {
         return SizedBox(
-          width: 49,
+          width: MediaQuery.of(context).size.width * .11,
           height: double.infinity,
           child: Column(
             children: [
               const SizedBox(height: 20),
               const SizedBox(height: 100, width: 35),
               const SizedBox(height: 5),
-              Container(
+              SizedBox(
                 //color: Color.fromARGB(68, 255, 193, 7),
                 height: 600,
                 width: 55,

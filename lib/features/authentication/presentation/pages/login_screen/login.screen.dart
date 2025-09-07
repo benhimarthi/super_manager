@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
-import 'package:super_manager/features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
-import '../../../../../core/service/depenedancy.injection.dart';
-import '../../../../../core/util/change.screen.manager.dart';
+import 'package:super_manager/features/synchronisation/refresh.datas.from.remote.storage.dart';
 import '../../cubit/authentication.cubit.dart';
 import '../../cubit/authentication.state.dart';
-import '../user_management_screen/main.screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -73,9 +69,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   context,
                 ).showSnackBar(SnackBar(content: Text(state.message)));
               } else if (state is UserAuthenticated) {
-                //await getIt<RefreshCategoriesFromRemote>()();
-                await getIt<ProductSyncTriggerCubit>().refreshFromRemote();
-                nextScreen(context, MainScreen());
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return RefreshDatasFromRemoteStorage();
+                  },
+                );
+                //nextScreenReplace(context, MainScreen());
               } else if (state is AuthenticationOfflinePending) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

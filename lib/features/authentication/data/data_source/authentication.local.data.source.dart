@@ -18,6 +18,7 @@ abstract class AuthenticationLocalDataSource {
   Future<void> clearUpdateFlag(String userId);
   Future<List<String>> getDeletedUserIds();
   Future<void> clearDeletedFlag(String userId);
+  Future<void> clearAll();
 }
 
 class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
@@ -204,5 +205,10 @@ class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
     );
     deletedUsers.remove(userId);
     await _hiveBox.put("deleted_users", deletedUsers);
+  }
+
+  @override
+  Future<void> clearAll() async {
+    await _hiveBox.clear();
   }
 }

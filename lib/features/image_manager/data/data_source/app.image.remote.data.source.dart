@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:super_manager/core/errors/custom.exception.dart';
+import 'package:super_manager/core/errors/failure.dart';
+import 'package:super_manager/core/session/session.manager.dart';
 
 import '../models/app.image.model.dart';
 
@@ -39,14 +41,24 @@ class AppImageRemoteDataSourceImpl implements AppImageRemoteDataSource {
 
   @override
   Future<List<AppImageModel>> fetchImagesForEntity(String entityId) async {
-    final snapshot = await imageCollection
-        .where('entityId', isEqualTo: entityId)
-        .where('active', isEqualTo: true)
-        .get();
-
-    return snapshot.docs
-        .map((doc) => AppImageModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
+    try {
+      final uid =
+          SessionManager.getUserSession()!.administratorId ??
+          SessionManager.getUserSession()!.id;
+      final snapshot = entityId != ""
+          ? await imageCollection
+                .where('entityId', isEqualTo: entityId)
+                .where('active', isEqualTo: true)
+                .get()
+          : await imageCollection.where('adminId', isEqualTo: uid).get();
+      return snapshot.docs
+          .map(
+            (doc) => AppImageModel.fromMap(doc.data() as Map<String, dynamic>),
+          )
+          .toList();
+    } on ServerException catch (e) {
+      throw ServerFailure(message: e.message, statusCode: 500);
+    }
   }
 
   @override

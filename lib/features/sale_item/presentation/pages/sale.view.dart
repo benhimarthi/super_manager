@@ -98,7 +98,7 @@ class _SaleViewState extends State<SaleView> {
                           return Container(
                             height: 100,
                             width: 100,
-                            color: Colors.blue,
+                            //color: Colors.blue,
                           );
                         }
                       },

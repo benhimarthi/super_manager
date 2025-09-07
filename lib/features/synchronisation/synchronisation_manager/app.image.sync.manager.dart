@@ -44,7 +44,7 @@ class AppImageSyncManagerImpl implements AppImageSyncManager {
     // Optional: you could support pulling by entityType or batch criteria if desired
     // For now, we’ll assume pulling all (adjust if you scope it)
     // This example uses dummy entityId 'sync' — you'll likely iterate per-entity context
-    final remoteImages = await _remote.fetchImagesForEntity('sync');
+    final remoteImages = await _remote.fetchImagesForEntity('');
 
     await _local.clearAll();
     for (final image in remoteImages) {

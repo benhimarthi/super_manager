@@ -29,7 +29,7 @@ class AppImageModel extends AppImage {
       active: map['active'] ?? true,
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
-      adminId: map['adminId'] as String,
+      adminId: (map['adminId'] ?? "") as String,
     );
   }
 
@@ -86,6 +86,7 @@ class AppImageModel extends AppImage {
       'active': active,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'adminId': adminId,
     };
   }
 

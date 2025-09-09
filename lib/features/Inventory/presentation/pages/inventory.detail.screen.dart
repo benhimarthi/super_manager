@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.form.data.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.meta.data.form.dart';
 
+import '../../../../core/session/session.manager.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import '../../domain/entities/inventory.dart';
@@ -111,6 +112,9 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
         inventorySource: _inventorySourceController.text,
         createdBy: _createdByController.text,
         updatedBy: _updatedByController.text,
+        adminId: SessionManager.getUserSession()!.administratorId != null
+            ? SessionManager.getUserSession()!.administratorId!
+            : SessionManager.getUserSession()!.id,
       );
 
       final inventoryCubit = context.read<InventoryCubit>();

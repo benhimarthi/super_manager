@@ -90,7 +90,7 @@ class InventoryModel extends Inventory {
       updatedAt: DateTime.parse(map['updatedAt'] as String),
       lostSaleOpportunitiesQuantity:
           map['lostSaleOpportunitiesQuantity'] as int,
-      adminId: map['adminId'] as String,
+      adminId: (map['adminId'] ?? "") as String,
     );
   }
 

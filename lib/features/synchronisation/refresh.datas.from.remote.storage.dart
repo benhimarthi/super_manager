@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:super_manager/core/service/depenedancy.injection.dart';
-import 'package:super_manager/features/authentication/data/data_source/sync.manager.dart';
-import 'package:super_manager/features/authentication/data/data_source/sync.trigger.dart';
 import 'package:super_manager/features/synchronisation/cubit/action_history_synch_manager_cubit/action.history.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';

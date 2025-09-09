@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
+import 'package:super_manager/core/errors/failure.dart';
 
 import '../models/app.image.model.dart';
 
@@ -63,11 +65,17 @@ class AppImageLocalDataSourceImpl implements AppImageLocalDataSource {
 
   @override
   Future<List<AppImageModel>> getImagesForEntity(String entityId) async {
-    var res = mainBox.values
-        .map((e) => AppImageModel.fromMap(Map<String, dynamic>.from(e)))
-        .where((img) => img.entityId == entityId && img.active)
-        .toList();
-    return res;
+    try {
+      print(mainBox.values);
+      var res = mainBox.values
+          .map((e) => AppImageModel.fromMap(Map<String, dynamic>.from(e)))
+          .where((img) => img.entityId == entityId && img.active)
+          .toList();
+
+      return res;
+    } catch (e) {
+      throw LocalFailure(message: e.toString(), statusCode: 500);
+    }
   }
 
   // ➕ Create Staging

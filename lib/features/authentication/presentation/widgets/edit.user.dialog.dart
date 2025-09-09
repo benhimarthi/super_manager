@@ -43,6 +43,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
       avatar: _avatarController.text.trim(),
       role: _selectedRole,
       activated: widget.user.activated,
+      administratorId: widget.user.administratorId,
     );
     context.read<AuthenticationCubit>().updateUser(updatedUser);
     SessionManager.saveUserSession(updatedUser);

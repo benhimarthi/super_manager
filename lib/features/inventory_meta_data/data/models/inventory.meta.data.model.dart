@@ -15,6 +15,7 @@ class InventoryMetadataModel extends InventoryMetadata {
     required super.inventorySource,
     required super.createdBy,
     required super.updatedBy,
+    required super.adminId,
   });
 
   factory InventoryMetadataModel.fromEntity(InventoryMetadata entity) {
@@ -32,6 +33,7 @@ class InventoryMetadataModel extends InventoryMetadata {
       inventorySource: entity.inventorySource,
       createdBy: entity.createdBy,
       updatedBy: entity.updatedBy,
+      adminId: entity.adminId,
     );
   }
 
@@ -50,6 +52,7 @@ class InventoryMetadataModel extends InventoryMetadata {
       inventorySource: inventorySource,
       createdBy: createdBy,
       updatedBy: updatedBy,
+      adminId: adminId,
     );
   }
 
@@ -67,6 +70,7 @@ class InventoryMetadataModel extends InventoryMetadata {
     String? inventorySource,
     String? createdBy,
     String? updatedBy,
+    String? adminId,
   }) {
     return InventoryMetadataModel(
       id: id ?? this.id,
@@ -82,6 +86,7 @@ class InventoryMetadataModel extends InventoryMetadata {
       inventorySource: inventorySource ?? this.inventorySource,
       createdBy: createdBy ?? this.createdBy,
       updatedBy: updatedBy ?? this.updatedBy,
+      adminId: adminId ?? this.adminId,
     );
   }
 
@@ -100,6 +105,7 @@ class InventoryMetadataModel extends InventoryMetadata {
       inventorySource: map['inventorySource'] as String,
       createdBy: map['createdBy'] as String,
       updatedBy: map['updatedBy'] as String,
+      adminId: (map['adminId'] ?? "") as String,
     );
   }
 
@@ -118,6 +124,7 @@ class InventoryMetadataModel extends InventoryMetadata {
       'inventorySource': inventorySource,
       'createdBy': createdBy,
       'updatedBy': updatedBy,
+      'adminId': adminId,
     };
   }
 

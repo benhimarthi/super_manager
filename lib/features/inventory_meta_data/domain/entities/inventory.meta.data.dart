@@ -14,6 +14,7 @@ class InventoryMetadata extends Equatable {
   final String inventorySource;
   final String createdBy;
   final String updatedBy;
+  final String adminId;
 
   const InventoryMetadata({
     required this.id,
@@ -29,22 +30,23 @@ class InventoryMetadata extends Equatable {
     required this.inventorySource,
     required this.createdBy,
     required this.updatedBy,
+    required this.adminId,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        inventoryId,
-        costPerUnit,
-        totalStockValue,
-        markupPercentage,
-        averageDailySales,
-        stockTurnoverRate,
-        leadTimeInDays,
-        demandForecast,
-        seasonalityFactor,
-        inventorySource,
-        createdBy,
-        updatedBy,
-      ];
+    id,
+    inventoryId,
+    costPerUnit,
+    totalStockValue,
+    markupPercentage,
+    averageDailySales,
+    stockTurnoverRate,
+    leadTimeInDays,
+    demandForecast,
+    seasonalityFactor,
+    inventorySource,
+    createdBy,
+    updatedBy,
+  ];
 }

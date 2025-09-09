@@ -79,6 +79,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
               listener: (context, state) {
                 if (state is InventoryMetadataManagerLoaded) {
                   metadatas = state.metadataList;
+                  print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${metadatas}");
                 }
               },
               builder: (context, state) {

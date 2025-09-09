@@ -39,6 +39,7 @@ class AuthenticationRepositoryImplementation
       password: password,
       role: role,
       activated: true,
+      administratorId: currentUser != null ? currentUser.id : "",
     );
     try {
       await _remoteDataSource.createUser(user);

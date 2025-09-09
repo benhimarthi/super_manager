@@ -37,7 +37,6 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
   Future<List<ProductCategory>> _loadParentOptions() async {
     imageUrl = {};
     final result = await getIt<GetAllProductCategories>()();
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     return result.fold((_) => [], (categories) {
       // Exclude self to prevent circular parenting
       return widget.category == null
@@ -74,7 +73,6 @@ class _SelectingParentCategoryState extends State<SelectingParentCategory> {
                     return BlocConsumer<AppImageManagerCubit, AppImageState>(
                       listener: (context, state) {
                         if (state is AppImageCategoryLoaded) {
-                          print("@@@@@@@@@@@@@@@@@@@@@GGGGGGGGGGGGG");
                           var image = state.images.firstOrNull;
                           if (image != null) {
                             imageUrl.add(image.url);

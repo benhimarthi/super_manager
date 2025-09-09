@@ -45,12 +45,16 @@ class AppImageRemoteDataSourceImpl implements AppImageRemoteDataSource {
       final uid =
           SessionManager.getUserSession()!.administratorId ??
           SessionManager.getUserSession()!.id;
+      print(
+        "########################@@@@@@@@@@@@@ ${uid == "" ? SessionManager.getUserSession()!.id : SessionManager.getUserSession()!.administratorId}",
+      );
       final snapshot = entityId != ""
           ? await imageCollection
                 .where('entityId', isEqualTo: entityId)
                 .where('active', isEqualTo: true)
                 .get()
           : await imageCollection.where('adminId', isEqualTo: uid).get();
+      print(snapshot.docs);
       return snapshot.docs
           .map(
             (doc) => AppImageModel.fromMap(doc.data() as Map<String, dynamic>),

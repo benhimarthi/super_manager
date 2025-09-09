@@ -110,6 +110,9 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           inventorySource: "",
           createdBy: SessionManager.getUserSession()!.id,
           updatedBy: SessionManager.getUserSession()!.id,
+          adminId: SessionManager.getUserSession()!.administratorId != null
+              ? SessionManager.getUserSession()!.administratorId!
+              : SessionManager.getUserSession()!.id,
         );
         var currentUser = SessionManager.getUserSession()!;
         //final info = NetworkInfo();

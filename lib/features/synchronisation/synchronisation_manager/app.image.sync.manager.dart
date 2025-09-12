@@ -45,7 +45,6 @@ class AppImageSyncManagerImpl implements AppImageSyncManager {
     // For now, we’ll assume pulling all (adjust if you scope it)
     // This example uses dummy entityId 'sync' — you'll likely iterate per-entity context
     final remoteImages = await _remote.fetchImagesForEntity('');
-    print("##############################@@@@@@@@@@@@@@@ $remoteImages");
     await _local.clearAll();
     for (final image in remoteImages) {
       await _local.cacheImage(image);

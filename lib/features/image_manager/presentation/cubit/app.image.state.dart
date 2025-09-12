@@ -27,6 +27,15 @@ class AppImageProductLoaded extends AppImageState {
   List<Object?> get props => [images];
 }
 
+class AppImageProfileLoaded extends AppImageState {
+  final List<AppImage> images;
+
+  const AppImageProfileLoaded(this.images);
+
+  @override
+  List<Object?> get props => [images];
+}
+
 class AppImageCategoryLoaded extends AppImageState {
   final List<AppImage> images;
 

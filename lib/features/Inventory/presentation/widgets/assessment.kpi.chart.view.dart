@@ -229,7 +229,6 @@ class _AssessmentKpiChartViewState extends State<AssessmentKpiChartView> {
                   data["inv_id"]: data["datas"]["unitsReceive"],
                 });
                 totalUnitsReceive = calculateKPI(unitsReceiveSet);
-                print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@**");
                 totSellThroughRate(totalUnitSold, totalUnitsReceive);
                 daysOfInvOnHand(totalAvgInventory, totalCOGS);
                 stockToSalesRatio(

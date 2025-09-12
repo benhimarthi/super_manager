@@ -14,12 +14,16 @@ class ProfileImage extends StatefulWidget {
   final String entityType;
   final String name;
   final bool displayEdit;
+  final double radius;
+  final double fontSize;
   const ProfileImage({
     super.key,
     required this.itemId,
     required this.entityType,
     required this.name,
     this.displayEdit = true,
+    required this.radius,
+    required this.fontSize,
   });
 
   @override
@@ -35,7 +39,7 @@ class _ProfileImageState extends State<ProfileImage> {
   void initState() {
     super.initState();
     avatar = AppImageModel.empty();
-    context.read<AppImageManagerCubit>().loadImages(widget.itemId);
+    context.read<AppImageManagerCubit>().loadProfileImages(widget.itemId);
   }
 
   updateProfileImge(String url) {
@@ -77,7 +81,7 @@ class _ProfileImageState extends State<ProfileImage> {
                   image = File(state.image.url);
                 }
               }
-              if (state is AppImageManagerLoaded) {
+              if (state is AppImageProfileLoaded) {
                 if (state.images.isNotEmpty) {
                   final toDisplay = state.images
                       .where((x) => x.url.isNotEmpty && x.active)
@@ -95,19 +99,19 @@ class _ProfileImageState extends State<ProfileImage> {
             builder: (context, state) {
               return image != null
                   ? CircleAvatar(
-                      radius: 54,
+                      radius: widget.radius,
                       backgroundColor: Colors.white,
                       backgroundImage: FileImage(image!),
                     )
                   : CircleAvatar(
-                      radius: 54,
+                      radius: widget.radius,
                       backgroundColor: Colors.white,
                       child: Text(
                         widget.name[0],
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 32,
+                          fontSize: widget.fontSize,
                         ),
                       ),
                     );

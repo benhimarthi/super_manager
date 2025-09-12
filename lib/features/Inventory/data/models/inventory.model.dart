@@ -179,7 +179,7 @@ class InventoryModel extends Inventory {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'lostSaleOpportunitiesQuantity': lostSaleOpportunitiesQuantity,
-      'adminID': adminId,
+      'adminId': adminId,
     };
   }
 

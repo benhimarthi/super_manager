@@ -51,6 +51,7 @@ class _SaleItemState extends State<SaleItem> {
       builder: (context, state) {
         return Container(
           width: 350,
+          margin: EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
             color: Colors.grey,
             borderRadius: BorderRadius.circular(10),
@@ -72,13 +73,13 @@ class _SaleItemState extends State<SaleItem> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       child: ProductCardItemCarousel(
                         productUid: widget.product.id,
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,

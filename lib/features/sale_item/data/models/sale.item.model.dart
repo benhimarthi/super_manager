@@ -75,7 +75,7 @@ class SaleItemModel extends SaleItem {
       totalPrice: (map['totalPrice'] as num).toDouble(),
       taxAmount: (map['taxAmount'] as num).toDouble(),
       discountApplied: (map['discountApplied'] as num).toDouble(),
-      adminId: map['adminId'] as String,
+      adminId: (map['adminId'] ?? "") as String,
     );
   }
 

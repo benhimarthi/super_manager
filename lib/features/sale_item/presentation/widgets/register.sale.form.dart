@@ -48,41 +48,45 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
     saleProduct();
   }
 
-  saleProduct() {
-    double discountAmount =
+  void saleProduct() {
+    final session = SessionManager.getUserSession()!;
+    final adminId = session.administratorId ?? session.id;
+
+    // Ensure discountPercent is fraction
+    double discountPerUnit =
         widget.productPricing.amount *
         (widget.productPricing.discountPercent / 100);
-    double totalAmount =
-        (widget.productPricing.amount - discountAmount) * quantity;
+    double discountedUnitPrice = widget.productPricing.amount - discountPerUnit;
+
+    double totalAmount = discountedUnitPrice * quantity;
+
     sale = Sale(
       id: saleUid,
-      customerId: SessionManager.getUserSession()!.id,
+      customerId: session.id,
       date: DateTime.now(),
       status: productStatus,
       totalAmount: totalAmount,
       totalTax: 0,
-      discountAmount: discountAmount,
+      discountAmount: discountPerUnit * quantity,
       paymentMethod: "Card",
       currency: widget.productPricing.currency,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      adminId: SessionManager.getUserSession()!.administratorId != null
-          ? SessionManager.getUserSession()!.administratorId!
-          : SessionManager.getUserSession()!.id,
+      adminId: adminId,
     );
+
     saleItem = SaleItem(
       id: saleItemUid,
       saleId: saleUid,
       productId: widget.productSale.id,
       quantity: quantity,
-      unitPrice: widget.inventoryMetadata.costPerUnit,
-      totalPrice: widget.inventoryMetadata.costPerUnit * quantity,
+      unitPrice: discountedUnitPrice,
+      totalPrice: totalAmount,
       taxAmount: 0,
-      discountApplied: discountAmount,
-      adminId: SessionManager.getUserSession()!.administratorId != null
-          ? SessionManager.getUserSession()!.administratorId!
-          : SessionManager.getUserSession()!.id,
+      discountApplied: discountPerUnit * quantity,
+      adminId: adminId,
     );
+
     context.read<WidgetManipulatorCubit>().emitRandomElement({
       "id": "sale",
       "product_name": widget.productSale.name,

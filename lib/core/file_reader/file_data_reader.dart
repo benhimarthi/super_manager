@@ -71,7 +71,7 @@ class FileDataReader {
 
   static Future<Map<String, dynamic>?> pickAndReadFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: ['svg', 'xls', 'xlsx'],
+      allowedExtensions: ['csv', 'xls', 'xlsx'],
       type: FileType.custom,
     );
     if (result != null && result.files.single.path != null) {

@@ -47,7 +47,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
   late Inventory inv;
   late InventoryMetaDataMethods cl;
   late double costPerUnity = 0;
-  late double totalStockValue = 1500;
   late TextEditingController _totalStockValue;
   late TextEditingController _leadTime;
   late bool isEditing;
@@ -87,7 +86,10 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
     inv = (widget.inventory ?? InventoryModel.empty());
     inventoryProduct = ProductModel.empty();
     productPricing = ProductPricingModel.empty();
-    costPerUnity = cl.costPerUnit(totalStockValue, inv.quantityAvailable);
+    costPerUnity = cl.costPerUnit(
+      double.parse(_totalStockValue.text),
+      inv.quantityAvailable,
+    );
     if (widget.inventory != null) {
       context.read<ProductCubit>().getProductById(widget.inventory!.productId);
     }
@@ -99,7 +101,10 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
         final metadata = InventoryMetadata(
           id: metaDataUid,
           inventoryId: inv.id,
-          costPerUnit: costPerUnity,
+          costPerUnit: cl.costPerUnit(
+            double.parse(_totalStockValue.text),
+            inv.quantityAvailable,
+          ),
           totalStockValue: double.parse(_totalStockValue.text),
           markupPercentage: 0,
           averageDailySales: 0,
@@ -168,13 +173,23 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
         );
         context.read<NotificationCubit>().addNotification(notif);
       } else {
+        print(
+          "666666666666777777777777777777777  ${double.parse(_totalStockValue.text)} --- ${(inv.quantityAvailable + inv.quantityReserved + inv.quantitySold)}",
+        );
+        print(
+          double.parse(_totalStockValue.text) /
+              (inv.quantityAvailable + inv.quantityReserved + inv.quantitySold),
+        );
         var metadata =
             InventoryMetadataModel.fromEntity(
               widget.inventoryMetadata!,
             ).copyWith(
               totalStockValue: double.parse(_totalStockValue.text),
               costPerUnit:
-                  double.parse(_totalStockValue.text) / inv.quantityAvailable,
+                  double.parse(_totalStockValue.text) /
+                  (inv.quantityAvailable +
+                      inv.quantityReserved +
+                      inv.quantitySold),
               leadTimeInDays: int.parse(_leadTime.text),
               updatedBy: SessionManager.getUserSession()!.id,
             );

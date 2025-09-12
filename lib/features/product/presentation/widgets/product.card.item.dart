@@ -30,7 +30,6 @@ class _ProductCardItemState extends State<ProductCardItem> {
   @override
   void initState() {
     super.initState();
-    print(widget.product.pricingId);
     myProductCategories = [];
     productStatus = widget.product.active;
     context.read<AppImageManagerCubit>().loadImages(widget.product.id);

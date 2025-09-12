@@ -107,6 +107,16 @@ class _InventoryItemCardState extends State<InventoryItemCard> {
                     widget.inventory.quantitySold,
                     context,
                   ),
+                  _buildQuantityInfo(
+                    'Cost/unit',
+                    widget.metadata!.costPerUnit,
+                    context,
+                  ),
+                  _buildQuantityInfo(
+                    'Total cost',
+                    widget.metadata!.totalStockValue,
+                    context,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -174,13 +184,13 @@ class _InventoryItemCardState extends State<InventoryItemCard> {
     );
   }
 
-  Widget _buildQuantityInfo(String label, int value, context) {
+  Widget _buildQuantityInfo(String label, dynamic value, context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         Text(
-          value.toString(),
+          value.toStringAsFixed(2),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,

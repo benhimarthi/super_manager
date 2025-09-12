@@ -79,7 +79,6 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
               listener: (context, state) {
                 if (state is InventoryMetadataManagerLoaded) {
                   metadatas = state.metadataList;
-                  print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${metadatas}");
                 }
               },
               builder: (context, state) {
@@ -182,6 +181,13 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                                     builder: (context) {
                                       return DeleteInventoryConfirmationView(
                                         deletedInventory: inventoryList[index],
+                                        inventoryMetaData: metadatas
+                                            .where(
+                                              (x) =>
+                                                  x.inventoryId ==
+                                                  inventoryList[index].id,
+                                            )
+                                            .firstOrNull,
                                       );
                                     },
                                   );

@@ -36,7 +36,6 @@ class AuthenticationRemoteDataSrcImpl
           .get();
       return UserModel.fromMap(snapshot.data()!);
     } catch (e) {
-      //print("")
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }

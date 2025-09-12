@@ -63,7 +63,12 @@ class _InventoryRelevantNumbersViewState
     context.read<SaleCubit>().loadSales();
   }
 
-  Widget _inventoryNbInfos(String title, double value, bool selected) {
+  Widget _inventoryNbInfos(
+    String title,
+    double value,
+    bool selected,
+    String unit,
+  ) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -106,7 +111,7 @@ class _InventoryRelevantNumbersViewState
             SizedBox(
               width: 55,
               child: Text(
-                value.toString(),
+                "${value.toString()} $unit",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -152,7 +157,7 @@ class _InventoryRelevantNumbersViewState
           widget.myInventoryHistories,
           _startDate,
           _endDate,
-        )['supply_cost'] +
+        )['supply_cost'] -
         PeriodInformationsDatas.endDateProductAvailableQuantity(
           sales,
           saleItems,
@@ -182,18 +187,7 @@ class _InventoryRelevantNumbersViewState
 
   stockToSalesRatio() {
     return InventoryKPI.stockToSalesRatio(
-      PeriodInformationsDatas.startDateProductAvailableQuantity(
-            sales,
-            saleItems,
-            widget.myInventoryHistories,
-            _startDate,
-          )['amount'] +
-          PeriodInformationsDatas.periodSupplyQttValue(
-            widget.myInventoryHistories,
-            _startDate,
-            _endDate,
-          )['supply_cost'] -
-          COGS(),
+      averageInventory(),
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         sales,
         saleItems,
@@ -220,10 +214,16 @@ class _InventoryRelevantNumbersViewState
         _endDate,
       )['period_quantity_sold'],
       PeriodInformationsDatas.periodSupplyQttValue(
-        widget.myInventoryHistories,
-        _startDate,
-        _endDate,
-      )['supply_quantity'],
+            widget.myInventoryHistories,
+            _startDate,
+            _endDate,
+          )['supply_quantity'] +
+          PeriodInformationsDatas.startDateProductAvailableQuantity(
+            sales,
+            saleItems,
+            widget.myInventoryHistories,
+            _startDate,
+          )['start_date_quantity'],
     );
   }
 
@@ -352,7 +352,7 @@ class _InventoryRelevantNumbersViewState
                             ),
                             SizedBox(width: 10),
                             Text(
-                              '$currentKpiValue',
+                              currentKpiValue.toStringAsFixed(2),
                               style: TextStyle(
                                 color: Theme.of(context).primaryColor,
                               ),
@@ -390,34 +390,40 @@ class _InventoryRelevantNumbersViewState
                                 "Average inventory",
                                 averageInventory(),
                                 false,
+                                "DH",
                               ),
                               _inventoryNbInfos(
                                 "Stock turn over rate",
                                 inventoryTurnOver(),
                                 false,
+                                "",
                               ),
                               _inventoryNbInfos(
                                 "Gross Margin Return On Investment",
                                 grossMarginReturnOnInvestment(),
                                 false,
+                                "DH",
                               ),
                               //stockToSalesRatio
                               _inventoryNbInfos(
                                 "Stock to sales ratio",
                                 stockToSalesRatio(),
                                 false,
+                                "",
                               ),
                               //daysOfInventoryOnHand
                               _inventoryNbInfos(
                                 "Days of inventory on hand",
                                 daysOfInventoryOnHand(),
                                 false,
+                                "D",
                               ),
                               //sellThroughRate
                               _inventoryNbInfos(
                                 "Sell through rate",
                                 sellThroughRate(),
                                 false,
+                                "%",
                               ),
                             ],
                           ),

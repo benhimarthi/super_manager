@@ -55,8 +55,10 @@ class PeriodInformationsDatas {
               isSameDate(startDate, x.timestamp),
         )
         .toList();
+
     prevInventories.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     final earliestRestock = prevInventories.lastOrNull;
+
     if (earliestRestock != null) {
       final salesAfterLastRestock = sales
           .where(
@@ -65,6 +67,7 @@ class PeriodInformationsDatas {
                 x.date.isBefore(startDate),
           )
           .toList();
+
       final salesItemsALR = saleItems
           .where(
             (x) => salesAfterLastRestock
@@ -73,18 +76,21 @@ class PeriodInformationsDatas {
                 .contains(x.saleId),
           )
           .toList();
+
       int quantitySale = salesItemsALR.isNotEmpty
           ? salesItemsALR
                 .map((x) => x.quantity)
                 .toList()
                 .reduce((a, b) => a + b)
           : 0;
+
       final res = earliestRestock.action == "update"
           ? earliestRestock
                     .changes['inventory']!['new_version']['quantityAvailable'] -
                 quantitySale
           : earliestRestock.changes['inventory']!['quantityAvailable'] -
                 quantitySale;
+
       double unitPrice = earliestRestock.action == "update"
           ? earliestRestock
                 .changes['inventory_meta_data']!['new_version']['costPerUnit']

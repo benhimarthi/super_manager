@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
-import 'package:super_manager/features/product/domain/entities/product.dart';
+import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
+import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/notification_service/notification.params.dart';
 import '../../../../core/session/session.manager.dart';
 import '../../../notification_manager/domain/entities/notification.dart';
 import '../../../notification_manager/presentation/cubit/notification.cubit.dart';
-import '../../../product/presentation/cubit/product.cubit.dart';
 
 class DeleteInventoryConfirmationView extends StatelessWidget {
   final Inventory deletedInventory;
+  final InventoryMetadata? inventoryMetaData;
   const DeleteInventoryConfirmationView({
     super.key,
     required this.deletedInventory,
+    required this.inventoryMetaData,
   });
 
   @override
@@ -32,7 +34,6 @@ class DeleteInventoryConfirmationView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Do your really wish to remove, this Inventory ?"),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -40,6 +41,9 @@ class DeleteInventoryConfirmationView extends StatelessWidget {
                 onTap: () {
                   context.read<InventoryCubit>().deleteInventory(
                     deletedInventory.id,
+                  );
+                  context.read<InventoryMetadataCubit>().deleteMetadata(
+                    inventoryMetaData!.id,
                   );
                   final adminUid =
                       SessionManager.getUserSession()!.administratorId;

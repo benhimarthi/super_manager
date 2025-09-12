@@ -224,7 +224,6 @@ class _InventoryFormDataState extends State<InventoryFormData> {
                     try {
                       var productId = (state.element as String);
                       setState(() {
-                        //print(productId);
                         this.productId = productId;
                         _displayWarning = false;
                       });

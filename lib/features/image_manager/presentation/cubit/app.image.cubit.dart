@@ -49,6 +49,15 @@ class AppImageManagerCubit extends Cubit<AppImageState> {
     );
   }
 
+  Future<void> loadProfileImages(String entityId) async {
+    emit(AppImageManagerLoading());
+    final result = await _getAll(entityId);
+    result.fold(
+      (failure) => emit(AppImageManagerError(failure.message)),
+      (images) => emit(AppImageProfileLoaded(images)),
+    );
+  }
+
   Future<void> loadProductImages(String entityId) async {
     emit(AppImageManagerLoading());
     final result = await _getAll(entityId);

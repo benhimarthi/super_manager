@@ -67,7 +67,7 @@ class _SaleViewState extends State<SaleView> {
                   return Container();
                 },
               ),
-              SizedBox(
+              Container(
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * .8,
                 //color: Colors.amber,
@@ -81,26 +81,33 @@ class _SaleViewState extends State<SaleView> {
                         }
                       },
                       builder: (context, state) {
-                        var inv = inventories.firstOrNull;
-                        var prod = products
-                            .where((x) => x.id == inventories.first.productId)
-                            .firstOrNull;
-                        var invMeta = inventoryMetaDatas
-                            .where((x) => x.inventoryId == inv!.id)
-                            .firstOrNull;
-                        if (inv != null && prod != null && invMeta != null) {
-                          return SaleItem(
-                            inventory: inv,
-                            product: prod,
-                            inventoryMetadata: invMeta,
-                          );
-                        } else {
-                          return Container(
-                            height: 100,
-                            width: 100,
-                            //color: Colors.blue,
-                          );
-                        }
+                        return Container(
+                          width: double.infinity,
+                          height: MediaQuery.of(context).size.height * .8,
+                          //color: Colors.amber,
+                          child: ListView(
+                            children: List.generate(inventories.length, (
+                              index,
+                            ) {
+                              var prod = products
+                                  .where(
+                                    (x) => x.id == inventories[index].productId,
+                                  )
+                                  .firstOrNull;
+                              var invMeta = inventoryMetaDatas
+                                  .where(
+                                    (x) =>
+                                        x.inventoryId == inventories[index].id,
+                                  )
+                                  .firstOrNull;
+                              return SaleItem(
+                                inventory: inventories[index],
+                                product: prod!,
+                                inventoryMetadata: invMeta!,
+                              );
+                            }),
+                          ),
+                        );
                       },
                     ),
                     ConfirmSaleView(inventory: inventories),

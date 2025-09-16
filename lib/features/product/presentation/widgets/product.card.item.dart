@@ -61,10 +61,7 @@ class _ProductCardItemState extends State<ProductCardItem> {
         margin: EdgeInsets.all(10),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
-          ),
+          borderRadius: BorderRadius.circular(10),
           color: productStatus
               ? Color.fromARGB(255, 27, 29, 31)
               : Colors.transparent,
@@ -77,9 +74,11 @@ class _ProductCardItemState extends State<ProductCardItem> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
+                Container(
+                  //color: Colors.amber,
+                  padding: EdgeInsets.symmetric(vertical: 2),
                   width: 100,
-                  height: 30,
+                  height: 25,
                   child: Text(
                     widget.product.name,
                     style: TextStyle(
@@ -90,11 +89,16 @@ class _ProductCardItemState extends State<ProductCardItem> {
                     ),
                   ),
                 ),
-                Text.rich(
-                  TextSpan(
-                    text: "bare code : ",
-                    style: TextStyle(color: Colors.white),
-                    children: [TextSpan(text: widget.product.barcode)],
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 2),
+                  width: 150,
+                  height: 25,
+                  child: Text.rich(
+                    TextSpan(
+                      text: "bc : ",
+                      style: TextStyle(color: Colors.white),
+                      children: [TextSpan(text: widget.product.barcode)],
+                    ),
                   ),
                 ),
 
@@ -118,7 +122,10 @@ class _ProductCardItemState extends State<ProductCardItem> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProductCardItemCarousel(productUid: widget.product.id),
+                ProductCardItemCarousel(
+                  productUid: widget.product.id,
+                  elementName: widget.product.name,
+                ),
                 SizedBox(width: 15),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,

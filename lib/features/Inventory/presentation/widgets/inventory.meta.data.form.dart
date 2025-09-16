@@ -173,13 +173,6 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
         );
         context.read<NotificationCubit>().addNotification(notif);
       } else {
-        print(
-          "666666666666777777777777777777777  ${double.parse(_totalStockValue.text)} --- ${(inv.quantityAvailable + inv.quantityReserved + inv.quantitySold)}",
-        );
-        print(
-          double.parse(_totalStockValue.text) /
-              (inv.quantityAvailable + inv.quantityReserved + inv.quantitySold),
-        );
         var metadata =
             InventoryMetadataModel.fromEntity(
               widget.inventoryMetadata!,

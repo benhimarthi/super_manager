@@ -121,9 +121,10 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<List<ProductModel>> getAllLocalProducts() async {
     try {
+      for (var t in _mainBox.values) {
+        print("8888888888888888888888888888889999990000 ${t['name']}");
+      }
       return _mainBox.values
-          .toList()
-          .where((x) => x['creatorID'] == SessionManager.getUserSession()!.id)
           .toList()
           .map((e) => ProductModel.fromMap(Map<String, dynamic>.from(e)))
           .toList();

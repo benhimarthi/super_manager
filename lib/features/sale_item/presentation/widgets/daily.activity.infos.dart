@@ -50,7 +50,9 @@ class _DailyActivityInfosState extends State<DailyActivityInfos> {
       builder: (context, state) {
         return Container(
           height: 100,
-          width: 350,
+          //width: 350,
+          //color: Colors.amber,
+          margin: EdgeInsets.symmetric(horizontal: 6),
           child: ListView(
             //mainAxisAlignment: MainAxisAlignment.spaceAround,
             scrollDirection: Axis.horizontal,

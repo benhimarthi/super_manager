@@ -17,6 +17,7 @@ import 'package:super_manager/features/synchronisation/cubit/authentication_sync
 import 'package:super_manager/features/synchronisation/cubit/notification_synch_manager_cubit/notification.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/product.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/firebase_options.dart';
 import 'core/app_theme/app.theme.dart';
@@ -45,8 +46,10 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupDependencyInjection();
   await initializeNotificationService();
+
   runApp(const MyApp());
   // Listen to Firestore collection called 'action_history'
+  getIt<ProductSyncManager>().initialize();
   _subscription = FirebaseFirestore.instance
       .collection('notifications')
       .snapshots()

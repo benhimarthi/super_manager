@@ -70,7 +70,7 @@ class _InventoryItemCardState extends State<InventoryItemCard> {
     return Card(
       elevation: 4,
       color: const Color.fromARGB(255, 27, 29, 31),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),

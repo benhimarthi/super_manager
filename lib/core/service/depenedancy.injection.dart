@@ -354,7 +354,7 @@ Future<void> setupDependencyInjection() async {
       () => ProductRemoteDataSourceImpl(getIt()),
     )
     ..registerLazySingleton<ProductSyncManager>(
-      () => ProductSyncManagerImpl(getIt(), getIt()),
+      () => ProductSyncManagerImpl(getIt(), getIt(), getIt()),
     );
   final inventoryBox = await Hive.openBox('inventories');
   final createdinventoryBox = await Hive.openBox('inventories_created');

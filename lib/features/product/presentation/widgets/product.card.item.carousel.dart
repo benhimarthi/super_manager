@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/util/circular.list.navigator.dart';
@@ -11,7 +10,12 @@ import '../../../image_manager/presentation/cubit/app.image.state.dart';
 
 class ProductCardItemCarousel extends StatefulWidget {
   final String productUid;
-  const ProductCardItemCarousel({super.key, required this.productUid});
+  final String elementName;
+  const ProductCardItemCarousel({
+    super.key,
+    required this.productUid,
+    required this.elementName,
+  });
 
   @override
   State<ProductCardItemCarousel> createState() =>
@@ -72,15 +76,27 @@ class _ProductCardItemCarouselState extends State<ProductCardItemCarousel> {
         }
       },
       builder: (context, state) {
-        return currentImageUrl == ""
+        final file = File(currentImageUrl);
+        return currentImageUrl == "" || !file.existsSync()
             ? Container(
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.image, color: Theme.of(context).primaryColor),
+                child: Center(
+                  child: Text(
+                    widget.elementName[0].toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                /*Icon(Icons.image,
+                color: Theme.of(context).primaryColor),*/
               )
             : Container(
                 width: 100,
@@ -88,7 +104,7 @@ class _ProductCardItemCarouselState extends State<ProductCardItemCarousel> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   image: DecorationImage(
-                    image: FileImage(File(currentImageUrl)),
+                    image: FileImage(file),
                     fit: BoxFit.cover,
                   ),
                 ),

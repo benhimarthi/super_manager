@@ -105,7 +105,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
                   }
                   return SizedBox(
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.height * .9,
+                    //height: MediaQuery.of(context).size.height * .9,
                     //color: Colors.amber,
                     child: Column(
                       children: [

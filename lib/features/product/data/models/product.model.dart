@@ -101,6 +101,20 @@ class ProductModel extends Product {
   }
 
   factory ProductModel.fromMap(Map<String, dynamic> map) {
+    bool active = false;
+    try {
+      var value = map['active'] as String;
+      switch (value) {
+        case "true":
+          active = true;
+          break;
+        case "false":
+          active = false;
+          break;
+      }
+    } catch (e) {
+      active = map['active'] as bool;
+    }
     return ProductModel(
       id: map['id'] as String,
       name: map['name'] as String,
@@ -110,7 +124,7 @@ class ProductModel extends Product {
       barcode: map['barcode'] as String,
       imageUrl: map['imageUrl'] as String,
       pricingId: map['pricingId'] as String,
-      active: map['active'] as bool,
+      active: active, //map['active'] as bool,
       creatorID: map['creatorID'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),

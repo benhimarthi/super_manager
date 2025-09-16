@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:super_manager/features/product/data/models/product.model.dart';
 import '../../../../core/file_reader/file_data_reader.dart';
+import '../../../product/presentation/pages/product.form.page.dart';
 
-void openFile() async {
-  Map<String, dynamic>? data = await FileDataReader.pickAndReadFile();
+void openFile(context) async {
+  Object? data = await FileDataReader.pickAndReadFile();
+  try {
+    var datas = data as List<Map<String, dynamic>>;
+    var productModel = ProductModel.fromMap(datas[0]);
+    _addProduct(context, productModel);
+  } catch (e) {}
+}
+
+void _addProduct(context, prod) {
+  showDialog(
+    context: context,
+    builder: (context) => ProductFormPage(create: false, product: prod),
+  );
 }
 
 addItemOptions({
@@ -42,7 +56,7 @@ addItemOptions({
             ),
             GestureDetector(
               onTap: () {
-                openFile();
+                openFile(context);
               },
               child: Container(
                 width: 100,

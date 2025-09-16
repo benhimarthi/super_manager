@@ -76,6 +76,7 @@ class _SaleItemState extends State<SaleItem> {
                       margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                       child: ProductCardItemCarousel(
                         productUid: widget.product.id,
+                        elementName: widget.product.name,
                       ),
                     ),
                     Container(

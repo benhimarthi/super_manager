@@ -1,33 +1,44 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:xml/xml.dart';
 
 class FileDataReader {
   // Reads and parses an SVG file into a nested Map
-  static Future<Map<String, dynamic>> readSvg(String filePath) async {
+  static Future<List<Map<String, dynamic>>> readCsv(String filePath) async {
     final file = File(filePath);
-    final svgString = await file.readAsString();
+    final csvString = await file.readAsString();
 
-    XmlDocument document = XmlDocument.parse(svgString);
+    List<Map<String, dynamic>> parseCsvToMap(String csv) {
+      final lines = csv.trim().split('\n');
+      if (lines.isEmpty) return [];
 
-    Map<String, dynamic> svgElementToMap(XmlElement element) {
-      return {
-        'tag': element.name.local,
-        'attributes': Map<String, String>.fromEntries(
-          element.attributes.map(
-            (attr) => MapEntry(attr.name.local, attr.value),
-          ),
-        ),
-        'text': element.value,
-        'children': element.children
-            .whereType<XmlElement>()
-            .map((child) => svgElementToMap(child))
-            .toList(),
-      };
+      // Extract headers, removing any quotes
+      final headers = lines.first
+          .split(',')
+          .map((h) => h.replaceAll('"', '').trim())
+          .toList();
+
+      final List<Map<String, String>> rows = [];
+
+      for (var i = 1; i < lines.length; i++) {
+        final values = lines[i]
+            .split(',')
+            .map((v) => v.replaceAll('"', '').trim())
+            .toList();
+        if (values.length != headers.length) {
+          // Skip or handle error for malformed rows
+          continue;
+        }
+        final Map<String, String> rowMap = {};
+        for (var j = 0; j < headers.length; j++) {
+          rowMap[headers[j]] = values[j];
+        }
+        rows.add(rowMap);
+      }
+      return rows;
     }
 
-    return svgElementToMap(document.rootElement);
+    return parseCsvToMap(csvString);
   }
 
   // Reads an Excel file and converts sheets into a List of Maps
@@ -69,7 +80,7 @@ class FileDataReader {
     return excelData;
   }
 
-  static Future<Map<String, dynamic>?> pickAndReadFile() async {
+  static Future<Object?> pickAndReadFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowedExtensions: ['csv', 'xls', 'xlsx'],
       type: FileType.custom,
@@ -77,16 +88,14 @@ class FileDataReader {
     if (result != null && result.files.single.path != null) {
       String path = result.files.single.path!;
       String extension = path.split('.').last.toLowerCase();
-
-      if (extension == 'svg') {
-        return await readSvg(path);
+      if (extension == 'csv') {
+        return await readCsv(path);
       } else if (extension == 'xls' || extension == 'xlsx') {
         return await readExcel(path);
       } else {
-        // Unsupported file type
         return null;
       }
     }
-    return null; // No file picked
+    return null;
   }
 }

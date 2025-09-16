@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/core/service/depenedancy.injection.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/add.inventory.item.options.dart';
 import 'package:super_manager/features/product/presentation/widgets/product.card.item.dart';
 import 'package:super_manager/features/product_category/presentation/widgets/product.category.view.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/product.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/product.dart';
@@ -29,6 +31,12 @@ class _ProductPageState extends State<ProductPage> {
     context.read<ProductCubit>().loadProducts();
   }
 
+  @override
+  dispose() {
+    super.dispose();
+    getIt<ProductSyncManager>().dispose();
+  }
+
   void _addProduct() {
     showDialog(
       context: context,
@@ -45,6 +53,9 @@ class _ProductPageState extends State<ProductPage> {
             myProduct = stateP.products;
             productList = stateP.products;
           });
+          for (var t in stateP.products) {
+            print("_________________ ${t.name}");
+          }
         }
       },
       builder: (context, stateP) {

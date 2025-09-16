@@ -107,7 +107,7 @@ class _InventoryItemKpiChartViewState extends State<InventoryItemKpiChartView> {
 
   stockToSalesRatio(DateTime startDate, DateTime endDate) {
     return InventoryKPI.stockToSalesRatio(
-      PeriodInformationsDatas.startDateProductAvailableQuantity(
+      /*PeriodInformationsDatas.startDateProductAvailableQuantity(
             widget.sales,
             widget.saleItems,
             widget.myInventoryHistories,
@@ -118,7 +118,8 @@ class _InventoryItemKpiChartViewState extends State<InventoryItemKpiChartView> {
             startDate,
             endDate,
           )['supply_cost'] -
-          COGS(startDate, endDate),
+          COGS(startDate, endDate)*/
+      averageInventory(startDate, endDate),
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         widget.sales,
         widget.saleItems,

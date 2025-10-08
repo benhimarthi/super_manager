@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.technov.yourmanager"
-    compileSdk = 35 //flutter.compileSdkVersion
+    compileSdk = 36 //flutter.compileSdkVersion
     ndkVersion = "27.0.12077973" //flutter.ndkVersion
 
     compileOptions {
@@ -28,7 +28,7 @@ android {
         applicationId = "com.technov.yourmanager"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23//flutter.minSdkVersion
+        minSdk = flutter.minSdkVersion//flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

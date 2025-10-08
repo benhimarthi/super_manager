@@ -79,6 +79,4 @@ class ActionHistoryModel extends ActionHistory {
     'adminId': adminId,
   };
 
-  @override
-  List<Object?> get props => super.props;
 }

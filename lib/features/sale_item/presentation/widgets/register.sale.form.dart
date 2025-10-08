@@ -85,6 +85,8 @@ class _RegisterSaleFormState extends State<RegisterSaleForm> {
       taxAmount: 0,
       discountApplied: discountPerUnit * quantity,
       adminId: adminId,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     context.read<WidgetManipulatorCubit>().emitRandomElement({

@@ -11,13 +11,17 @@ abstract class SaleItemLocalDataSource {
   Future<void> applyUpdate(SaleItemModel model);
   Future<void> applyDelete(String id);
 
-  List<SaleItemModel> getAllLocalSaleItems();
+  Future<SaleItemModel?> getSaleItemById(String id);
+  Future<List<SaleItemModel>> getAllLocalSaleItems();
+  Future<List<SaleItemModel>> getSaleItemsBySaleId(String saleId);
 
-  List<SaleItemModel> getSaleItemsBySaleId(String saleId);
+  Future<List<SaleItemModel>> getPendingCreates();
+  Future<List<SaleItemModel>> getPendingUpdates();
+  Future<List<String>> getPendingDeletions();
 
-  List<SaleItemModel> getPendingCreates();
-  List<SaleItemModel> getPendingUpdates();
-  List<String> getPendingDeletions();
+  Future<void> removeSyncedCreation(String id);
+  Future<void> removeSyncedUpdate(String id);
+  Future<void> removeSyncedDeletion(String id);
 
   Future<void> clearAll();
 }
@@ -40,19 +44,16 @@ class SaleItemLocalDataSourceImpl implements SaleItemLocalDataSource {
 
   @override
   Future<void> addCreatedSaleItem(SaleItemModel model) async {
-    await _mainBox.put(model.id, model.toMap());
     await _createdBox.put(model.id, model.toMap());
   }
 
   @override
   Future<void> addUpdatedSaleItem(SaleItemModel model) async {
-    await _mainBox.put(model.id, model.toMap());
     await _updatedBox.put(model.id, model.toMap());
   }
 
   @override
   Future<void> addDeletedSaleItemId(String id) async {
-    await _mainBox.delete(id);
     await _deletedBox.put(id, id);
   }
 
@@ -72,14 +73,21 @@ class SaleItemLocalDataSourceImpl implements SaleItemLocalDataSource {
   }
 
   @override
-  List<SaleItemModel> getAllLocalSaleItems() {
+  Future<SaleItemModel?> getSaleItemById(String id) async {
+    final map = _mainBox.get(id);
+    if (map == null) return null;
+    return SaleItemModel.fromMap(Map<String, dynamic>.from(map));
+  }
+
+  @override
+  Future<List<SaleItemModel>> getAllLocalSaleItems() async {
     return _mainBox.values
         .map((m) => SaleItemModel.fromMap(Map<String, dynamic>.from(m)))
         .toList();
   }
 
   @override
-  List<SaleItemModel> getSaleItemsBySaleId(String saleId) {
+  Future<List<SaleItemModel>> getSaleItemsBySaleId(String saleId) async {
     return _mainBox.values
         .map((m) => SaleItemModel.fromMap(Map<String, dynamic>.from(m)))
         .where((item) => item.saleId == saleId)
@@ -87,22 +95,37 @@ class SaleItemLocalDataSourceImpl implements SaleItemLocalDataSource {
   }
 
   @override
-  List<SaleItemModel> getPendingCreates() {
+  Future<List<SaleItemModel>> getPendingCreates() async {
     return _createdBox.values
         .map((m) => SaleItemModel.fromMap(Map<String, dynamic>.from(m)))
         .toList();
   }
 
   @override
-  List<SaleItemModel> getPendingUpdates() {
+  Future<List<SaleItemModel>> getPendingUpdates() async {
     return _updatedBox.values
         .map((m) => SaleItemModel.fromMap(Map<String, dynamic>.from(m)))
         .toList();
   }
 
   @override
-  List<String> getPendingDeletions() {
+  Future<List<String>> getPendingDeletions() async {
     return _deletedBox.values.toList();
+  }
+
+  @override
+  Future<void> removeSyncedCreation(String id) async {
+    await _createdBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedUpdate(String id) async {
+    await _updatedBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedDeletion(String id) async {
+    await _deletedBox.delete(id);
   }
 
   @override

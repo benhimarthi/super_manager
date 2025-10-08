@@ -112,7 +112,7 @@ class _UserManagementState extends State<UserManagement> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
+                                SizedBox(
                                   //color: Colors.amber,
                                   width: 70,
                                   child: Text(
@@ -243,7 +243,7 @@ class _UserManagementState extends State<UserManagement> {
                                             .updateUser(updatedUser);
                                       });
                                     },
-                                    activeColor: const Color.fromARGB(
+                                    activeThumbColor: const Color.fromARGB(
                                       255,
                                       41,
                                       204,

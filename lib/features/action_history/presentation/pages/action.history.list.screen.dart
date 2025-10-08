@@ -8,7 +8,7 @@ import '../cubit/action.history.state.dart';
 // Assume ActionHistory, ActionHistoryCubit, and ActionHistoryManagerLoaded are imported
 
 class ActionHistoryListScreen extends StatelessWidget {
-  const ActionHistoryListScreen({Key? key}) : super(key: key);
+  const ActionHistoryListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class ActionHistoryListScreen extends StatelessWidget {
 class ActionHistoryCard extends StatelessWidget {
   final ActionHistory action;
 
-  const ActionHistoryCard({Key? key, required this.action}) : super(key: key);
+  const ActionHistoryCard({super.key, required this.action});
 
   Widget _buildChangeSummary(Map<String, Map<String, dynamic>> changes) {
     if (changes.isEmpty) {

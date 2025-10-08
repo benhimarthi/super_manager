@@ -35,7 +35,7 @@ class InventoryCubit extends Cubit<InventoryState> {
   Future<void> _tryAutoSync() async {
     final conn = await _connectivity.checkConnectivity();
     if (conn != ConnectivityResult.none) {
-      await _syncCubit.triggerManualSync();
+      await _syncCubit.startSyncing();
     }
   }
 
@@ -53,7 +53,7 @@ class InventoryCubit extends Cubit<InventoryState> {
     result.fold(
       (failure) => emit(InventoryManagerError(failure.message)),
       (_) async {
-        await loadInventory();
+        //await loadInventory();
         await _tryAutoSync();
       },
     );

@@ -88,8 +88,12 @@ class _ProfileImageState extends State<ProfileImage> {
                       .lastOrNull;
 
                   if (toDisplay != null) {
-                    avatar = toDisplay as AppImageModel;
-                    image = File(toDisplay.url);
+                    if (toDisplay.entityId == widget.itemId) {
+                      avatar = toDisplay as AppImageModel;
+                      image = File(toDisplay.url);
+                    } else {
+                      avatar = AppImageModel.empty();
+                    }
                   } else {
                     avatar = AppImageModel.empty();
                   }
@@ -100,14 +104,14 @@ class _ProfileImageState extends State<ProfileImage> {
               return image != null
                   ? CircleAvatar(
                       radius: widget.radius,
-                      backgroundColor: Colors.white,
+                      //backgroundColor: Colors.white,
                       backgroundImage: FileImage(image!),
                     )
                   : CircleAvatar(
                       radius: widget.radius,
                       backgroundColor: Colors.white,
                       child: Text(
-                        widget.name[0],
+                        widget.name.isNotEmpty ? widget.name[0] : "-",
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,

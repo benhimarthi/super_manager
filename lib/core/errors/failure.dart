@@ -15,31 +15,25 @@ abstract class Failure extends Equatable {
 }
 
 class APIFailure extends Failure {
-  const APIFailure({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const APIFailure({required super.message, required super.statusCode});
 
   factory APIFailure.fromException(APIException exception) =>
       APIFailure(message: exception.message, statusCode: exception.statusCode);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const NetworkFailure({required super.message, required super.statusCode});
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const ServerFailure({required super.message, required super.statusCode});
 }
 
 class LocalFailure extends Failure {
   const LocalFailure({
-    required String message,
-    required int statusCode,
-  }) : super(
-          message: message,
-          statusCode: statusCode,
-        );
+    required super.message,
+    required super.statusCode,
+  });
   factory LocalFailure.fromLocalException(LocalException exc) => LocalFailure(
         message: exc.message,
         statusCode: exc.statusCode,

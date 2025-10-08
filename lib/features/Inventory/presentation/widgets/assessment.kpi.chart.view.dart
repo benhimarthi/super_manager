@@ -241,7 +241,7 @@ class _AssessmentKpiChartViewState extends State<AssessmentKpiChartView> {
         }
       },
       builder: (context, state) {
-        return Container(
+        return SizedBox(
           width: double.infinity,
           height: 250,
           //color: Colors.amber,

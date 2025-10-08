@@ -18,6 +18,7 @@ class SaleItemRepositoryImpl implements SaleItemRepository {
     try {
       final model = SaleItemModel.fromEntity(item);
       await _local.addCreatedSaleItem(model);
+      await _local.applyCreate(model);
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));
@@ -27,7 +28,7 @@ class SaleItemRepositoryImpl implements SaleItemRepository {
   @override
   ResultFuture<List<SaleItem>> getSaleItemsBySaleId(String saleId) async {
     try {
-      final models = _local.getSaleItemsBySaleId(saleId);
+      final models = await _local.getSaleItemsBySaleId(saleId);
       final entities = models.map((e) => e.toEntity()).toList();
       return Right(entities);
     } catch (e) {
@@ -38,12 +39,13 @@ class SaleItemRepositoryImpl implements SaleItemRepository {
   @override
   ResultFuture<SaleItem> getSaleItemById(String id) async {
     try {
-      final list = _local.getAllLocalSaleItems();
-      final found = list.firstWhere((e) => e.id == id);
-      return Right(found.toEntity());
+      final model = await _local.getSaleItemById(id);
+      if (model == null) {
+        return const Left(LocalFailure(message: 'SaleItem not found', statusCode: 404));
+      }
+      return Right(model.toEntity());
     } catch (e) {
-      return const Left(
-          LocalFailure(message: 'SaleItem not found', statusCode: 500));
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
     }
   }
 
@@ -52,6 +54,7 @@ class SaleItemRepositoryImpl implements SaleItemRepository {
     try {
       final model = SaleItemModel.fromEntity(item);
       await _local.addUpdatedSaleItem(model);
+      await _local.applyUpdate(model);
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));
@@ -62,6 +65,7 @@ class SaleItemRepositoryImpl implements SaleItemRepository {
   ResultFuture<void> deleteSaleItem(String id) async {
     try {
       await _local.addDeletedSaleItemId(id);
+      await _local.applyDelete(id);
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));

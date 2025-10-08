@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:super_manager/features/action_history/data/data_source/action.history.local.data.source.dart';
 import 'package:super_manager/features/action_history/data/data_source/action.history.remote.data.source.dart';
@@ -11,6 +12,7 @@ import 'package:super_manager/features/action_history/domain/usecases/create.act
 import 'package:super_manager/features/action_history/domain/usecases/delete.action.history.dart';
 import 'package:super_manager/features/action_history/domain/usecases/get.all.action.history.dart';
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
+import 'package:super_manager/features/authentication/data/data_source/user.sync.manager.dart';
 import 'package:super_manager/features/authentication/domain/usecases/reset.account.password.dart';
 import 'package:super_manager/features/image_manager/domain/usecases/get.app.image.by.id.dart';
 import 'package:super_manager/features/notification_manager/data/data_source/notification.local.data.source.dart';
@@ -45,7 +47,6 @@ import 'package:super_manager/features/sale_item/presentation/cubit/sale.item.cu
 import 'package:super_manager/features/synchronisation/cubit/action_history_synch_manager_cubit/action.history.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/notification_synch_manager_cubit/notification.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
-import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/action.history.sync.manager.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/notification.sync.manager.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/sale.item.sync.manager.dart';
@@ -61,7 +62,6 @@ import '../../features/Inventory/domain/usecases/update.inventory.dart';
 import '../../features/Inventory/presentation/cubit/inventory.cubit.dart';
 import '../../features/authentication/data/data_source/authentication.local.data.source.dart';
 import '../../features/authentication/data/data_source/authentictaion.remote.data.source.dart';
-import '../../features/authentication/data/data_source/sync.manager.dart';
 import '../../features/authentication/data/repositories/authentication.repository.impl.dart';
 import '../../features/authentication/domain/repositories/authentication.repository.dart';
 import '../../features/authentication/domain/usecases/create.user.dart';
@@ -120,12 +120,13 @@ import '../../features/product_pricing/domain/usecases/update.product.pricing.da
 import '../../features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import '../../features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
-import '../../features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import '../../features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import '../../features/synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/inventory_sync_trigger_cubit/inventory.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
 import '../../features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
+import '../../features/synchronisation/cubit/sale_sync_manager_cubit/sale.sync.trigger.cubit.dart';
 import '../../features/synchronisation/synchronisation_manager/app.image.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/inventory.meta.data.sync.manager.dart';
 import '../../features/synchronisation/synchronisation_manager/inventory.sync.manager.dart';
@@ -147,18 +148,30 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
+  getIt.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
   getIt.registerLazySingleton<Connectivity>(() => Connectivity());
   getIt.registerLazySingleton<Box>(() => Hive.box('authenticationBox'));
 
   // Register Data Sources
   getIt.registerLazySingleton<AuthenticationRemoteDataSource>(
-    () => AuthenticationRemoteDataSrcImpl(
+    () => AuthenticationRemoteDataSourceImpl(
       getIt<FirebaseAuth>(),
       getIt<FirebaseFirestore>(),
+      getIt(),
     ),
   );
+  final mainUserBox = await Hive.openBox('users');
+  final createdUserBox = await Hive.openBox('users_created');
+  final updatedUserBox = await Hive.openBox('users_updated');
+  final deletedUserBox = await Hive.openBox('users_deleted');
+
   getIt.registerLazySingleton<AuthenticationLocalDataSource>(
-    () => AuthenticationLocalDataSrcImpl(getIt<Box>()),
+    () => AuthenticationLocalDataSourceImpl(
+      mainBox: mainUserBox,
+      createdBox: createdUserBox,
+      updatedBox: updatedUserBox,
+      deletedBox: deletedUserBox,
+    ),
   );
 
   // Register Repositories
@@ -170,14 +183,11 @@ Future<void> setupDependencyInjection() async {
   );
 
   //Rgistration of the synchronisator
-  getIt.registerLazySingleton<SyncManager>(
-    () => SyncManager(
-      getIt<AuthenticationRemoteDataSource>(),
-      getIt<AuthenticationLocalDataSource>(),
-    ),
+  getIt.registerLazySingleton<UserSyncManager>(
+    () => UserSyncManagerImpl(getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<AuthenticationSyncTriggerCubit>(
-    () => AuthenticationSyncTriggerCubit(getIt<SyncManager>()),
+    () => AuthenticationSyncTriggerCubit(getIt()),
   );
 
   // Register Use Cases
@@ -260,10 +270,11 @@ Future<void> setupDependencyInjection() async {
     );
 
   getIt
-    ..registerLazySingleton(
-      () => ProductCategorySyncManager(
+    ..registerLazySingleton<ProductCategorySyncManager>(
+      () => ProductCategorySyncManagerImpl(
         getIt<ProductCategoryLocalDataSource>(),
         getIt<ProductCategoryRemoteDataSource>(),
+        getIt(),
       ),
     )
     ..registerFactory(() => ProductCategorySyncTriggerCubit(getIt()));
@@ -313,7 +324,7 @@ Future<void> setupDependencyInjection() async {
       () => ProductPricingRemoteDataSourceImpl(getIt()),
     )
     ..registerLazySingleton<ProductPricingSyncManager>(
-      () => ProductPricingSyncManagerImpl(getIt(), getIt()),
+      () => ProductPricingSyncManagerImpl(getIt(), getIt(), getIt()),
     );
 
   final productBox = await Hive.openBox('products');
@@ -391,7 +402,7 @@ Future<void> setupDependencyInjection() async {
       () => InventoryRemoteDataSourceImpl(getIt()),
     )
     ..registerLazySingleton<InventorySyncManager>(
-      () => InventorySyncManagerImpl(getIt(), getIt()),
+      () => InventorySyncManagerImpl(getIt(), getIt(), getIt()),
     );
 
   final inventoryMetadataBox = await Hive.openBox('inventoryMetadata');
@@ -464,7 +475,7 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => DeleteAppImage(getIt()))
     ..registerLazySingleton(() => AppImageSyncTriggerCubit(getIt()))
     ..registerLazySingleton<AppImageSyncManager>(
-      () => AppImageSyncManagerImpl(getIt(), getIt()),
+      () => AppImageSyncManagerImpl(getIt(), getIt(), getIt()),
     )
     ..registerLazySingleton<AppImageRepository>(
       () => AppImageRepositoryImpl(local: getIt()),
@@ -577,7 +588,7 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => DeleteActionHistory(getIt()))
     ..registerLazySingleton(() => ActionHistorySyncTriggerCubit(getIt()))
     ..registerLazySingleton<ActionHistorySyncManager>(
-      () => ActionHistorySyncManagerImpl(getIt(), getIt()),
+      () => ActionHistorySyncManagerImpl(getIt(), getIt(), getIt()),
     )
     ..registerLazySingleton<ActionHistoryRepository>(
       () => ActionHistoryRepositoryImpl(local: getIt()),
@@ -621,7 +632,7 @@ Future<void> setupDependencyInjection() async {
     ..registerLazySingleton(() => DeleteNotification(getIt()))
     ..registerLazySingleton(() => NotificationSyncTriggerCubit(getIt()))
     ..registerLazySingleton<NotificationSyncManager>(
-      () => NotificationSyncManagerImpl(getIt(), getIt()),
+      () => NotificationSyncManagerImpl(getIt(), getIt(), getIt()),
     )
     ..registerLazySingleton<NotificationRemoteDataSource>(
       () => NotificationRemoteDataSourceImpl(getIt()),

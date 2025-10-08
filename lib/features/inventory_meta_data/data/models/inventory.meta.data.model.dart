@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/inventory.meta.data.dart';
 
 class InventoryMetadataModel extends InventoryMetadata {
@@ -16,6 +18,8 @@ class InventoryMetadataModel extends InventoryMetadata {
     required super.createdBy,
     required super.updatedBy,
     required super.adminId,
+    required super.createdAt,
+    required super.updatedAt,
   });
 
   factory InventoryMetadataModel.fromEntity(InventoryMetadata entity) {
@@ -34,6 +38,8 @@ class InventoryMetadataModel extends InventoryMetadata {
       createdBy: entity.createdBy,
       updatedBy: entity.updatedBy,
       adminId: entity.adminId,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
     );
   }
 
@@ -53,6 +59,8 @@ class InventoryMetadataModel extends InventoryMetadata {
       createdBy: createdBy,
       updatedBy: updatedBy,
       adminId: adminId,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -71,6 +79,8 @@ class InventoryMetadataModel extends InventoryMetadata {
     String? createdBy,
     String? updatedBy,
     String? adminId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return InventoryMetadataModel(
       id: id ?? this.id,
@@ -87,6 +97,8 @@ class InventoryMetadataModel extends InventoryMetadata {
       createdBy: createdBy ?? this.createdBy,
       updatedBy: updatedBy ?? this.updatedBy,
       adminId: adminId ?? this.adminId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -106,6 +118,8 @@ class InventoryMetadataModel extends InventoryMetadata {
       createdBy: map['createdBy'] as String,
       updatedBy: map['updatedBy'] as String,
       adminId: (map['adminId'] ?? "") as String,
+      createdAt: DateTime.parse(map['createdAt'] as String),
+      updatedAt: DateTime.parse(map['updatedAt'] as String),
     );
   }
 
@@ -125,6 +139,8 @@ class InventoryMetadataModel extends InventoryMetadata {
       'createdBy': createdBy,
       'updatedBy': updatedBy,
       'adminId': adminId,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 
@@ -143,5 +159,7 @@ class InventoryMetadataModel extends InventoryMetadata {
     inventorySource,
     createdBy,
     updatedBy,
+    createdAt,
+    updatedAt,
   ];
 }

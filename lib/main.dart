@@ -16,7 +16,12 @@ import 'package:super_manager/features/synchronisation/cubit/action_history_sync
 import 'package:super_manager/features/synchronisation/cubit/authentication_synch_manager_cubit/authentication.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/notification_synch_manager_cubit/notification.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
-import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/cubit/sale_sync_manager_cubit/sale.sync.trigger.cubit.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/app.image.sync.manager.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/inventory.meta.data.sync.manager.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/inventory.sync.manager.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/product.category.sync.manager.dart';
+import 'package:super_manager/features/synchronisation/synchronisation_manager/product.pricing.sync.manager.dart';
 import 'package:super_manager/features/synchronisation/synchronisation_manager/product.sync.manager.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:super_manager/firebase_options.dart';
@@ -33,7 +38,7 @@ import 'features/product/presentation/cubit/product.cubit.dart';
 import 'features/product_category/presentation/cubit/local.category.manager.cubit.dart';
 import 'features/product_pricing/presentation/cubit/product.pricing.cubit.dart';
 import 'features/synchronisation/cubit/app_image_synch_manager_cubit/app.image.sync.trigger.cubit.dart';
-import 'features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'features/synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
 import 'features/synchronisation/cubit/inventory_sync_trigger_cubit/inventory.sync.trigger.cubit.dart';
 import 'features/synchronisation/cubit/product_category_sync_manager_cubit/product.category.sync.trigger.cubit.dart';
@@ -50,6 +55,11 @@ Future<void> main() async {
   runApp(const MyApp());
   // Listen to Firestore collection called 'action_history'
   getIt<ProductSyncManager>().initialize();
+  getIt<ProductPricingSyncManager>().initialize();
+  getIt<ProductCategorySyncManager>().initialize();
+  getIt<InventorySyncManager>().startSync();
+  getIt<InventoryMetadataSyncManager>().startSync();
+  getIt<AppImageSyncManager>().initialize();
   _subscription = FirebaseFirestore.instance
       .collection('notifications')
       .snapshots()

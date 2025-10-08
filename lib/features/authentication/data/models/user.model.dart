@@ -5,6 +5,7 @@ class UserModel extends User {
   const UserModel({
     required super.id,
     required super.createdAt,
+    required super.updatedAt,
     super.createdBy,
     super.administratorId,
     required super.name,
@@ -23,6 +24,7 @@ class UserModel extends User {
       id: user.id,
       administratorId: user.administratorId,
       createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
       createdBy: user.createdBy,
       name: user.name,
       avatar: user.avatar,
@@ -34,37 +36,40 @@ class UserModel extends User {
   }
 
   UserModel.fromMap(Map<dynamic, dynamic> map)
-    : this(
-        id: map['id'] as String,
-        administratorId: (map['administratorId'] ?? "") as String,
-        createdAt: map['createdAt'] as String,
-        createdBy: (map['createdBy'] ?? "") as String,
-        name: map['name'] as String,
-        avatar: map['avatar'] as String,
-        email: map['email'] as String,
-        password: "empty",
-        role: UserRole.values.firstWhere((e) => e.toString() == map['role']),
-        activated: map['activated'] ?? true,
-      );
+      : this(
+          id: map['id'] as String,
+          administratorId: (map['administratorId'] ?? "") as String,
+          createdAt: DateTime.parse(map['createdAt'] as String),
+          updatedAt: DateTime.parse(map['updatedAt'] as String),
+          createdBy: (map['createdBy'] ?? "") as String,
+          name: map['name'] as String,
+          avatar: map['avatar'] as String,
+          email: map['email'] as String,
+          password: "empty",
+          role: UserRole.values.firstWhere((e) => e.toString() == map['role']),
+          activated: map['activated'] ?? true,
+        );
 
-  const UserModel.empty()
-    : this(
-        id: '0',
-        administratorId: "_empty.adminId",
-        createdAt: "_empty.createdAt",
-        createdBy: "_empty.createdAt",
-        name: "_empty.name",
-        avatar: "_empty.avatar",
-        email: "_empty.email",
-        password: "_empty.password",
-        role: UserRole.regular,
-        activated: false,
-      );
+  UserModel.empty()
+      : this(
+          id: '0',
+          administratorId: "_empty.adminId",
+          createdAt: DateTime.fromMicrosecondsSinceEpoch(0),
+          updatedAt: DateTime.fromMicrosecondsSinceEpoch(0),
+          createdBy: "_empty.createdAt",
+          name: "_empty.name",
+          avatar: "_empty.avatar",
+          email: "_empty.email",
+          password: "_empty.password",
+          role: UserRole.regular,
+          activated: false,
+        );
 
   UserModel copyWith({
     String? id,
     String? administratorId,
-    String? createdAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     String? createdBy,
     String? name,
     String? avatar,
@@ -77,6 +82,7 @@ class UserModel extends User {
       id: id ?? this.id,
       administratorId: administratorId ?? this.administratorId,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       createdBy: createdBy ?? this.createdBy,
       name: name ?? this.name,
       avatar: avatar ?? this.avatar,
@@ -88,16 +94,17 @@ class UserModel extends User {
   }
 
   Map<String, dynamic> toMap() => {
-    'id': id,
-    'administratorId': administratorId,
-    'createdAt': createdAt,
-    'createdBy': createdBy,
-    'name': name,
-    'avatar': avatar,
-    'email': email,
-    'role': role.toString(),
-    'activated': activated,
-  };
+        'id': id,
+        'administratorId': administratorId,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+        'createdBy': createdBy,
+        'name': name,
+        'avatar': avatar,
+        'email': email,
+        'role': role.toString(),
+        'activated': activated,
+      };
 
   String toJson() => jsonEncode(toMap());
 }

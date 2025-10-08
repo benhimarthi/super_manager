@@ -110,7 +110,7 @@ class _ProductPricingViewState extends State<ProductPricingView> {
               listener: (context, state) {},
               builder: (context, state) {
                 return myProductPricing.isNotEmpty
-                    ? Container(
+                    ? SizedBox(
                         width: 220,
                         height: 55,
                         //decoration: BoxDecoration(color: Colors.amber),

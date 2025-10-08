@@ -11,6 +11,7 @@ abstract class InventoryMetadataRemoteDataSource {
   Future<InventoryMetadataModel> getMetadataById(String id);
   Future<void> updateMetadata(InventoryMetadataModel model);
   Future<void> deleteMetadata(String id);
+  Stream<QuerySnapshot> streamInventoryMetadata();
 }
 
 class InventoryMetadataRemoteDataSourceImpl
@@ -61,5 +62,20 @@ class InventoryMetadataRemoteDataSourceImpl
   @override
   Future<void> deleteMetadata(String id) async {
     await _firestore.collection(_collection).doc(id).delete();
+  }
+
+  @override
+  Stream<QuerySnapshot> streamInventoryMetadata() {
+    try {
+      final uid =
+          SessionManager.getUserSession()!.administratorId ??
+          SessionManager.getUserSession()!.id;
+      return _firestore
+          .collection(_collection)
+          .where('adminId', isEqualTo: uid)
+          .snapshots();
+    } on ServerException catch (e) {
+      throw ServerFailure(message: e.message, statusCode: 500);
+    }
   }
 }

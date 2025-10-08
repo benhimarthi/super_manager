@@ -37,7 +37,12 @@ class ProductCategoryRepositoryImpl implements ProductCategoryRepository {
   @override
   ResultFuture<ProductCategory> getCategoryById(String id) async {
     try {
-      final model = await _local.getLocalCategoryById(id);
+      final model = await _local.getCategoryById(id);
+      if (model == null) {
+        return const Left(
+          LocalFailure(message: 'Category not found', statusCode: 404),
+        );
+      }
       return Right(model);
     } on LocalException catch (e) {
       return Left(LocalFailure.fromLocalException(e));

@@ -44,6 +44,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
       role: _selectedRole,
       activated: widget.user.activated,
       administratorId: widget.user.administratorId,
+      updatedAt: DateTime.now(),
     );
     context.read<AuthenticationCubit>().updateUser(updatedUser);
     SessionManager.saveUserSession(updatedUser);
@@ -71,7 +72,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   context.read<AuthenticationCubit>().updateUser(updatedUser);
                 });
               },
-              activeColor: const Color.fromARGB(255, 41, 204, 47),
+              activeThumbColor: const Color.fromARGB(255, 41, 204, 47),
             ),
           ),
         ],

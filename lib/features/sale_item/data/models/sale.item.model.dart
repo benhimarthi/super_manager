@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/sale.item.dart';
 
 class SaleItemModel extends SaleItem {
@@ -11,6 +13,8 @@ class SaleItemModel extends SaleItem {
     required super.taxAmount,
     required super.discountApplied,
     required super.adminId,
+    required super.createdAt,
+    required super.updatedAt,
   });
 
   factory SaleItemModel.fromEntity(SaleItem entity) {
@@ -24,6 +28,8 @@ class SaleItemModel extends SaleItem {
       taxAmount: entity.taxAmount,
       discountApplied: entity.discountApplied,
       adminId: entity.adminId,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
     );
   }
 
@@ -38,10 +44,12 @@ class SaleItemModel extends SaleItem {
       taxAmount: taxAmount,
       discountApplied: discountApplied,
       adminId: adminId,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
-  SaleItem copyWith({
+  SaleItemModel copyWith({
     String? id,
     String? saleId,
     String? productId,
@@ -51,8 +59,10 @@ class SaleItemModel extends SaleItem {
     double? taxAmount,
     double? discountApplied,
     String? adminId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
-    return SaleItem(
+    return SaleItemModel(
       id: id ?? this.id,
       saleId: saleId ?? this.saleId,
       productId: productId ?? this.productId,
@@ -62,6 +72,8 @@ class SaleItemModel extends SaleItem {
       taxAmount: taxAmount ?? this.taxAmount,
       discountApplied: discountApplied ?? this.discountApplied,
       adminId: adminId ?? this.adminId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -75,7 +87,9 @@ class SaleItemModel extends SaleItem {
       totalPrice: (map['totalPrice'] as num).toDouble(),
       taxAmount: (map['taxAmount'] as num).toDouble(),
       discountApplied: (map['discountApplied'] as num).toDouble(),
-      adminId: (map['adminId'] ?? "") as String,
+      adminId: (map['adminId'] ?? '') as String,
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
     );
   }
 
@@ -90,18 +104,8 @@ class SaleItemModel extends SaleItem {
       'taxAmount': taxAmount,
       'discountApplied': discountApplied,
       'adminId': adminId,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
-
-  @override
-  List<Object?> get props => [
-    id,
-    saleId,
-    productId,
-    quantity,
-    unitPrice,
-    totalPrice,
-    taxAmount,
-    discountApplied,
-  ];
 }

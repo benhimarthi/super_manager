@@ -1,214 +1,195 @@
 import 'package:hive/hive.dart';
-import '../../../../core/errors/custom.exception.dart';
+import 'package:super_manager/core/errors/failure.dart';
+
 import '../models/user.model.dart';
 
 abstract class AuthenticationLocalDataSource {
   Future<void> cacheUser(UserModel user);
-  Future<UserModel?> getCachedUser(String email);
-  Future<void> updateCachedUser(UserModel user);
-  Future<void> removeCachedUser(String userId);
-  Future<List<UserModel>> getCachedUsers(String creatorUID);
-  Future<void> markUserAsPending(String userId);
-  Future<void> markUserAsUpdated(UserModel user);
-  Future<void> markUserAsDeleted(String userId);
+  Future<void> updateUser(UserModel user);
+  Future<void> deleteUser(String id);
+
+  Future<UserModel?> getUserById(String id);
+  Future<UserModel?> getUserByEmail(String email);
+  Future<List<UserModel>> getUsersForCreator(String creatorId);
+
+  // Current User
+  Future<void> cacheCurrentUser(UserModel user);
   Future<UserModel?> getCurrentUser();
-  Future<bool> isUserMarkedAsPending(String userId);
-  Future<void> clearPendingFlag(String userId);
+  Future<void> clearCurrentUser();
+
+  // 🔁 Sync staging
+  Future<void> stageCreatedUser(UserModel user);
+  Future<void> stageUpdatedUser(UserModel user);
+  Future<void> stageDeletedUser(String id);
+
+  Future<List<UserModel>> getCreatedUsers();
   Future<List<UserModel>> getUpdatedUsers();
-  Future<void> clearUpdateFlag(String userId);
   Future<List<String>> getDeletedUserIds();
-  Future<void> clearDeletedFlag(String userId);
+
+  Future<void> clearCreatedUser(String id);
+  Future<void> clearUpdatedUser(String id);
+  Future<void> clearDeletedUser(String id);
   Future<void> clearAll();
+
+  // Apply changes from remote
+  Future<void> applyCreate(UserModel user);
+  Future<void> applyUpdate(UserModel user);
+  Future<void> applyDelete(String id);
 }
 
-class AuthenticationLocalDataSrcImpl implements AuthenticationLocalDataSource {
-  const AuthenticationLocalDataSrcImpl(this._hiveBox);
+class AuthenticationLocalDataSourceImpl implements AuthenticationLocalDataSource {
+  final Box mainBox;
+  final Box createdBox;
+  final Box updatedBox;
+  final Box deletedBox;
 
-  final Box _hiveBox;
+  AuthenticationLocalDataSourceImpl({
+    required this.mainBox,
+    required this.createdBox,
+    required this.updatedBox,
+    required this.deletedBox,
+  });
 
+  // Main store
   @override
   Future<void> cacheUser(UserModel user) async {
-    try {
-      await _hiveBox.put(user.id, user.toMap());
-    } catch (e) {
-      throw const LocalException(
-        message: "Failed to cache user",
-        statusCode: 500,
-      );
-    }
+    await mainBox.put(user.id, user.toMap());
   }
 
   @override
-  Future<UserModel?> getCachedUser(String uid) async {
-    try {
-      final userData = _hiveBox.get(uid);
-      return userData != null ? UserModel.fromMap(userData) : null;
-    } catch (e) {
-      throw const LocalException(
-        message: "Failed to retrieve cached user",
-        statusCode: 500,
-      );
-    }
+  Future<void> updateUser(UserModel user) async {
+    await mainBox.put(user.id, user.toMap());
   }
 
   @override
-  Future<void> updateCachedUser(UserModel user) async {
-    try {
-      await _hiveBox.put(user.id, user.toMap());
-    } catch (e) {
-      throw const LocalException(
-        message: "Failed to update cached user",
-        statusCode: 500,
-      );
-    }
+  Future<void> deleteUser(String id) async {
+    await mainBox.delete(id);
   }
 
   @override
-  Future<void> removeCachedUser(String userId) async {
-    try {
-      await _hiveBox.delete(userId);
-    } catch (e) {
-      throw const LocalException(
-        message: "Failed to remove cached user",
-        statusCode: 500,
-      );
-    }
+  Future<UserModel?> getUserById(String id) async {
+    final data = mainBox.get(id);
+    if (data == null) return null;
+    return UserModel.fromMap(Map<String, dynamic>.from(data));
   }
 
   @override
-  Future<List<UserModel>> getCachedUsers(String creatorUID) async {
+  Future<UserModel?> getUserByEmail(String email) async {
+    for (final value in mainBox.values) {
+      final userMap = Map<String, dynamic>.from(value as Map);
+      if (userMap['id'] != 'CURRENT_USER' && userMap['email'] == email) {
+        return UserModel.fromMap(userMap);
+      }
+    }
+    return null;
+  }
+
+  @override
+  Future<List<UserModel>> getUsersForCreator(String creatorId) async {
     try {
-      final users = _hiveBox.values
-          .toList()
-          .where((x) => x['createdBy'] == creatorUID)
-          .map((userData) {
-            return UserModel.fromMap(userData);
-          })
+      return mainBox.values
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .where((e) => e['id'] != 'CURRENT_USER' && e['createdBy'] == creatorId)
+          .map((e) => UserModel.fromMap(e))
           .toList();
-      return users;
     } catch (e) {
-      throw const LocalException(
-        message: "Failed to retrieve cached users",
-        statusCode: 500,
-      );
+      throw LocalFailure(message: e.toString(), statusCode: 500);
     }
   }
 
-  /*@override
-  Future<void> markUserAsDeleted(String userId) async {
-    try {
-      await _hiveBox.put(userId, {"deleted": true});
-    } catch (e) {
-      throw const LocalException(
-          message: "Failed to mark user for deletion", statusCode: 500);
-    }
-  }*/
+  // Current User
+  @override
+  Future<void> cacheCurrentUser(UserModel user) async {
+    await mainBox.put('CURRENT_USER', user.toMap());
+  }
 
   @override
   Future<UserModel?> getCurrentUser() async {
-    try {
-      final currentUser = _hiveBox.get("current_user");
-      return currentUser != null ? UserModel.fromMap(currentUser) : null;
-    } catch (e) {
-      throw const LocalException(
-        message: "Failed to retrieve current user",
-        statusCode: 500,
-      );
-    }
+    final data = mainBox.get('CURRENT_USER');
+    if (data == null) return null;
+    return UserModel.fromMap(Map<String, dynamic>.from(data as Map));
   }
 
   @override
-  Future<void> markUserAsPending(String userId) async {
-    final pendingUsers = _hiveBox.get(
-      "pending_users",
-      defaultValue: <String>[],
-    );
-    if (!pendingUsers.contains(userId)) {
-      pendingUsers.add(userId);
-      await _hiveBox.put("pending_users", pendingUsers);
-    }
+  Future<void> clearCurrentUser() async {
+    await mainBox.delete('CURRENT_USER');
+  }
+
+  // ➕ Create Staging
+  @override
+  Future<void> stageCreatedUser(UserModel user) async {
+    await cacheUser(user);
+    await createdBox.put(user.id, user.toMap());
   }
 
   @override
-  Future<void> markUserAsUpdated(UserModel user) async {
-    final updatedUsers = _hiveBox.get(
-      "updated_users",
-      defaultValue: List<Map<String, dynamic>>,
-    );
-    updatedUsers.removeWhere((u) {
-      return u["id"] == user.id;
-    }); // Prevent duplicate entries
-    updatedUsers.add(user.toMap());
-    await _hiveBox.put("updated_users", updatedUsers);
-  }
-
-  @override
-  Future<void> markUserAsDeleted(String userId) async {
-    final deletedUsers = _hiveBox.get(
-      "deleted_users",
-      defaultValue: <String>[],
-    );
-    if (!deletedUsers.contains(userId)) {
-      deletedUsers.add(userId);
-      await _hiveBox.put("deleted_users", deletedUsers);
-    }
-  }
-
-  @override
-  Future<bool> isUserMarkedAsPending(String userId) async {
-    final pendingUsers = _hiveBox.get(
-      "pending_users",
-      defaultValue: <String>[],
-    );
-    return pendingUsers.contains(userId);
-  }
-
-  @override
-  Future<void> clearPendingFlag(String userId) async {
-    final pendingUsers = _hiveBox.get(
-      "pending_users",
-      defaultValue: <String>[],
-    );
-    pendingUsers.remove(userId);
-    await _hiveBox.put("pending_users", pendingUsers);
-  }
-
-  @override
-  Future<List<UserModel>> getUpdatedUsers() async {
-    final List<dynamic> rawList =
-        _hiveBox.get("updated_users", defaultValue: []) as List<dynamic>;
-    return rawList
-        .map((data) => UserModel.fromMap(Map<String, dynamic>.from(data)))
+  Future<List<UserModel>> getCreatedUsers() async {
+    return createdBox.values
+        .map((e) => UserModel.fromMap(Map<String, dynamic>.from(e as Map)))
         .toList();
   }
 
   @override
-  Future<void> clearUpdateFlag(String userId) async {
-    final updatedUsers = _hiveBox.get(
-      "updated_users",
-      defaultValue: <List<Map<String, dynamic>>>[],
-    );
-    updatedUsers.removeWhere((userData) => userData["id"] == userId);
-    await _hiveBox.put("updated_users", updatedUsers);
+  Future<void> clearCreatedUser(String id) async {
+    await createdBox.delete(id);
+  }
+
+  // 🛠️ Update Staging
+  @override
+  Future<void> stageUpdatedUser(UserModel user) async {
+    await updateUser(user);
+    await updatedBox.put(user.id, user.toMap());
+  }
+
+  @override
+  Future<List<UserModel>> getUpdatedUsers() async {
+    return updatedBox.values
+        .map((e) => UserModel.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
+
+  @override
+  Future<void> clearUpdatedUser(String id) async {
+    await updatedBox.delete(id);
+  }
+
+  // ❌ Delete Staging
+  @override
+  Future<void> stageDeletedUser(String id) async {
+    await deleteUser(id);
+    await deletedBox.put(id, {'id': id});
   }
 
   @override
   Future<List<String>> getDeletedUserIds() async {
-    return _hiveBox.get("deleted_users", defaultValue: <String>[]);
+    return deletedBox.values.map((e) => (e as Map)['id'] as String).toList();
   }
 
   @override
-  Future<void> clearDeletedFlag(String userId) async {
-    final deletedUsers = _hiveBox.get(
-      "deleted_users",
-      defaultValue: <String>[],
-    );
-    deletedUsers.remove(userId);
-    await _hiveBox.put("deleted_users", deletedUsers);
+  Future<void> clearDeletedUser(String id) async {
+    await deletedBox.delete(id);
   }
 
   @override
   Future<void> clearAll() async {
-    await _hiveBox.clear();
+    await mainBox.clear();
+    await createdBox.clear();
+    await updatedBox.clear();
+    await deletedBox.clear();
+  }
+
+  @override
+  Future<void> applyCreate(UserModel user) async {
+    await mainBox.put(user.id, user.toMap());
+  }
+
+  @override
+  Future<void> applyUpdate(UserModel user) async {
+    await mainBox.put(user.id, user.toMap());
+  }
+
+  @override
+  Future<void> applyDelete(String id) async {
+    await mainBox.delete(id);
   }
 }

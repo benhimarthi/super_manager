@@ -10,7 +10,7 @@ import '../../product/data/models/product.model.dart';
 abstract class ProductSyncManager {
   Future<void> pushLocalChanges();
   Future<void> pullRemoteData();
-  Future<void> refreshFromRemote(); // optional full overwrite
+  Future<void> refreshFromRemote();
   void startListeningToRemoteChanges();
   void stopListeningToRemoteChanges();
   void initialize();
@@ -27,46 +27,57 @@ class ProductSyncManagerImpl implements ProductSyncManager {
 
   @override
   void initialize() {
-    // Call this once after creation or when app starts
     startListeningToRemoteChanges();
   }
 
   @override
   void dispose() {
-    // Call this on app shutdown or when sync manager no longer needed
     stopListeningToRemoteChanges();
   }
 
   @override
   Future<void> pushLocalChanges() async {
     final created = await _local.getPendingCreations();
-    final updated = await _local.getPendingUpdates();
-    final deleted = await _local.getPendingDeletions();
-
     for (final product in created) {
-      await _remote.createProduct(product);
-    }
-    for (final product in updated) {
-      await _remote.updateProduct(product);
-    }
-    for (final id in deleted) {
-      await _remote.deleteProduct(id);
+      try {
+        await _remote.createProduct(product);
+        await _local.removeSyncedCreation(product.id);
+      } catch (e) {
+        print('Error pushing creation for product ${product.id}: $e');
+      }
     }
 
-    await _local.clearSyncedCreations();
-    await _local.clearSyncedUpdates();
+    final updated = await _local.getPendingUpdates();
+    for (final product in updated) {
+      try {
+        await _remote.updateProduct(product);
+        await _local.removeSyncedUpdate(product.id);
+      } catch (e) {
+        print('Error pushing update for product ${product.id}: $e');
+      }
+    }
+
+    final deleted = await _local.getPendingDeletions();
     for (final id in deleted) {
-      await _local.removeSyncedDeletion(id);
+      try {
+        await _remote.deleteProduct(id);
+        await _local.removeSyncedDeletion(id);
+      } catch (e) {
+        print('Error pushing deletion for product $id: $e');
+      }
     }
   }
 
   @override
   Future<void> pullRemoteData() async {
     final remoteList = await _remote.getAllProducts();
-
-    await _local.clearAll();
-    for (final product in remoteList) {
-      await _local.applyCreate(product);
+    for (final remoteProduct in remoteList) {
+      final localProduct = await _local.getProductById(remoteProduct.id);
+      if (localProduct == null) {
+        await _local.applyCreate(remoteProduct);
+      } else if (remoteProduct.updatedAt.isAfter(localProduct.updatedAt)) {
+        await _local.applyUpdate(remoteProduct);
+      }
     }
   }
 
@@ -77,61 +88,43 @@ class ProductSyncManagerImpl implements ProductSyncManager {
 
   @override
   void startListeningToRemoteChanges() {
-    print("@@@@@@@@@@@@@@@@##########555555555555555555555");
     _remoteSubscription = _firestore
-        .collection('products') //products
+        .collection('products')
         .snapshots()
-        .listen(
-          (snapshot) async {
-            for (final change in snapshot.docChanges) {
-              if (SessionManager.getUserSession() == null) continue;
-              final currentUserId = SessionManager.getUserSession()!.id;
-              final adminID = SessionManager.getUserSession()!.administratorId;
-              final myProducts = await _local.getAllLocalProducts();
-              final productData = change.doc.data();
+        .listen((snapshot) async {
+      if (SessionManager.getUserSession() == null) return;
+      final currentUserId = SessionManager.getUserSession()!.id;
 
-              if (productData == null) {
-                continue;
-              } /*else if (productData['adminId'] == adminID) {
-                final productIds = myProducts.map((x) => x.id).toList();
-                if (productIds.isNotEmpty) {
-                  if (productIds.contains(productData['id'])) {
-                    continue;
-                  }
-                }
-              }*/
-              switch (change.type) {
-                case DocumentChangeType.added:
-                  // Only apply remote create if not pending local creations
-                  if (currentUserId != productData['creatorID']) {
-                    final remoteProduct = ProductModel.fromMap(productData);
-                    await _local.applyCreate(remoteProduct);
-                  }
-                  break;
-                case DocumentChangeType.modified:
-                  // Only apply remote update if not pending local updates
-                  if (currentUserId != productData['creatorID']) {
-                    final remoteProduct = ProductModel.fromMap(productData);
-                    print("999999999@@@@@@@@@@@@@@@@66666666666666");
-                    await _local.applyUpdate(remoteProduct);
-                  }
-                  break;
-                case DocumentChangeType.removed:
-                  // Only apply remote delete if not pending local deletes
-                  if (currentUserId != productData['creatorID']) {
-                    await _local.applyDelete(productData['id']);
-                  }
-                  break;
-              }
+      for (final change in snapshot.docChanges) {
+        final productData = change.doc.data();
+        if (productData == null) continue;
+
+        if (productData['creatorID'] == currentUserId) continue;
+
+        final remoteProduct = ProductModel.fromMap(productData);
+        final localProduct = await _local.getProductById(remoteProduct.id);
+
+        switch (change.type) {
+          case DocumentChangeType.added:
+            if (localProduct == null) {
+              await _local.applyCreate(remoteProduct);
             }
-          },
-          onError: (error) {
-            print('Error syncing products in real-time: $error');
-          },
-        );
+            break;
+          case DocumentChangeType.modified:
+            if (localProduct == null || remoteProduct.updatedAt.isAfter(localProduct.updatedAt)) {
+              await _local.applyUpdate(remoteProduct);
+            }
+            break;
+          case DocumentChangeType.removed:
+            if (localProduct != null) {
+              await _local.applyDelete(remoteProduct.id);
+            }
+            break;
+        }
+      }
+    });
   }
 
-  /// Stop listening to remote changes
   @override
   void stopListeningToRemoteChanges() {
     _remoteSubscription?.cancel();

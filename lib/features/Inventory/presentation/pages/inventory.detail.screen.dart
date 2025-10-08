@@ -5,7 +5,7 @@ import 'package:super_manager/features/Inventory/presentation/widgets/inventory.
 
 import '../../../../core/session/session.manager.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
-import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import '../../../inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import '../../domain/entities/inventory.dart';
 import '../cubit/inventory.cubit.dart';
 
@@ -15,8 +15,7 @@ class InventoryDetailScreen extends StatefulWidget {
   final Inventory? inventory;
   final InventoryMetadata? metadata;
 
-  const InventoryDetailScreen({Key? key, this.inventory, this.metadata})
-    : super(key: key);
+  const InventoryDetailScreen({super.key, this.inventory, this.metadata});
 
   @override
   _InventoryDetailScreenState createState() => _InventoryDetailScreenState();
@@ -114,7 +113,7 @@ class _InventoryDetailScreenState extends State<InventoryDetailScreen> {
         updatedBy: _updatedByController.text,
         adminId: SessionManager.getUserSession()!.administratorId != null
             ? SessionManager.getUserSession()!.administratorId!
-            : SessionManager.getUserSession()!.id,
+            : SessionManager.getUserSession()!.id, createdAt: DateTime.now(), updatedAt: DateTime.now(),
       );
 
       final inventoryCubit = context.read<InventoryCubit>();

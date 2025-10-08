@@ -8,7 +8,7 @@ abstract class ProductCategoryLocalDataSource {
   Future<void> addDeletedCategoryId(String id);
 
   Future<List<ProductCategoryModel>> getAllLocalCategories();
-  Future<ProductCategoryModel> getLocalCategoryById(String id);
+  Future<ProductCategoryModel?> getCategoryById(String id);
 
   Future<void> applyCreate(ProductCategoryModel category);
   Future<void> applyUpdate(ProductCategoryModel category);
@@ -20,6 +20,8 @@ abstract class ProductCategoryLocalDataSource {
 
   Future<void> clearSyncedCreations();
   Future<void> clearSyncedUpdates();
+  Future<void> removeSyncedCreation(String id);
+  Future<void> removeSyncedUpdate(String id);
   Future<void> removeSyncedDeletion(String id);
   Future<void> clearAll();
 }
@@ -130,14 +132,11 @@ class ProductCategoryLocalDataSourceImpl
   }
 
   @override
-  Future<ProductCategoryModel> getLocalCategoryById(String id) async {
+  Future<ProductCategoryModel?> getCategoryById(String id) async {
     try {
       final raw = _mainBox.get(id);
       if (raw == null) {
-        throw const LocalException(
-          message: 'Category not found in cache',
-          statusCode: 500,
-        );
+        return null;
       }
       return ProductCategoryModel.fromMap(Map<String, dynamic>.from(raw));
     } catch (_) {
@@ -211,6 +210,30 @@ class ProductCategoryLocalDataSourceImpl
     } catch (_) {
       throw const LocalException(
         message: 'Failed to clear updated queue',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> removeSyncedCreation(String id) async {
+    try {
+      await _createdBox.delete(id);
+    } catch (_) {
+      throw const LocalException(
+        message: 'Failed to remove created from queue',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> removeSyncedUpdate(String id) async {
+    try {
+      await _updatedBox.delete(id);
+    } catch (_) {
+      throw const LocalException(
+        message: 'Failed to remove updated from queue',
         statusCode: 500,
       );
     }

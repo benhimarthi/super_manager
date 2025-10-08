@@ -9,12 +9,14 @@ class ProductCategorySyncTriggerCubit
     extends Cubit<ProductCategorySyncTriggerState> {
   final ProductCategorySyncManager _syncManager;
   Timer? _syncTimer;
-  late final StreamSubscription<ConnectivityResult> _subscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   ProductCategorySyncTriggerCubit(this._syncManager) : super(SyncInitial()) {
+    _syncManager.initialize();
     startSyncing();
-    Connectivity().onConnectivityChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen((results) {
+      if (results.any((result) => result != ConnectivityResult.none)) {
         _triggerSync();
       }
     });
@@ -30,28 +32,23 @@ class ProductCategorySyncTriggerCubit
 
   Future<void> _triggerSync() async {
     emit(SyncInProgress());
-
-    final result = await _syncManager.syncPendingChanges();
-    result.fold(
-      (failure) => emit(SyncFailure(failure.message)),
-      (_) => emit(SyncSuccess()),
-    );
-  }
-
-  void stopSyncing() {
-    _syncTimer?.cancel();
-    _syncTimer = null;
-  }
-
-  @override
-  Future<void> close() {
-    stopSyncing();
-    _subscription.cancel();
-    return super.close();
+    try {
+      await _syncManager.pushLocalChanges();
+      emit(SyncSuccess());
+    } catch (e) {
+      emit(SyncFailure(e.toString()));
+    }
   }
 
   Future<void> triggerManualSync() async {
-    await _triggerSync();
+    try {
+      emit(SyncInProgress());
+      await _syncManager.pushLocalChanges();
+      await _syncManager.pullRemoteData();
+      emit(SyncSuccess());
+    } catch (e) {
+      emit(SyncFailure(e.toString()));
+    }
   }
 
   Future<void> refreshFromRemote() async {
@@ -62,5 +59,18 @@ class ProductCategorySyncTriggerCubit
     } catch (e) {
       emit(SyncFailure(e.toString()));
     }
+  }
+
+  void stopSyncing() {
+    _syncTimer?.cancel();
+    _syncTimer = null;
+  }
+
+  @override
+  Future<void> close() {
+    _syncManager.dispose();
+    _connectivitySubscription?.cancel();
+    stopSyncing();
+    return super.close();
   }
 }

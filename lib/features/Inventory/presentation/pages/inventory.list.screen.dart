@@ -7,11 +7,11 @@ import 'package:super_manager/features/action_history/domain/entities/action.his
 import 'package:super_manager/features/action_history/presentation/cubit/action.history.cubit.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
-import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:super_manager/features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import '../../../action_history/presentation/cubit/action.history.state.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../../product/presentation/cubit/product.state.dart';
-import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
+import '../../../inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.state.dart';
 import '../cubit/inventory.cubit.dart';
 import '../cubit/inventory.state.dart';
 import '../widgets/add.inventory.item.options.dart';

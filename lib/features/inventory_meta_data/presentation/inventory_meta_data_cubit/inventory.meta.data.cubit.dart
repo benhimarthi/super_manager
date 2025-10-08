@@ -1,12 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
-import '../../../inventory_meta_data/domain/usecases/create.inventory.meta.data.dart';
-import '../../../inventory_meta_data/domain/usecases/delete.inventory.meta.data.dart';
-import '../../../inventory_meta_data/domain/usecases/get.all.inventory.meta.data.data.dart';
-import '../../../inventory_meta_data/domain/usecases/update.inventory.meta.data.dart';
-import '../inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
+import '../../domain/entities/inventory.meta.data.dart';
+import '../../domain/usecases/create.inventory.meta.data.dart';
+import '../../domain/usecases/delete.inventory.meta.data.dart';
+import '../../domain/usecases/get.all.inventory.meta.data.data.dart';
+import '../../domain/usecases/update.inventory.meta.data.dart';
+import '../../../synchronisation/cubit/inventory_meta_data_sync_trigger_cubit/inventory.meta.data.sync.trigger.cubit.dart';
 import 'inventory.meta.data.state.dart';
 
 class InventoryMetadataCubit extends Cubit<InventoryMetadataState> {
@@ -35,7 +35,7 @@ class InventoryMetadataCubit extends Cubit<InventoryMetadataState> {
   Future<void> _tryAutoSync() async {
     final conn = await _connectivity.checkConnectivity();
     if (conn != ConnectivityResult.none) {
-      await _syncCubit.triggerManualSync();
+      await _syncCubit.startSyncing();
     }
   }
 

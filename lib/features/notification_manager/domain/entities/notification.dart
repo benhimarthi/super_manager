@@ -11,6 +11,7 @@ class Notifications extends Equatable {
   final String senderId;
   final String? groupId;
   final DateTime createdAt;
+  final DateTime updatedAt;
   final DateTime sentAt;
   final DateTime? readAt;
   final DateTime expiresAt;
@@ -36,6 +37,7 @@ class Notifications extends Equatable {
     required this.senderId,
     this.groupId,
     required this.createdAt,
+    required this.updatedAt,
     required this.sentAt,
     this.readAt,
     required this.expiresAt,
@@ -53,27 +55,28 @@ class Notifications extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    title,
-    body,
-    type,
-    priority,
-    status,
-    recipientId,
-    senderId,
-    groupId,
-    createdAt,
-    sentAt,
-    readAt,
-    expiresAt,
-    channel,
-    isDelivered,
-    deviceToken,
-    actionUrl,
-    actions,
-    metadata,
-    retriesCount,
-    errorMessage,
-    readCount,
-  ];
+        id,
+        title,
+        body,
+        type,
+        priority,
+        status,
+        recipientId,
+        senderId,
+        groupId,
+        createdAt,
+        updatedAt,
+        sentAt,
+        readAt,
+        expiresAt,
+        channel,
+        isDelivered,
+        deviceToken,
+        actionUrl,
+        actions,
+        metadata,
+        retriesCount,
+        errorMessage,
+        readCount,
+      ];
 }

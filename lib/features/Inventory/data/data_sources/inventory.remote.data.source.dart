@@ -10,6 +10,7 @@ abstract class InventoryRemoteDataSource {
   Future<InventoryModel> getInventoryById(String id);
   Future<void> updateInventory(InventoryModel model);
   Future<void> deleteInventory(String id);
+  Stream<QuerySnapshot> streamInventory();
 }
 
 class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
@@ -59,5 +60,20 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
   @override
   Future<void> deleteInventory(String id) async {
     await _firestore.collection(_collection).doc(id).delete();
+  }
+
+  @override
+  Stream<QuerySnapshot> streamInventory() {
+     try {
+      final uid =
+          SessionManager.getUserSession()!.administratorId ??
+          SessionManager.getUserSession()!.id;
+      return _firestore
+          .collection(_collection)
+          .where('adminId', isEqualTo: uid)
+          .snapshots();
+    } on ServerException catch (e) {
+      throw ServerFailure(message: e.message, statusCode: 500);
+    }
   }
 }

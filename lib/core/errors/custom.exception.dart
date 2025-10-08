@@ -11,24 +11,17 @@ abstract class CustomException extends Equatable implements Exception {
 }
 
 class APIException extends CustomException {
-  const APIException({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const APIException({required super.message, required super.statusCode});
 }
 
 class NetworkException extends CustomException {
-  const NetworkException({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const NetworkException({required super.message, required super.statusCode});
 }
 
 class ServerException extends CustomException {
-  const ServerException({required String message, required int statusCode})
-      : super(message: message, statusCode: statusCode);
+  const ServerException({required super.message, required super.statusCode});
 }
 
 class LocalException extends CustomException {
-  const LocalException({required String message, required int statusCode})
-      : super(
-          message: message,
-          statusCode: statusCode,
-        );
+  const LocalException({required super.message, required super.statusCode});
 }

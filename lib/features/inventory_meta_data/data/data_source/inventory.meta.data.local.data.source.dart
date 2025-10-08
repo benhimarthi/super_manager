@@ -12,10 +12,15 @@ abstract class InventoryMetadataLocalDataSource {
   Future<void> applyDelete(String id);
 
   List<InventoryMetadataModel> getAllLocalMetadata();
+  Future<InventoryMetadataModel?> getMetadataById(String id);
 
   List<InventoryMetadataModel> getPendingCreates();
   List<InventoryMetadataModel> getPendingUpdates();
   List<String> getPendingDeletions();
+
+  Future<void> removeSyncedCreation(String id);
+  Future<void> removeSyncedUpdate(String id);
+  Future<void> removeSyncedDeletion(String id);
 
   Future<void> clearAll();
 }
@@ -39,8 +44,13 @@ class InventoryMetadataLocalDataSourceImpl
 
   @override
   Future<void> addCreatedMetadata(InventoryMetadataModel model) async {
-    await _mainBox.put(model.id, model.toMap());
-    await _createdBox.put(model.id, model.toMap());
+    try {
+      await _mainBox.put(model.id, model.toMap());
+      print("6666666667777777777777777777 ${_mainBox.values}");
+      await _createdBox.put(model.id, model.toMap());
+    } catch (e) {
+      print("00000000000000000000 ${e.toString()}");
+    }
   }
 
   @override
@@ -72,11 +82,20 @@ class InventoryMetadataLocalDataSourceImpl
 
   @override
   List<InventoryMetadataModel> getAllLocalMetadata() {
+    //clearAll();
     return _mainBox.values
         .map(
           (m) => InventoryMetadataModel.fromMap(Map<String, dynamic>.from(m)),
         )
         .toList();
+  }
+
+  @override
+  Future<InventoryMetadataModel?> getMetadataById(String id) async {
+    final data = await _mainBox.get(id);
+    return data != null
+        ? InventoryMetadataModel.fromMap(Map<String, dynamic>.from(data))
+        : null;
   }
 
   @override
@@ -100,6 +119,21 @@ class InventoryMetadataLocalDataSourceImpl
   @override
   List<String> getPendingDeletions() {
     return _deletedBox.values.toList();
+  }
+
+  @override
+  Future<void> removeSyncedCreation(String id) async {
+    await _createdBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedUpdate(String id) async {
+    await _updatedBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedDeletion(String id) async {
+    await _deletedBox.delete(id);
   }
 
   @override

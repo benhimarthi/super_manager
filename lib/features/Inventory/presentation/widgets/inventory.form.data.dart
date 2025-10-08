@@ -4,10 +4,10 @@ import 'package:super_manager/core/session/session.manager.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.available.product.list.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.meta.data.form.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
-import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:super_manager/features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import 'package:uuid/uuid.dart';
-import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
+import '../../../inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.state.dart';
 import '../../../widge_manipulator/cubit/widget.manipulator.state.dart';
 import '../../domain/entities/inventory.dart';
 

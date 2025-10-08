@@ -23,19 +23,20 @@ class SaleItemCubit extends Cubit<SaleItemState> {
     required DeleteSaleItem delete,
     required SaleItemSyncTriggerCubit syncCubit,
     required Connectivity connectivity,
-  }) : _getBySaleId = getBySaleId,
-       _create = create,
-       _update = update,
-       _delete = delete,
-       _syncCubit = syncCubit,
-       _connectivity = connectivity,
-       super(SaleItemManagerInitial());
+  })  : _getBySaleId = getBySaleId,
+        _create = create,
+        _update = update,
+        _delete = delete,
+        _syncCubit = syncCubit,
+        _connectivity = connectivity,
+        super(SaleItemManagerInitial());
 
   Future<void> _tryAutoSync() async {
     final conn = await _connectivity.checkConnectivity();
-    if (conn != ConnectivityResult.none) {
-      await _syncCubit.triggerManualSync();
+    if (conn.contains(ConnectivityResult.none)) {
+      return;
     }
+    await _syncCubit.triggerManualSync();
   }
 
   Future<void> loadSaleItems(String saleId) async {
@@ -48,7 +49,21 @@ class SaleItemCubit extends Cubit<SaleItemState> {
   }
 
   Future<void> addSaleItem(SaleItem item) async {
-    final result = await _create(item);
+    final now = DateTime.now();
+    final newItem = SaleItem(
+      id: item.id,
+      saleId: item.saleId,
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.totalPrice,
+      taxAmount: item.taxAmount,
+      discountApplied: item.discountApplied,
+      adminId: item.adminId,
+      createdAt: now,
+      updatedAt: now,
+    );
+    final result = await _create(newItem);
     result.fold((failure) => emit(SaleItemManagerError(failure.message)), (
       _,
     ) async {
@@ -58,7 +73,21 @@ class SaleItemCubit extends Cubit<SaleItemState> {
   }
 
   Future<void> updateSaleItem(SaleItem item) async {
-    final result = await _update(item);
+    final now = DateTime.now();
+    final updatedItem = SaleItem(
+      id: item.id,
+      saleId: item.saleId,
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.totalPrice,
+      taxAmount: item.taxAmount,
+      discountApplied: item.discountApplied,
+      adminId: item.adminId,
+      createdAt: item.createdAt,
+      updatedAt: now,
+    );
+    final result = await _update(updatedItem);
     result.fold((failure) => emit(SaleItemManagerError(failure.message)), (
       _,
     ) async {

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
+import '../../domain/entities/inventory.meta.data.dart';
 
 abstract class InventoryMetadataState extends Equatable {
   const InventoryMetadataState();

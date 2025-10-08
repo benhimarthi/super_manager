@@ -16,6 +16,7 @@ class SaleRepositoryImpl implements SaleRepository {
     try {
       final model = SaleModel.fromEntity(sale);
       await _local.addCreatedSale(model);
+      await _local.applyCreate(model); // Also apply to main box for immediate UI update
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));
@@ -25,7 +26,7 @@ class SaleRepositoryImpl implements SaleRepository {
   @override
   ResultFuture<List<Sale>> getAllSales() async {
     try {
-      final models = _local.getAllLocalSales();
+      final models = await _local.getAllLocalSales();
       final entities = models.map((e) => e.toEntity()).toList();
       return Right(entities);
     } catch (e) {
@@ -36,12 +37,13 @@ class SaleRepositoryImpl implements SaleRepository {
   @override
   ResultFuture<Sale> getSaleById(String id) async {
     try {
-      final list = _local.getAllLocalSales();
-      final found = list.firstWhere((e) => e.id == id);
-      return Right(found.toEntity());
+      final model = await _local.getSaleById(id);
+      if (model == null) {
+        return const Left(LocalFailure(message: 'Sale not found', statusCode: 404));
+      }
+      return Right(model.toEntity());
     } catch (e) {
-      return const Left(
-          LocalFailure(message: 'Sale not found', statusCode: 500));
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
     }
   }
 
@@ -50,6 +52,7 @@ class SaleRepositoryImpl implements SaleRepository {
     try {
       final model = SaleModel.fromEntity(sale);
       await _local.addUpdatedSale(model);
+      await _local.applyUpdate(model); // Also apply to main box for immediate UI update
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));
@@ -60,6 +63,7 @@ class SaleRepositoryImpl implements SaleRepository {
   ResultFuture<void> deleteSale(String id) async {
     try {
       await _local.addDeletedSaleId(id);
+      await _local.applyDelete(id); // Also apply to main box for immediate UI update
       return const Right(null);
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));

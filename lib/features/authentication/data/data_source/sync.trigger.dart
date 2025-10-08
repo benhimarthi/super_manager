@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
-import 'sync.manager.dart';
+import 'package:super_manager/features/authentication/data/data_source/user.sync.manager.dart';
 
 class SyncTrigger {
   SyncTrigger(this._syncManager);
 
-  final SyncManager _syncManager;
+  final UserSyncManager _syncManager;
   Timer? _syncTimer;
 
   void startSyncing() {

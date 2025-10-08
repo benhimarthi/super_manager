@@ -10,10 +10,14 @@ abstract class ActionHistoryLocalDataSource {
   Future<void> applyCreate(ActionHistoryModel model);
   Future<void> applyDelete(String entityId, DateTime timestamp);
 
+  Future<ActionHistoryModel?> getAction(String entityId, DateTime timestamp);
   List<ActionHistoryModel> getAllLocalActions();
 
   List<ActionHistoryModel> getPendingCreates();
   List<Map<String, dynamic>> getPendingDeletions();
+
+  Future<void> removeSyncedCreation(String entityId, DateTime timestamp);
+  Future<void> removeSyncedDeletion(String entityId, DateTime timestamp);
 
   Future<void> clearAll();
 }
@@ -27,9 +31,20 @@ class ActionHistoryLocalDataSourceImpl implements ActionHistoryLocalDataSource {
     required Box mainBox,
     required Box createdBox,
     required Box deletedBox,
-  }) : _mainBox = mainBox,
-       _createdBox = createdBox,
-       _deletedBox = deletedBox;
+  })  : _mainBox = mainBox,
+        _createdBox = createdBox,
+        _deletedBox = deletedBox;
+
+  String _composeKey(String entityId, DateTime timestamp) =>
+      '$entityId-${timestamp.toIso8601String()}';
+
+  @override
+  Future<ActionHistoryModel?> getAction(String entityId, DateTime timestamp) async {
+    final key = _composeKey(entityId, timestamp);
+    final data = _mainBox.get(key);
+    if (data == null) return null;
+    return ActionHistoryModel.fromMap(Map<String, dynamic>.from(data));
+  }
 
   @override
   Future<void> addCreatedAction(ActionHistoryModel model) async {
@@ -85,12 +100,21 @@ class ActionHistoryLocalDataSourceImpl implements ActionHistoryLocalDataSource {
   }
 
   @override
+  Future<void> removeSyncedCreation(String entityId, DateTime timestamp) async {
+    final key = _composeKey(entityId, timestamp);
+    await _createdBox.delete(key);
+  }
+
+  @override
+  Future<void> removeSyncedDeletion(String entityId, DateTime timestamp) async {
+    final key = _composeKey(entityId, timestamp);
+    await _deletedBox.delete(key);
+  }
+
+  @override
   Future<void> clearAll() async {
     await _mainBox.clear();
     await _createdBox.clear();
     await _deletedBox.clear();
   }
-
-  String _composeKey(String entityId, DateTime timestamp) =>
-      '$entityId-${timestamp.toIso8601String()}';
 }

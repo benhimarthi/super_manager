@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/core/authorization_management/authorization.service.dart';
@@ -144,60 +143,9 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 menuItem(
-                  "Home",
-                  () {
-                    setState(() {
-                      targetPosition = 0;
-                      context.read<WidgetManipulatorCubit>().changeMenu(
-                        targetPosition,
-                        "HOME",
-                      );
-                    });
-                  },
-                  AuthorizationService.hasPermission(
-                    currentUser!.role,
-                    Permissions.salesRead,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                menuItem(
-                  "Products",
-                  () {
-                    setState(() {
-                      targetPosition = 118;
-                      context.read<WidgetManipulatorCubit>().changeMenu(
-                        targetPosition,
-                        "PRODUCT",
-                      );
-                    });
-                  },
-                  AuthorizationService.hasPermission(
-                    currentUser!.role,
-                    Permissions.salesRead,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                menuItem(
-                  "Inventory",
-                  () {
-                    setState(() {
-                      targetPosition = 118;
-                      context.read<WidgetManipulatorCubit>().changeMenu(
-                        targetPosition,
-                        "INVENTORY",
-                      );
-                    });
-                  },
-                  AuthorizationService.hasPermission(
-                    currentUser!.role,
-                    Permissions.salesRead,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                menuItem(
-                  "Users",
+                  Icons.group,
                   () {
                     setState(() {
                       targetPosition = 118 * 2;
@@ -212,9 +160,77 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                     Permissions.usersRead,
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
                 menuItem(
-                  "Finances",
+                  Icons.home,
+                  () {
+                    setState(() {
+                      targetPosition = 0;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "HOME",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                menuItem(
+                  Icons.gif_box,
+                  () {
+                    setState(() {
+                      targetPosition = 118;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "PRODUCT",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                menuItem(
+                  Icons.category,
+                  () {
+                    setState(() {
+                      targetPosition = 118;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "PRODUCT_CATEGORY",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                menuItem(
+                  Icons.inventory,
+                  () {
+                    setState(() {
+                      targetPosition = 118;
+                      context.read<WidgetManipulatorCubit>().changeMenu(
+                        targetPosition,
+                        "INVENTORY",
+                      );
+                    });
+                  },
+                  AuthorizationService.hasPermission(
+                    currentUser!.role,
+                    Permissions.salesRead,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                menuItem(
+                  Icons.money,
                   () {
                     setState(() {
                       setState(() {
@@ -231,9 +247,9 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
                     Permissions.salesRead,
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
                 menuItem(
-                  "Stats",
+                  Icons.graphic_eq,
                   () {
                     setState(() {
                       targetPosition = 118 * 4;
@@ -257,21 +273,19 @@ class _MenuApplicationViewState extends State<MenuApplicationView> {
     );
   }
 
-  menuItem(String title, onTap, bool authorization) {
+  menuItem(IconData icon, onTap, bool authorization) {
     return Visibility(
       visible: authorization,
-      child: RotatedBox(
-        quarterTurns: -1, // Rotates 90° counter-clockwise
-        child: GestureDetector(
-          onTap: onTap,
-          child: Text(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Icon(icon),
+        /*Text(
             title,
             style: TextStyle(
               fontSize: 20,
               color: Color.fromARGB(255, 64, 64, 64),
             ),
-          ),
-        ),
+          ),*/
       ),
     );
   }

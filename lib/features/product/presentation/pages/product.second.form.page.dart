@@ -116,6 +116,7 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         adminId: SessionManager.getUserSession()!.administratorId != null
             ? SessionManager.getUserSession()!.administratorId!
             : SessionManager.getUserSession()!.id,
+        updatedAt: DateTime.now(),
       );
       context.read<NotificationCubit>().addNotification(notif);
     } else {
@@ -166,6 +167,7 @@ class _ProductSecondFormPageState extends State<ProductSecondFormPage> {
         adminId: SessionManager.getUserSession()!.administratorId != null
             ? SessionManager.getUserSession()!.administratorId!
             : SessionManager.getUserSession()!.id,
+        updatedAt: DateTime.now(),
       );
       context.read<NotificationCubit>().addNotification(notif);
     }

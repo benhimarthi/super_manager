@@ -20,152 +20,58 @@ class AuthenticationRepositoryImplementation
 
   final AuthenticationRemoteDataSource _remoteDataSource;
   final AuthenticationLocalDataSource _localDataSource;
-  final _uui = Uuid();
+  final _uuid = const Uuid();
+
   @override
-  ResultVoid createUser({
-    required String name,
-    required String email,
-    required String password,
-    required UserRole role,
-  }) async {
-    final currentUser = SessionManager.getUserSession();
-    final user = UserModel(
-      id: _uui.v4(),
-      createdAt: DateTime.now().toIso8601String(),
-      createdBy: currentUser != null ? currentUser.id : "",
-      name: name,
-      avatar: "empty",
-      email: email,
-      password: password,
-      role: role,
-      activated: true,
-      administratorId: currentUser != null ? currentUser.id : "",
-    );
+  ResultVoid createUser(
+      {required String name,
+      required String email,
+      required String password,
+      required UserRole role}) async {
     try {
-      await _remoteDataSource.createUser(user);
-      await _localDataSource.cacheUser(user); // Sync to local storage
+      final now = DateTime.now();
+      final currentUser = SessionManager.getUserSession()!;
+
+      final user = UserModel(
+        id: _uuid.v4(),
+        createdAt: now,
+        updatedAt: now,
+        createdBy: currentUser.id,
+        administratorId: currentUser.administratorId,
+        name: name,
+        avatar: 'empty',
+        email: email,
+        password: password,
+        role: role,
+        activated: true,
+      );
+      await _localDataSource.stageCreatedUser(user);
       return const Right(null);
-    } on NetworkException catch (e) {
-      await _localDataSource.markUserAsPending(
-        user.id,
-      ); // Mark user for later sync
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    }
-  }
-
-  /*@override
-  ResultFuture<User> login({required String email}) async {
-    try {
-      final remoteUser = await _remoteDataSource.getUserByEmail(email);
-      await _localDataSource.cacheUser(remoteUser);
-      return Right(remoteUser);
-    } on NetworkException catch (_) {
-      // Try fetching from local storage if network fails
-      final localUser = await _localDataSource.getCachedUser(email);
-      return localUser != null
-          ? Right(localUser)
-          : const Left(
-              NetworkFailure(message: "No local data found", statusCode: 500));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    }
-  }*/
-
-  @override
-  ResultFuture<User> getCurrentUser() async {
-    try {
-      final localUser = await _localDataSource.getCurrentUser();
-      return localUser != null
-          ? Right(localUser)
-          : const Left(
-              NetworkFailure(message: "No cached user found", statusCode: 500),
-            );
     } catch (e) {
-      return Left(ServerFailure(message: e.toString(), statusCode: 500));
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
     }
   }
 
   @override
-  ResultVoid updateUser(User user) async {
+  ResultFuture<User> loginWithEmail(
+      {required String email, required String password}) async {
     try {
-      await _remoteDataSource.updateUser(
-        UserModel.fromMap(((UserModel.fromUser(user)).toMap())),
-      );
-      await _localDataSource.updateCachedUser(
-        UserModel.fromMap(UserModel.fromUser(user).toMap()),
-      );
-      return const Right(null);
-    } on NetworkException catch (_) {
-      await _localDataSource.markUserAsUpdated(UserModel.fromUser(user));
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    }
-  }
-
-  @override
-  ResultVoid deleteUser(String userId) async {
-    try {
-      await _remoteDataSource.deleteUser(userId);
-      await _localDataSource.removeCachedUser(userId);
-      return const Right(null);
-    } on NetworkException catch (_) {
-      await _localDataSource.markUserAsDeleted(userId);
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    }
-  }
-
-  @override
-  ResultFuture<List<User>> getUsers(String userUid) async {
-    try {
-      final users = await _localDataSource.getCachedUsers(userUid);
-      return Right(users);
-    } on NetworkException catch (_) {
-      final cachedUsers = await _localDataSource.getCachedUsers(userUid);
-      return cachedUsers.isNotEmpty
-          ? Right(cachedUsers)
-          : const Left(
-              NetworkFailure(message: "No local data found", statusCode: 500),
-            );
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
-    }
-  }
-
-  @override
-  ResultFuture<User> loginWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final connectivityResult = await Connectivity().checkConnectivity();
+      final connectivityResult = await (Connectivity().checkConnectivity());
       if (connectivityResult == ConnectivityResult.none) {
-        final localUser = await _localDataSource.getCachedUser(email);
+        final localUser = await _localDataSource.getUserByEmail(email);
         return localUser != null
             ? Right(localUser)
-            : const Left(
-                NetworkFailure(message: "No local data found", statusCode: 500),
-              );
+            : const Left(ServerFailure(
+                message: 'No local user found', statusCode: 404));
       }
-      final remoteUser = await _remoteDataSource.loginWithEmail(
-        email,
-        password,
-      );
+
+      final remoteUser = await _remoteDataSource.loginWithEmail(email, password);
+      await _localDataSource.cacheCurrentUser(remoteUser);
       await _localDataSource.cacheUser(remoteUser);
+
       return Right(remoteUser);
-    } on NetworkException catch (_) {
-      final localUser = await _localDataSource.getCachedUser(email);
-      return localUser != null
-          ? Right(localUser)
-          : const Left(
-              NetworkFailure(message: "No local data found", statusCode: 500),
-            );
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString(), statusCode: 500));
     }
   }
 
@@ -173,17 +79,13 @@ class AuthenticationRepositoryImplementation
   ResultFuture<User> loginWithGoogle() async {
     try {
       final remoteUser = await _remoteDataSource.loginWithGoogle();
+      await _localDataSource.cacheCurrentUser(remoteUser);
       await _localDataSource.cacheUser(remoteUser);
       return Right(remoteUser);
-    } on NetworkException catch (_) {
-      return const Left(
-        NetworkFailure(
-          message: "Network error during Google login",
-          statusCode: 500,
-        ),
-      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
     }
   }
 
@@ -191,39 +93,65 @@ class AuthenticationRepositoryImplementation
   ResultVoid logout() async {
     try {
       await _remoteDataSource.logout();
+      await _localDataSource.clearCurrentUser();
+      await _localDataSource.clearAll();
       return const Right(null);
-    } catch (e) {
-      return Left(ServerFailure(message: e.toString(), statusCode: 500));
-    }
-  }
-
-  @override
-  ResultVoid manageUserStatus(String userUid, bool value) async {
-    try {
-      final remoteUser = await _remoteDataSource.loginWithGoogle();
-      await _localDataSource.cacheUser(remoteUser);
-      return Right(remoteUser);
-    } on NetworkException catch (_) {
-      return const Left(
-        NetworkFailure(
-          message: "Network error during Google login",
-          statusCode: 500,
-        ),
-      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
     }
   }
 
   @override
   ResultVoid resetAccountPassword(String email) {
-    // TODO: implement resetAccountPassword
     throw UnimplementedError();
   }
 
   @override
   ResultVoid renewEmailAccount(String email) {
-    // TODO: implement renewEmailAccount
+    throw UnimplementedError();
+  }
+
+  @override
+  ResultFuture<List<User>> getUsers(String creatorId) async {
+    try {
+      final localUsers = await _localDataSource.getUsersForCreator(creatorId);
+      return Right(localUsers);
+    } catch (e) {
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
+    }
+  }
+
+  @override
+  ResultVoid updateUser(User user) async {
+    try {
+      await _localDataSource.stageUpdatedUser(UserModel.fromUser(user));
+      return const Right(null);
+    } catch (e) {
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
+    }
+  }
+
+  @override
+  ResultVoid deleteUser(String id) async {
+    try {
+      await _localDataSource.stageDeletedUser(id);
+      return const Right(null);
+    } catch (e) {
+      return Left(LocalFailure(message: e.toString(), statusCode: 500));
+    }
+  }
+  
+  @override
+  ResultFuture<User> getCurrentUser() {
+    // TODO: implement getCurrentUser
+    throw UnimplementedError();
+  }
+  
+  @override
+  ResultVoid manageUserStatus(String userUid, bool value) {
+    // TODO: implement manageUserStatus
     throw UnimplementedError();
   }
 }

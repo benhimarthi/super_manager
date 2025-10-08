@@ -11,11 +11,17 @@ abstract class InventoryLocalDataSource {
   Future<void> applyUpdate(InventoryModel model);
   Future<void> applyDelete(String id);
 
+  Future<InventoryModel?> getInventoryById(String id);
+
   List<InventoryModel> getAllLocalInventory();
 
   List<InventoryModel> getPendingCreates();
   List<InventoryModel> getPendingUpdates();
   List<String> getPendingDeletions();
+
+  Future<void> removeSyncedCreation(String id);
+  Future<void> removeSyncedUpdate(String id);
+  Future<void> removeSyncedDeletion(String id);
 
   Future<void> clearAll();
 }
@@ -70,7 +76,17 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   }
 
   @override
+  Future<InventoryModel?> getInventoryById(String id) async {
+    final map = _mainBox.get(id);
+    if (map != null) {
+      return InventoryModel.fromMap(Map<String, dynamic>.from(map));
+    }
+    return null;
+  }
+
+  @override
   List<InventoryModel> getAllLocalInventory() {
+    //clearAll();
     return _mainBox.values
         .map((m) => InventoryModel.fromMap(Map<String, dynamic>.from(m)))
         .toList();
@@ -93,6 +109,21 @@ class InventoryLocalDataSourceImpl implements InventoryLocalDataSource {
   @override
   List<String> getPendingDeletions() {
     return _deletedBox.values.toList();
+  }
+
+  @override
+  Future<void> removeSyncedCreation(String id) async {
+    await _createdBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedUpdate(String id) async {
+    await _updatedBox.delete(id);
+  }
+
+  @override
+  Future<void> removeSyncedDeletion(String id) async {
+    await _deletedBox.delete(id);
   }
 
   @override

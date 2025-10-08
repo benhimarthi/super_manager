@@ -72,6 +72,7 @@ class DeleteProductConfirmationScreen extends StatelessWidget {
                         SessionManager.getUserSession()!.administratorId != null
                         ? SessionManager.getUserSession()!.administratorId!
                         : SessionManager.getUserSession()!.id,
+                    updatedAt: DateTime.now(),
                   );
                   context.read<NotificationCubit>().addNotification(notif);
                   Navigator.pop(context);

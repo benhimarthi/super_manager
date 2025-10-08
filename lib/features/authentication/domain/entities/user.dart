@@ -4,7 +4,8 @@ enum UserRole { admin, seller, inventoryManger, regular }
 
 class User extends Equatable {
   final String id;
-  final String createdAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String? administratorId;
   final String? createdBy;
   final String name;
@@ -17,6 +18,7 @@ class User extends Equatable {
   const User({
     required this.id,
     required this.createdAt,
+    required this.updatedAt,
     this.createdBy,
     this.administratorId,
     required this.name,
@@ -27,20 +29,21 @@ class User extends Equatable {
     this.activated,
   });
 
-  const User.empty()
-    : this(
-        id: '0',
-        createdAt: "_empty.createdAt",
-        createdBy: "_empty.createdBy",
-        administratorId: "_empty.adminId",
-        name: "_empty.name",
-        avatar: "_empty.avatar",
-        email: "_empty.email",
-        password: "_empty.password",
-        role: UserRole.regular,
-        activated: false,
-      );
+  User.empty()
+      : this(
+          id: '0',
+          createdAt: DateTime.fromMicrosecondsSinceEpoch(0),
+          updatedAt: DateTime.fromMicrosecondsSinceEpoch(0),
+          createdBy: "_empty.createdBy",
+          administratorId: "_empty.adminId",
+          name: "_empty.name",
+          avatar: "_empty.avatar",
+          email: "_empty.email",
+          password: "_empty.password",
+          role: UserRole.regular,
+          activated: false,
+        );
 
   @override
-  List<Object?> get props => [id, name, email, avatar, role];
+  List<Object?> get props => [id, name, email, avatar, role, updatedAt];
 }

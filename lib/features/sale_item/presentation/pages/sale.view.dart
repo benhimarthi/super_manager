@@ -8,11 +8,11 @@ import 'package:super_manager/features/product/presentation/cubit/product.cubit.
 import 'package:super_manager/features/sale_item/presentation/widgets/confirm.sale.view.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/daily.activity.infos.dart';
 import 'package:super_manager/features/sale_item/presentation/widgets/sale.item.dart';
-import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:super_manager/features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 
 import '../../../Inventory/presentation/cubit/inventory.state.dart';
 import '../../../product/presentation/cubit/product.state.dart';
-import '../../../synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.state.dart';
+import '../../../inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.state.dart';
 
 class SaleView extends StatefulWidget {
   const SaleView({super.key});
@@ -49,7 +49,7 @@ class _SaleViewState extends State<SaleView> {
         builder: (context, state) {
           return Column(
             children: [
-              Container(
+              SizedBox(
                 height: 45,
                 width: double.infinity,
                 //color: Colors.green,
@@ -67,7 +67,7 @@ class _SaleViewState extends State<SaleView> {
                   return Container();
                 },
               ),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * .8,
                 //color: Colors.amber,
@@ -81,7 +81,7 @@ class _SaleViewState extends State<SaleView> {
                         }
                       },
                       builder: (context, state) {
-                        return Container(
+                        return SizedBox(
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * .8,
                           //color: Colors.amber,

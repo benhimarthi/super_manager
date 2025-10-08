@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:super_manager/features/sale/presentation/cubit/sale.state.dart';
-import '../../../synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
+import '../../../synchronisation/cubit/sale_sync_manager_cubit/sale.sync.trigger.cubit.dart';
 import '../../domain/entities/sale.dart';
 import '../../domain/usecases/create.sale.dart';
 import '../../domain/usecases/delete.sale.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChangesDisplayWidget extends StatelessWidget {
   final Map<dynamic, Map<dynamic, dynamic>> changes;
 
-  const ChangesDisplayWidget({required this.changes});
+  const ChangesDisplayWidget({super.key, required this.changes});
 
   @override
   Widget build(BuildContext context) {

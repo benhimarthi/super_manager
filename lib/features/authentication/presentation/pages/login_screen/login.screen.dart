@@ -211,26 +211,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Container(
-                              width: 70,
-                              height: 45,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 242, 242, 242),
-                                /*image: DecorationImage(
-                                    fit: BoxFit.scaleDown,
-                                    image:
-                                        AssetImage("assets/icons/google.png"),
-                                  ),*/
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Image.asset("assets/icons/google.png"),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
                         GestureDetector(
                           onTap: () {
                             GoRouter.of(context).go("/register");

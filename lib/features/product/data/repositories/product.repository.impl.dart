@@ -36,7 +36,10 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   ResultFuture<Product> getProductById(String id) async {
     try {
-      final model = await _local.getLocalProductById(id);
+      final model = await _local.getProductById(id);
+      if (model == null) {
+        return Left(LocalFailure(message: 'Product not found', statusCode: 404));
+      }
       return Right(model.toEntity());
     } catch (e) {
       return Left(LocalFailure(message: e.toString(), statusCode: 500));

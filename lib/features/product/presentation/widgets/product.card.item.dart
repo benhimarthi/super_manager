@@ -168,7 +168,7 @@ class _ProductCardItemState extends State<ProductCardItem> {
                   scale: .5,
                   child: Switch(
                     value: productStatus,
-                    activeColor: Colors.green,
+                    activeThumbColor: Colors.green,
                     onChanged: (val) {
                       setState(() {
                         productStatus = val;

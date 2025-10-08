@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
-import '../../../authentication/data/data_source/sync.manager.dart';
+import 'package:super_manager/features/authentication/data/data_source/user.sync.manager.dart';
 import 'authentication.sync.trigger.state.dart';
 
 class AuthenticationSyncTriggerCubit
     extends Cubit<AuthenticationSyncTriggerState> {
-  final SyncManager _syncManager;
+  final UserSyncManager _syncManager;
   Timer? _syncTimer;
   late final StreamSubscription<ConnectivityResult> _subscription;
 
@@ -57,7 +56,7 @@ class AuthenticationSyncTriggerCubit
 
   Future<void> renewMailAccountMailAddress(String email) async {
     emit(SyncInProgress());
-    await _syncManager.updateMailAddress(email);
+    await _syncManager.renewEmailAccount(email);
   }
 
   @override

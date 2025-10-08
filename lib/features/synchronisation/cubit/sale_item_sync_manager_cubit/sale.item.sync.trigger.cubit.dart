@@ -1,18 +1,49 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 import '../../synchronisation_manager/sale.item.sync.manager.dart';
-import '../product_pricing_sync_manager_cubit/product.pricing.sync.trigger.state.dart';
+import 'sale.item.sync.trigger.state.dart';
 
-class SaleItemSyncTriggerCubit extends Cubit<ProductPricingSyncTriggerState> {
-  final SaleItemSyncManager _sync;
+class SaleItemSyncTriggerCubit extends Cubit<SaleItemSyncTriggerState> {
+  final SaleItemSyncManager _syncManager;
+  Timer? _syncTimer;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
-  SaleItemSyncTriggerCubit(this._sync) : super(SyncIdle());
+  SaleItemSyncTriggerCubit(this._syncManager) : super(const SyncInitial()) {
+    _syncManager.initialize();
+    startSyncing();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
+      if (results.any((result) => result != ConnectivityResult.none)) {
+        _triggerSync();
+      }
+    });
+  }
+
+  void startSyncing() {
+    _syncTimer?.cancel(); // avoid duplicates
+    _syncTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _triggerSync();
+    });
+    _triggerSync(); // immediate first run
+  }
+
+  Future<void> _triggerSync() async {
+    emit(const SyncInProgress());
+    try {
+      await _syncManager.pushLocalChanges();
+      emit(const SyncSuccess());
+    } catch (e) {
+      emit(SyncFailure(e.toString()));
+    }
+  }
 
   Future<void> triggerManualSync() async {
     try {
-      emit(SyncInProgress());
-      await _sync.pushLocalChanges();
-      await _sync.pullRemoteData();
-      emit(SyncSuccess());
+      emit(const SyncInProgress());
+      await _syncManager.pushLocalChanges();
+      await _syncManager.pullRemoteData();
+      emit(const SyncSuccess());
     } catch (e) {
       emit(SyncFailure(e.toString()));
     }
@@ -20,11 +51,24 @@ class SaleItemSyncTriggerCubit extends Cubit<ProductPricingSyncTriggerState> {
 
   Future<void> refreshFromRemote() async {
     try {
-      emit(SyncInProgress());
-      await _sync.refreshFromRemote();
-      emit(SyncSuccess());
+      emit(const SyncInProgress());
+      await _syncManager.refreshFromRemote();
+      emit(const SyncSuccess());
     } catch (e) {
       emit(SyncFailure(e.toString()));
     }
+  }
+
+  void stopSyncing() {
+    _syncTimer?.cancel();
+    _syncTimer = null;
+  }
+
+  @override
+  Future<void> close() {
+    _syncManager.dispose();
+    _connectivitySubscription?.cancel();
+    stopSyncing();
+    return super.close();
   }
 }

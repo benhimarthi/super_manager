@@ -9,8 +9,7 @@ import 'package:super_manager/features/synchronisation/cubit/product_category_sy
 import 'package:super_manager/features/synchronisation/cubit/product_pricing_sync_manager_cubit/product.pricing.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/product_sync_manager_cubit/product.sync.trigger.cubit.dart';
 import 'package:super_manager/features/synchronisation/cubit/sale_item_sync_manager_cubit/sale.item.sync.trigger.cubit.dart';
-import 'package:super_manager/features/synchronisation/cubit/sale_synch_manager_cubit/sale.sync.trigger.cubit.dart';
-
+import 'package:super_manager/features/synchronisation/cubit/sale_sync_manager_cubit/sale.sync.trigger.cubit.dart';
 import '../../core/util/change.screen.manager.dart';
 import '../authentication/presentation/pages/user_management_screen/main.screen.dart';
 

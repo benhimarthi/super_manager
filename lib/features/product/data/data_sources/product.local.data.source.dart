@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:super_manager/core/session/session.manager.dart';
 
 import '../../../../core/errors/custom.exception.dart';
 import '../models/product.model.dart';
@@ -14,14 +13,14 @@ abstract class ProductLocalDataSource {
   Future<void> applyDelete(String id);
 
   Future<List<ProductModel>> getAllLocalProducts();
-  Future<ProductModel> getLocalProductById(String id);
+  Future<ProductModel?> getProductById(String id);
 
   Future<List<ProductModel>> getPendingCreations();
   Future<List<ProductModel>> getPendingUpdates();
   Future<List<String>> getPendingDeletions();
 
-  Future<void> clearSyncedCreations();
-  Future<void> clearSyncedUpdates();
+  Future<void> removeSyncedCreation(String id);
+  Future<void> removeSyncedUpdate(String id);
   Future<void> removeSyncedDeletion(String id);
 
   Future<void> clearAll();
@@ -38,10 +37,10 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
     required Box createdBox,
     required Box updatedBox,
     required Box deletedBox,
-  }) : _mainBox = mainBox,
-       _createdBox = createdBox,
-       _updatedBox = updatedBox,
-       _deletedBox = deletedBox;
+  })  : _mainBox = mainBox,
+        _createdBox = createdBox,
+        _updatedBox = updatedBox,
+        _deletedBox = deletedBox;
 
   @override
   Future<void> addCreatedProduct(ProductModel product) async {
@@ -121,9 +120,6 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<List<ProductModel>> getAllLocalProducts() async {
     try {
-      for (var t in _mainBox.values) {
-        print("8888888888888888888888888888889999990000 ${t['name']}");
-      }
       return _mainBox.values
           .toList()
           .map((e) => ProductModel.fromMap(Map<String, dynamic>.from(e)))
@@ -137,14 +133,11 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   }
 
   @override
-  Future<ProductModel> getLocalProductById(String id) async {
+  Future<ProductModel?> getProductById(String id) async {
     try {
       final raw = _mainBox.get(id);
       if (raw == null) {
-        throw const LocalException(
-          message: 'Product not found in cache',
-          statusCode: 500,
-        );
+        return null;
       }
       return ProductModel.fromMap(Map<String, dynamic>.from(raw));
     } catch (_) {
@@ -196,24 +189,24 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   }
 
   @override
-  Future<void> clearSyncedCreations() async {
+  Future<void> removeSyncedCreation(String id) async {
     try {
-      await _createdBox.clear();
+      await _createdBox.delete(id);
     } catch (_) {
       throw const LocalException(
-        message: 'Failed to clear created queue',
+        message: 'Failed to remove created ID from queue',
         statusCode: 500,
       );
     }
   }
 
   @override
-  Future<void> clearSyncedUpdates() async {
+  Future<void> removeSyncedUpdate(String id) async {
     try {
-      await _updatedBox.clear();
+      await _updatedBox.delete(id);
     } catch (_) {
       throw const LocalException(
-        message: 'Failed to clear updated queue',
+        message: 'Failed to remove updated ID from queue',
         statusCode: 500,
       );
     }

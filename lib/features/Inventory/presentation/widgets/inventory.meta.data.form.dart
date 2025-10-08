@@ -15,7 +15,7 @@ import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/product/presentation/cubit/product.cubit.dart';
 import 'package:super_manager/features/product_pricing/data/models/product.pricing.model.dart';
 import 'package:super_manager/features/product_pricing/domain/entities/product.pricing.dart';
-import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:super_manager/features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/notification_service/notification.params.dart';
@@ -118,6 +118,8 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           adminId: SessionManager.getUserSession()!.administratorId != null
               ? SessionManager.getUserSession()!.administratorId!
               : SessionManager.getUserSession()!.id,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         );
         var currentUser = SessionManager.getUserSession()!;
         //final info = NetworkInfo();
@@ -170,6 +172,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
           adminId: SessionManager.getUserSession()!.administratorId != null
               ? SessionManager.getUserSession()!.administratorId!
               : SessionManager.getUserSession()!.id,
+          updatedAt: DateTime.now(),
         );
         context.read<NotificationCubit>().addNotification(notif);
       } else {
@@ -250,6 +253,7 @@ class _InventoryMetaDataFormState extends State<InventoryMetaDataForm> {
             adminId: SessionManager.getUserSession()!.administratorId != null
                 ? SessionManager.getUserSession()!.administratorId!
                 : SessionManager.getUserSession()!.id,
+            updatedAt: DateTime.now(),
           );
           context.read<NotificationCubit>().addNotification(notif);
         }

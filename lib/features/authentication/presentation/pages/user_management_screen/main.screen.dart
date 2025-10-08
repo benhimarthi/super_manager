@@ -71,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
                     width: MediaQuery.of(context).size.width * .88,
                     height: double.infinity,
                   ),
-                  SelectedOption(),
+                  //SelectedOption(),
                 ],
               ),
             ),

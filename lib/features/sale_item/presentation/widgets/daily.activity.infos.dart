@@ -37,10 +37,8 @@ class _DailyActivityInfosState extends State<DailyActivityInfos> {
         if (state is SaleManagerLoaded) {
           mySales = state.saleList;
           setState(() {
-            amountSold = mySales
-                .map((x) => x.totalAmount)
-                .toList()
-                .reduce((a, b) => a + b);
+            var sls = mySales.map((x) => x.totalAmount).toList();
+            amountSold = sls.isNotEmpty ? sls.reduce((a, b) => a + b):0;
           });
           for (var n in mySales.map((x) => x.id).toList()) {
             context.read<SaleItemCubit>().loadSaleItems(n);

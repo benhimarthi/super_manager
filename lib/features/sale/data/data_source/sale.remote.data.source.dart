@@ -4,10 +4,11 @@ import '../../../../core/session/session.manager.dart';
 import '../models/sale.model.dart';
 
 abstract class SaleRemoteDataSource {
-  Future<void> createSale(SaleModel model);
+  Future<SaleModel> createSale(SaleModel model);
   Future<List<SaleModel>> getAllSales();
+  Stream<List<SaleModel>> watchAllSales();
   Future<SaleModel> getSaleById(String id);
-  Future<void> updateSale(SaleModel model);
+  Future<SaleModel> updateSale(SaleModel model);
   Future<void> deleteSale(String id);
 }
 
@@ -18,23 +19,36 @@ class SaleRemoteDataSourceImpl implements SaleRemoteDataSource {
   SaleRemoteDataSourceImpl(this._firestore);
 
   @override
-  Future<void> createSale(SaleModel model) async {
-    final uid = SessionManager.getUserSession()!.id;
-    final data = model.toMap()..addAll({'creatorId': uid});
-    await _firestore.collection(_collection).doc(model.id).set(data);
+  Future<SaleModel> createSale(SaleModel model) async {
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final data = model.toMap()
+      ..addAll({
+        'adminId': uid,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    final docRef = _firestore.collection(_collection).doc(model.id);
+    await docRef.set(data);
+    final snapshot = await docRef.get();
+    return SaleModel.fromMap(snapshot.data()!);
   }
 
   @override
   Future<List<SaleModel>> getAllSales() async {
-    final uid =
-        SessionManager.getUserSession()!.administratorId ??
-        SessionManager.getUserSession()!.id;
-    final snapshot = await _firestore
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final snapshot = await _firestore.collection(_collection).where('adminId', isEqualTo: uid).get();
+    return snapshot.docs.map((doc) => SaleModel.fromMap(doc.data())).toList();
+  }
+
+  @override
+  Stream<List<SaleModel>> watchAllSales() {
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    return _firestore
         .collection(_collection)
         .where('adminId', isEqualTo: uid)
-        .get();
-
-    return snapshot.docs.map((doc) => SaleModel.fromMap(doc.data())).toList();
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => SaleModel.fromMap(doc.data())).toList());
   }
 
   @override
@@ -45,9 +59,12 @@ class SaleRemoteDataSourceImpl implements SaleRemoteDataSource {
   }
 
   @override
-  Future<void> updateSale(SaleModel model) async {
-    final data = model.toMap();
-    await _firestore.collection(_collection).doc(model.id).update(data);
+  Future<SaleModel> updateSale(SaleModel model) async {
+    final data = model.toMap()..addAll({'updatedAt': FieldValue.serverTimestamp()});
+    final docRef = _firestore.collection(_collection).doc(model.id);
+    await docRef.update(data);
+    final snapshot = await docRef.get();
+    return SaleModel.fromMap(snapshot.data()!);
   }
 
   @override

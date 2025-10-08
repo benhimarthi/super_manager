@@ -8,7 +8,7 @@ class ModifyAccountEmailAddressNewEmail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     return Column(
@@ -38,7 +38,7 @@ class ModifyAccountEmailAddressNewEmail extends StatelessWidget {
               Form(
                 key: formKey,
                 child: TextFormField(
-                  controller: _emailController,
+                  controller: emailController,
                   decoration: InputDecoration(
                     label: Text("your new mail address"),
                   ),
@@ -77,7 +77,7 @@ class ModifyAccountEmailAddressNewEmail extends StatelessWidget {
             if (formKey.currentState!.validate()) {
               context
                   .read<AuthenticationSyncTriggerCubit>()
-                  .renewMailAccountMailAddress(_emailController.text.trim())
+                  .renewMailAccountMailAddress(emailController.text.trim())
                   .whenComplete(() {
                     showDialog(
                       context: context,

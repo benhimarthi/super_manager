@@ -1,112 +1,47 @@
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../../../core/errors/custom.exception.dart';
-import '../models/user.model.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:super_manager/core/errors/custom.exception.dart';
+import 'package:super_manager/features/authentication/data/models/user.model.dart';
 
 abstract class AuthenticationRemoteDataSource {
+  Future<void> createUser(UserModel user);
+  Future<void> updateUser(UserModel user);
+  Future<void> deleteUser(String id);
+
+  Future<UserModel> getUserById(String id);
+  Future<List<UserModel>> getUsers(String creatorId);
   Future<UserModel> loginWithEmail(String email, String password);
   Future<UserModel> loginWithGoogle();
   Future<void> logout();
-  Future<void> createUser(UserModel user);
-  Future<UserModel> getUserByEmail(String email);
-  Future<void> updateUser(UserModel user);
-  Future<void> deleteUser(String userId);
-  Future<List<UserModel>> getUsers(String creatorUID);
-  Future<void> resetAccountPassword(String email);
-  Future<void> renewAccountEmailAddress(String email);
+  Future<void> resetPassword(String email);
+  Future<void> updateMailAddress(String email);
 }
 
-class AuthenticationRemoteDataSrcImpl
+class AuthenticationRemoteDataSourceImpl
     implements AuthenticationRemoteDataSource {
-  const AuthenticationRemoteDataSrcImpl(this._auth, this._firestore);
-
-  final FirebaseAuth _auth;
+  final auth.FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+  final GoogleSignIn _googleSignIn;
 
-  @override
-  Future<UserModel> loginWithEmail(String email, String password) async {
-    try {
-      final credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(credential.user!.uid)
-          .get();
-      return UserModel.fromMap(snapshot.data()!);
-    } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 500);
-    }
-  }
-
-  @override
-  Future<UserModel> loginWithGoogle() async {
-    try {
-      /*final GoogleSignInAccount? googleUser = await GoogleSignIn().authenticate();
-      if (googleUser == null) {
-        throw const ServerException(
-          message: "Google Sign-In failed",
-          statusCode: 401,
-        );
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final userCredential = await _auth.signInWithCredential(credential);
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .get();
-
-      return snapshot.exists
-          ? UserModel.fromMap(snapshot.data()!)
-          : const UserModel.empty();*/
-      return const UserModel.empty();
-    } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 500);
-    }
-  }
-
-  @override
-  Future<void> logout() async {
-    await _auth.signOut();
-  }
+  AuthenticationRemoteDataSourceImpl(
+    this._auth,
+    this._firestore,
+    this._googleSignIn,
+  );
 
   @override
   Future<void> createUser(UserModel user) async {
     try {
-      final UserCredential credential = await _auth
-          .createUserWithEmailAndPassword(
-            email: user.email,
-            password: user.password,
-          );
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: user.email,
+        password: user.password,
+      );
+      final createdUser = user.copyWith(id: credential.user!.uid);
       await _firestore
           .collection('users')
           .doc(credential.user!.uid)
-          .set(user.toMap());
-    } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 500);
-    }
-  }
-
-  @override
-  Future<UserModel> getUserByEmail(String email) async {
-    try {
-      final snapshot = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
-
-      if (snapshot.docs.isEmpty) {
-        throw const ServerException(message: "User not found", statusCode: 404);
-      }
-
-      return UserModel.fromMap(snapshot.docs.first.data());
+          .set(createdUser.toMap());
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
     }
@@ -115,59 +50,99 @@ class AuthenticationRemoteDataSrcImpl
   @override
   Future<void> updateUser(UserModel user) async {
     try {
-      var currentUser = await _firestore
-          .collection('users')
-          .where("email", isEqualTo: user.email)
-          .get();
-      if (currentUser.docs.isNotEmpty) {
-        var target = currentUser.docs.first.id;
-        await _firestore.collection("users").doc(target).update(user.toMap());
-      }
+      await _firestore.collection('users').doc(user.id).update(user.toMap());
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 
   @override
-  Future<void> deleteUser(String userId) async {
+  Future<void> deleteUser(String id) async {
     try {
-      final deleted = await _firestore
-          .collection('users')
-          .where("id", isEqualTo: userId)
-          .get();
-      final userD = deleted.docs.firstOrNull;
-      if (userD != null) {
-        await _firestore.collection("users").doc(userD.id).delete();
-      }
+      await _firestore.collection('users').doc(id).delete();
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 
   @override
-  Future<List<UserModel>> getUsers(String creatorUID) async {
+  Future<UserModel> getUserById(String id) async {
+    try {
+      final snapshot = await _firestore.collection('users').doc(id).get();
+      return UserModel.fromMap(snapshot.data()!);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+
+  @override
+  Future<List<UserModel>> getUsers(String creatorId) async {
     try {
       final snapshot = await _firestore
           .collection('users')
-          .where("createdBy", isEqualTo: creatorUID)
+          .where('createdBy', isEqualTo: creatorId)
           .get();
-      return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+      return snapshot.docs.map((e) => UserModel.fromMap(e.data())).toList();
     } catch (e) {
       throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 
   @override
-  Future<void> resetAccountPassword(String email) async {
+  Future<UserModel> loginWithEmail(String email, String password) async {
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return await getUserById(credential.user!.uid);
     } catch (e) {
-      throw ServerException(message: e.toString(), statusCode: 404);
+      throw ServerException(message: e.toString(), statusCode: 500);
     }
   }
 
   @override
-  Future<void> renewAccountEmailAddress(String email) async {
+  Future<UserModel> loginWithGoogle() async {
+    try {
+      final googleUser = null; //await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw const ServerException(
+          message: 'Google sign-in was cancelled',
+          statusCode: 400,
+        );
+      }
+      final googleAuth = await googleUser.authentication;
+      final credential = auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final userCredential = await _auth.signInWithCredential(credential);
+      return await getUserById(userCredential.user!.uid);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+
+  @override
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: 500);
+    }
+  }
+
+  @override
+  Future<void> updateMailAddress(String email) async {
     try {
       await _auth.currentUser!.verifyBeforeUpdateEmail(email);
     } catch (e) {

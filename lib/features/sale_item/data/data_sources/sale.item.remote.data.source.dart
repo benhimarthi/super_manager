@@ -4,10 +4,12 @@ import '../../../../core/session/session.manager.dart';
 import '../models/sale.item.model.dart';
 
 abstract class SaleItemRemoteDataSource {
-  Future<void> createSaleItem(SaleItemModel model);
+  Future<SaleItemModel> createSaleItem(SaleItemModel model);
+  Future<List<SaleItemModel>> getAllSaleItems();
+  Stream<List<SaleItemModel>> watchAllSaleItems();
   Future<List<SaleItemModel>> getSaleItemsBySaleId(String saleId);
   Future<SaleItemModel> getSaleItemById(String id);
-  Future<void> updateSaleItem(SaleItemModel model);
+  Future<SaleItemModel> updateSaleItem(SaleItemModel model);
   Future<void> deleteSaleItem(String id);
 }
 
@@ -18,31 +20,47 @@ class SaleItemRemoteDataSourceImpl implements SaleItemRemoteDataSource {
   SaleItemRemoteDataSourceImpl(this._firestore);
 
   @override
-  Future<void> createSaleItem(SaleItemModel model) async {
-    final uid = SessionManager.getUserSession()!.id;
-    final data = model.toMap()..addAll({'creatorId': uid});
-    await _firestore.collection(_collection).doc(model.id).set(data);
+  Future<SaleItemModel> createSaleItem(SaleItemModel model) async {
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final data = model.toMap()
+      ..addAll({
+        'adminId': uid,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    final docRef = _firestore.collection(_collection).doc(model.id);
+    await docRef.set(data);
+    final snapshot = await docRef.get();
+    return SaleItemModel.fromMap(snapshot.data()!);
+  }
+
+  @override
+  Future<List<SaleItemModel>> getAllSaleItems() async {
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final snapshot = await _firestore.collection(_collection).where('adminId', isEqualTo: uid).get();
+    return snapshot.docs.map((doc) => SaleItemModel.fromMap(doc.data())).toList();
+  }
+
+  @override
+  Stream<List<SaleItemModel>> watchAllSaleItems() {
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    return _firestore
+        .collection(_collection)
+        .where('adminId', isEqualTo: uid)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => SaleItemModel.fromMap(doc.data())).toList());
   }
 
   @override
   Future<List<SaleItemModel>> getSaleItemsBySaleId(String saleId) async {
-    final uid =
-        SessionManager.getUserSession()!.administratorId ??
-        SessionManager.getUserSession()!.id;
-    final snapshot = saleId != ""
-        ? await _firestore
-              .collection(_collection)
-              .where('adminId', isEqualTo: uid)
-              .where('saleId', isEqualTo: saleId)
-              .get()
-        : await _firestore
-              .collection(_collection)
-              .where('adminId', isEqualTo: uid)
-              .get();
-
-    return snapshot.docs
-        .map((doc) => SaleItemModel.fromMap(doc.data()))
-        .toList();
+    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final snapshot = await _firestore
+        .collection(_collection)
+        .where('adminId', isEqualTo: uid)
+        .where('saleId', isEqualTo: saleId)
+        .get();
+    return snapshot.docs.map((doc) => SaleItemModel.fromMap(doc.data())).toList();
   }
 
   @override
@@ -53,9 +71,12 @@ class SaleItemRemoteDataSourceImpl implements SaleItemRemoteDataSource {
   }
 
   @override
-  Future<void> updateSaleItem(SaleItemModel model) async {
-    final data = model.toMap();
-    await _firestore.collection(_collection).doc(model.id).update(data);
+  Future<SaleItemModel> updateSaleItem(SaleItemModel model) async {
+    final data = model.toMap()..addAll({'updatedAt': FieldValue.serverTimestamp()});
+    final docRef = _firestore.collection(_collection).doc(model.id);
+    await docRef.update(data);
+    final snapshot = await docRef.get();
+    return SaleItemModel.fromMap(snapshot.data()!);
   }
 
   @override

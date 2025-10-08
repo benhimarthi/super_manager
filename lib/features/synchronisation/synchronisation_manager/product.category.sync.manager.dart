@@ -1,55 +1,134 @@
-import 'package:dartz/dartz.dart';
-import '../../../core/errors/failure.dart';
-import '../../../core/util/typedef.dart';
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:super_manager/core/session/session.manager.dart';
+
 import '../../product_category/data/data_sources/product.category.local.data.source.dart';
 import '../../product_category/data/data_sources/product.category.remote.data.source.dart';
+import '../../product_category/data/models/product.category.model.dart';
 
-class ProductCategorySyncManager {
+abstract class ProductCategorySyncManager {
+  Future<void> pushLocalChanges();
+  Future<void> pullRemoteData();
+  Future<void> refreshFromRemote();
+  void startListeningToRemoteChanges();
+  void stopListeningToRemoteChanges();
+  void initialize();
+  void dispose();
+}
+
+class ProductCategorySyncManagerImpl implements ProductCategorySyncManager {
   final ProductCategoryLocalDataSource _local;
   final ProductCategoryRemoteDataSource _remote;
+  final FirebaseFirestore _firestore;
+  StreamSubscription<QuerySnapshot>? _remoteSubscription;
 
-  ProductCategorySyncManager(this._local, this._remote);
+  ProductCategorySyncManagerImpl(this._local, this._remote, this._firestore);
 
-  ResultVoid syncPendingChanges() async {
-    try {
-      // 🆕 1. Sync Created
-      final created = await _local.getPendingCreations();
-      for (final model in created) {
-        await _remote.createCategory(model);
+  @override
+  void initialize() {
+    startListeningToRemoteChanges();
+  }
+
+  @override
+  void dispose() {
+    stopListeningToRemoteChanges();
+  }
+
+  @override
+  Future<void> pushLocalChanges() async {
+    final created = await _local.getPendingCreations();
+    for (final category in created) {
+      try {
+        await _remote.createCategory(category);
+        await _local.removeSyncedCreation(category.id);
+      } catch (e) {
+        print('Error pushing creation for category ${category.id}: $e');
       }
-      await _local.clearSyncedCreations();
+    }
 
-      // 🔁 2. Sync Updates
-      final updated = await _local.getPendingUpdates();
-      for (final model in updated) {
-        await _remote.updateCategory(model);
+    final updated = await _local.getPendingUpdates();
+    for (final category in updated) {
+      try {
+        await _remote.updateCategory(category);
+        await _local.removeSyncedUpdate(category.id);
+      } catch (e) {
+        print('Error pushing update for category ${category.id}: $e');
       }
-      await _local.clearSyncedUpdates();
+    }
 
-      // 🗑️ 3. Sync Deletions
-      final deletedIds = await _local.getPendingDeletions();
-      for (final id in deletedIds) {
+    final deleted = await _local.getPendingDeletions();
+    for (final id in deleted) {
+      try {
         await _remote.deleteCategory(id);
         await _local.removeSyncedDeletion(id);
+      } catch (e) {
+        print('Error pushing deletion for category $id: $e');
       }
-
-      return const Right(null);
-    } catch (e) {
-      return const Left(
-        ServerFailure(message: 'Failed to sync changes', statusCode: 500),
-      );
     }
   }
 
+  @override
   Future<void> pullRemoteData() async {
     final remoteList = await _remote.getAllCategories();
-    await _local.clearAll();
-    for (final pricing in remoteList) {
-      await _local.applyCreate(pricing);
+    for (final remoteCategory in remoteList) {
+      final localCategory = await _local.getCategoryById(remoteCategory.id);
+      if (localCategory == null) {
+        await _local.applyCreate(remoteCategory);
+      } else if (remoteCategory.updatedAt.isAfter(localCategory.updatedAt)) {
+        await _local.applyUpdate(remoteCategory);
+      }
     }
   }
 
+  @override
   Future<void> refreshFromRemote() async {
     await pullRemoteData();
+  }
+
+  @override
+  void startListeningToRemoteChanges() {
+    _remoteSubscription = _firestore
+        .collection('product_categories')
+        .snapshots()
+        .listen((snapshot) async {
+      if (SessionManager.getUserSession() == null) return;
+      final currentUserId = SessionManager.getUserSession()!.id;
+
+      for (final change in snapshot.docChanges) {
+        final categoryData = change.doc.data();
+        if (categoryData == null) continue;
+
+        // Assuming 'adminId' is the field that stores the creator's ID
+        if (categoryData['adminId'] == currentUserId) continue;
+
+        final remoteCategory = ProductCategoryModel.fromMap(categoryData as Map<String, dynamic>);
+        final localCategory = await _local.getCategoryById(remoteCategory.id);
+
+        switch (change.type) {
+          case DocumentChangeType.added:
+            if (localCategory == null) {
+              await _local.applyCreate(remoteCategory);
+            }
+            break;
+          case DocumentChangeType.modified:
+            if (localCategory == null || remoteCategory.updatedAt.isAfter(localCategory.updatedAt)) {
+              await _local.applyUpdate(remoteCategory);
+            }
+            break;
+          case DocumentChangeType.removed:
+            if (localCategory != null) {
+              await _local.applyDelete(remoteCategory.id);
+            }
+            break;
+        }
+      }
+    });
+  }
+
+  @override
+  void stopListeningToRemoteChanges() {
+    _remoteSubscription?.cancel();
+    _remoteSubscription = null;
   }
 }

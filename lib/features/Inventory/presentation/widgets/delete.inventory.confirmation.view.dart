@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/cubit/inventory.cubit.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
-import 'package:super_manager/features/synchronisation/cubit/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
+import 'package:super_manager/features/inventory_meta_data/presentation/inventory_meta_data_cubit/inventory.meta.data.cubit.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/notification_service/notification.params.dart';
 import '../../../../core/session/session.manager.dart';
@@ -73,6 +73,7 @@ class DeleteInventoryConfirmationView extends StatelessWidget {
                         SessionManager.getUserSession()!.administratorId != null
                         ? SessionManager.getUserSession()!.administratorId!
                         : SessionManager.getUserSession()!.id,
+                    updatedAt: DateTime.now(),
                   );
                   context.read<NotificationCubit>().addNotification(notif);
                   Navigator.pop(context);

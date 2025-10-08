@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:super_manager/features/image_manager/presentation/widgets/profile.image.dart';
 import 'package:super_manager/features/product_category/presentation/pages/category.form.page.dart';
 import '../../../../core/service/depenedancy.injection.dart';
 import '../../../../core/util/change.screen.manager.dart';
 import '../../domain/entities/product.category.dart';
 import '../cubit/local.category.manager.cubit.dart';
 import '../cubit/local.category.manager.state.dart';
+import '../widgets/category.item.dart';
 import '../widgets/group.product.category.by.parent.dart';
 import '../widgets/sync.status.indicator.dart';
 
@@ -34,14 +36,13 @@ class _ProductCategoryPageState extends State<ProductCategoryPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is LocalCategoryManagerLoaded) {
-              final grouped = groupByParent(state.categories);
-              final treeTiles = buildCategoryTree(
-                grouped,
-                null,
-                context: context,
+              return ListView(
+                children: state.categories.isEmpty
+                    ? []
+                    : state.categories
+                          .map((x) => CategoryItem(category: x, categories: state.categories,))
+                          .toList(),
               );
-
-              return ListView(children: treeTiles);
             }
             if (state is LocalCategoryManagerError) {
               return Center(child: Text(state.message));
@@ -66,17 +67,17 @@ class _ProductCategoryPageState extends State<ProductCategoryPage> {
     required BuildContext context,
   }) {
     final children = grouped[parentId] ?? [];
-
     return children.expand((cat) {
       final isExpanded = _expanded.contains(cat.id);
-      final hasSubcats = grouped.containsKey(cat.id);
+      final ht = grouped.containsKey(cat.id);
+      final hasSubcats = ht ? grouped[cat.id]!.isNotEmpty : false;
       final padding = 16.0 * depth;
 
       return [
         ListTile(
           title: Padding(
             padding: EdgeInsets.only(left: padding),
-            child: Text(cat.name),
+            child: Text(cat.name, overflow: TextOverflow.ellipsis),
           ),
           subtitle: Padding(
             padding: EdgeInsets.only(left: padding),
@@ -90,7 +91,7 @@ class _ProductCategoryPageState extends State<ProductCategoryPage> {
                 hasSubcats
                     ? Icon(isExpanded ? Icons.expand_less : Icons.expand_more)
                     : const SizedBox(width: 24),
-                cat.iconCodePoint != null
+                /*cat.iconCodePoint != null
                     ? Icon(
                         IconData(
                           cat.iconCodePoint!,
@@ -98,7 +99,15 @@ class _ProductCategoryPageState extends State<ProductCategoryPage> {
                         ),
                         color: Colors.teal,
                       )
-                    : const SizedBox(),
+                    : const SizedBox(),*/
+                ProfileImage(
+                  itemId: cat.id,
+                  entityType: "profile",
+                  name: cat.name,
+                  radius: 15,
+                  fontSize: 10,
+                  displayEdit: false,
+                ),
               ],
             ),
           ),

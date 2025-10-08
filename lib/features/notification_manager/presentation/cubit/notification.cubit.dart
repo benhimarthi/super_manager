@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../synchronisation/cubit/notification_synch_manager_cubit/notification.sync.trigger.cubit.dart';
+import '../../data/models/notification.model.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/usecases/create.notification.dart';
 import '../../domain/usecases/delete.notification.dart';
@@ -24,13 +25,13 @@ class NotificationCubit extends Cubit<NotificationState> {
     required DeleteNotification delete,
     required NotificationSyncTriggerCubit syncCubit,
     required Connectivity connectivity,
-  }) : _getAll = getAll,
-       _create = create,
-       _update = update,
-       _delete = delete,
-       _syncCubit = syncCubit,
-       _connectivity = connectivity,
-       super(NotificationManagerInitial());
+  })  : _getAll = getAll,
+        _create = create,
+        _update = update,
+        _delete = delete,
+        _syncCubit = syncCubit,
+        _connectivity = connectivity,
+        super(NotificationManagerInitial());
 
   Future<void> _tryAutoSync() async {
     final conn = await _connectivity.checkConnectivity();
@@ -49,7 +50,8 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 
   Future<void> addNotification(Notifications n) async {
-    final result = await _create(n);
+    final model = NotificationModel.fromEntity(n).copyWith(updatedAt: DateTime.now());
+    final result = await _create(model);
     result.fold((failure) => emit(NotificationManagerError(failure.message)), (
       _,
     ) async {
@@ -59,7 +61,8 @@ class NotificationCubit extends Cubit<NotificationState> {
   }
 
   Future<void> updateNotification(Notifications n) async {
-    final result = await _update(n);
+    final model = NotificationModel.fromEntity(n).copyWith(updatedAt: DateTime.now());
+    final result = await _update(model);
     result.fold((failure) => emit(NotificationManagerError(failure.message)), (
       _,
     ) async {

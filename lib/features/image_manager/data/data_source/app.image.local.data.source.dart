@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:super_manager/core/errors/custom.exception.dart';
 import 'package:super_manager/core/errors/failure.dart';
 
 import '../models/app.image.model.dart';
@@ -25,6 +24,11 @@ abstract class AppImageLocalDataSource {
   Future<void> clearUpdatedImage(String id);
   Future<void> clearDeletedImage(String id);
   Future<void> clearAll();
+
+  // Apply changes from remote
+  Future<void> applyCreate(AppImageModel image);
+  Future<void> applyUpdate(AppImageModel image);
+  Future<void> applyDelete(String id);
 }
 
 class AppImageLocalDataSourceImpl implements AppImageLocalDataSource {
@@ -137,5 +141,20 @@ class AppImageLocalDataSourceImpl implements AppImageLocalDataSource {
     await createdBox.clear();
     await updatedBox.clear();
     await deletedBox.clear();
+  }
+
+  @override
+  Future<void> applyCreate(AppImageModel image) async {
+    await mainBox.put(image.id, image.toMap());
+  }
+
+  @override
+  Future<void> applyUpdate(AppImageModel image) async {
+    await mainBox.put(image.id, image.toMap());
+  }
+
+  @override
+  Future<void> applyDelete(String id) async {
+    await mainBox.delete(id);
   }
 }

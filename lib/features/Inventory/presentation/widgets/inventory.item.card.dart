@@ -147,7 +147,6 @@ class _InventoryItemCardState extends State<InventoryItemCard> {
                     color: Colors.grey,
                   ),
                 ),
-
               // Actions
               if (widget.onEdit != null || widget.onDelete != null)
                 Padding(

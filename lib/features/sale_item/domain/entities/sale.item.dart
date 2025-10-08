@@ -10,6 +10,8 @@ class SaleItem extends Equatable {
   final double taxAmount;
   final double discountApplied; // Optional per item
   final String adminId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const SaleItem({
     required this.id,
@@ -21,6 +23,8 @@ class SaleItem extends Equatable {
     required this.taxAmount,
     required this.discountApplied,
     required this.adminId,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   @override
@@ -33,5 +37,8 @@ class SaleItem extends Equatable {
     totalPrice,
     taxAmount,
     discountApplied,
+    adminId,
+    createdAt,
+    updatedAt,
   ];
 }

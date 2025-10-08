@@ -15,6 +15,8 @@ class InventoryMetadata extends Equatable {
   final String createdBy;
   final String updatedBy;
   final String adminId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const InventoryMetadata({
     required this.id,
@@ -31,6 +33,8 @@ class InventoryMetadata extends Equatable {
     required this.createdBy,
     required this.updatedBy,
     required this.adminId,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   @override
@@ -48,5 +52,7 @@ class InventoryMetadata extends Equatable {
     inventorySource,
     createdBy,
     updatedBy,
+    createdAt,
+    updatedAt,
   ];
 }

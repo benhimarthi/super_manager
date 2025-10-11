@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.card.date.selector.dart';
-import 'package:super_manager/features/Inventory/presentation/widgets/inventory.relevant.numbers.view.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/product/domain/entities/product.dart';
 import 'package:super_manager/features/widge_manipulator/cubit/widget.manipulator.cubit.dart';
 import '../../../inventory_meta_data/domain/entities/inventory.meta.data.dart';
 import '../../domain/entities/inventory.dart';
+import 'inventoryRelevantNumbers/inventory.relevant.numbers.view.dart';
 
 class InventoryItemCard extends StatefulWidget {
   final List<Inventory> myInventories;

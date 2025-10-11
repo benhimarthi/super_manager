@@ -4,7 +4,10 @@ import 'package:super_manager/core/apllication_method/inventory.kpi.dart';
 import 'package:super_manager/core/apllication_method/inventory.kpi.information.dart';
 import 'package:super_manager/features/Inventory/domain/entities/inventory.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/component.info.dialog.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/extract.intervals.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/get.sub.intervals.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/inventory.item.kpi.chart.view.dart';
+import 'package:super_manager/features/Inventory/presentation/widgets/kpi.chart.widget.dart';
 import 'package:super_manager/features/Inventory/presentation/widgets/period.informations.datas.dart';
 import 'package:super_manager/features/action_history/domain/entities/action.history.dart';
 import 'package:super_manager/features/inventory_meta_data/domain/entities/inventory.meta.data.dart';
@@ -43,9 +46,12 @@ class _InventoryRelevantNumbersViewState
   late List<Sale> sales;
   late DateTime _startDate;
   late DateTime _endDate;
+  late String periodicity = "days";
+  late Map<String, dynamic> myPeriods = {};
   late int totalUnit = 0;
   late String currentKpiTitle;
   late double currentKpiValue;
+  late List<KPIValue> kpiData;
 
   @override
   void initState() {
@@ -54,13 +60,58 @@ class _InventoryRelevantNumbersViewState
     sales = [];
     _startDate = DateTime.now();
     _endDate = DateTime.now();
+    myPeriods = getPeriods();
     totalUnit =
         widget.inventory.quantityAvailable +
         widget.inventory.quantityReserved +
         widget.inventory.quantitySold;
     currentKpiTitle = "Average inventory";
     currentKpiValue = averageInventory();
+    kpiData = getKpiData();
     context.read<SaleCubit>().loadSales();
+  }
+
+  getPeriods() {
+    return getSubIntervals(_startDate, _endDate, periodicity);
+  }
+
+  List<KPIValue> getKpiData() {
+    List<KPIValue> data = [];
+    for (var period in myPeriods.entries) {
+      double value = 0.0;
+      if (currentKpiTitle == 'Average inventory') {
+        value = InventoryKPI.averageInventory(
+          PeriodInformationsDatas.startDateProductAvailableQuantity(
+            sales,
+            saleItems,
+            widget.myInventoryHistories,
+            period.value['start'],
+          )['amount'],
+          PeriodInformationsDatas.endDateProductAvailableQuantity(
+            sales,
+            saleItems,
+            widget.myInventoryHistories,
+            widget.inventory,
+            widget.inventoryMetadata,
+            period.value['end'],
+          )['amount'],
+        );
+      } else if (currentKpiTitle == 'Stock turn over rate') {
+        value = inventoryTurnOver(period.value['start'], period.value['end']);
+      } else if (currentKpiTitle == 'Gross Margin Return On Investment') {
+        value = grossMarginReturnOnInvestment(
+            period.value['start'], period.value['end']);
+      } else if (currentKpiTitle == 'Stock to sales ratio') {
+        value = stockToSalesRatio(period.value['start'], period.value['end']);
+      } else if (currentKpiTitle == 'Days of inventory on hand') {
+        value =
+            daysOfInventoryOnHand(period.value['start'], period.value['end']);
+      } else if (currentKpiTitle == 'Sell through rate') {
+        value = sellThroughRate(period.value['start'], period.value['end']);
+      }
+      data.add(KPIValue(period.key, value));
+    }
+    return data;
   }
 
   Widget _inventoryNbInfos(
@@ -74,6 +125,7 @@ class _InventoryRelevantNumbersViewState
         setState(() {
           currentKpiTitle = title;
           currentKpiValue = value;
+          kpiData = getKpiData();
         });
         context.read<WidgetManipulatorCubit>().emitRandomElement({
           "id": "select_inventory_kpi",
@@ -145,18 +197,18 @@ class _InventoryRelevantNumbersViewState
     );
   }
 
-  COGS() {
+  COGS(DateTime start, DateTime end) {
     //Cost of goods
     return PeriodInformationsDatas.startDateProductAvailableQuantity(
           sales,
           saleItems,
           widget.myInventoryHistories,
-          _startDate,
+          start,
         )['amount'] +
         PeriodInformationsDatas.periodSupplyQttValue(
           widget.myInventoryHistories,
-          _startDate,
-          _endDate,
+          start,
+          end,
         )['supply_cost'] -
         PeriodInformationsDatas.endDateProductAvailableQuantity(
           sales,
@@ -164,65 +216,65 @@ class _InventoryRelevantNumbersViewState
           widget.myInventoryHistories,
           widget.inventory,
           widget.inventoryMetadata,
-          _endDate,
+          end,
         )['amount'];
   }
 
-  inventoryTurnOver() {
-    return InventoryKPI.inventoryTurnover(COGS(), averageInventory());
+  inventoryTurnOver(DateTime start, DateTime end) {
+    return InventoryKPI.inventoryTurnover(COGS(start, end), averageInventory());
   }
 
-  grossMarginReturnOnInvestment() {
+  grossMarginReturnOnInvestment(DateTime start, DateTime end) {
     return InventoryKPI.gmroi(
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         sales,
         saleItems,
-        _startDate,
-        _endDate,
+        start,
+        end,
       )['period_quantity_revenue'],
-      COGS(),
+      COGS(start, end),
       averageInventory(),
     );
   }
 
-  stockToSalesRatio() {
+  stockToSalesRatio(DateTime start, DateTime end) {
     return InventoryKPI.stockToSalesRatio(
       averageInventory(),
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         sales,
         saleItems,
-        _startDate,
-        _endDate,
+        start,
+        end,
       )['period_quantity_revenue'],
     );
   }
 
-  daysOfInventoryOnHand() {
+  daysOfInventoryOnHand(DateTime start, DateTime end) {
     return InventoryKPI.daysOfInventoryOnHand(
       averageInventory(),
-      COGS(),
-      PeriodInformationsDatas.daysBetween(_startDate, _endDate),
+      COGS(start, end),
+      PeriodInformationsDatas.daysBetween(start, end),
     );
   }
 
-  sellThroughRate() {
+  sellThroughRate(DateTime start, DateTime end) {
     return InventoryKPI.sellThroughRate(
       PeriodInformationsDatas.salesQuantityDuringPeriod(
         sales,
         saleItems,
-        _startDate,
-        _endDate,
+        start,
+        end,
       )['period_quantity_sold'],
       PeriodInformationsDatas.periodSupplyQttValue(
             widget.myInventoryHistories,
-            _startDate,
-            _endDate,
+            start,
+            end,
           )['supply_quantity'] +
           PeriodInformationsDatas.startDateProductAvailableQuantity(
             sales,
             saleItems,
             widget.myInventoryHistories,
-            _startDate,
+            start,
           )['start_date_quantity'],
     );
   }
@@ -233,12 +285,13 @@ class _InventoryRelevantNumbersViewState
       "inv_id": widget.inventory.id,
       "datas": {
         'totalAvgInventory': averageInventory(),
-        'totalStockTurnOver': inventoryTurnOver(),
-        'totalGrossMarginReturnOnInv': grossMarginReturnOnInvestment(),
-        'totalStockToSalesRatio': stockToSalesRatio(),
-        'totalDaysOfInvOnHand': daysOfInventoryOnHand(),
-        'totalSellThroughRate': sellThroughRate(),
-        'COGS': COGS(),
+        'totalStockTurnOver': inventoryTurnOver(_startDate, _endDate),
+        'totalGrossMarginReturnOnInv':
+            grossMarginReturnOnInvestment(_startDate, _endDate),
+        'totalStockToSalesRatio': stockToSalesRatio(_startDate, _endDate),
+        'totalDaysOfInvOnHand': daysOfInventoryOnHand(_startDate, _endDate),
+        'totalSellThroughRate': sellThroughRate(_startDate, _endDate),
+        'COGS': COGS(_startDate, _endDate),
         'period_days': PeriodInformationsDatas.daysBetween(
           _startDate,
           _endDate,
@@ -262,7 +315,7 @@ class _InventoryRelevantNumbersViewState
               _startDate,
               _endDate,
             )['supply_cost'] -
-            COGS(),
+            COGS(_startDate, _endDate),
         'unitsSold': PeriodInformationsDatas.salesQuantityDuringPeriod(
           sales,
           saleItems,
@@ -291,6 +344,9 @@ class _InventoryRelevantNumbersViewState
                 setState(() {
                   _startDate = data['start_date'];
                   _endDate = data['end_date'];
+                  periodicity = data['periodicity'];
+                  myPeriods = getPeriods();
+                  kpiData = getKpiData();
                 });
               }
             } catch (e) {}
@@ -394,34 +450,35 @@ class _InventoryRelevantNumbersViewState
                               ),
                               _inventoryNbInfos(
                                 "Stock turn over rate",
-                                inventoryTurnOver(),
+                                inventoryTurnOver(_startDate, _endDate),
                                 false,
                                 "",
                               ),
                               _inventoryNbInfos(
                                 "Gross Margin Return On Investment",
-                                grossMarginReturnOnInvestment(),
+                                grossMarginReturnOnInvestment(
+                                    _startDate, _endDate),
                                 false,
                                 "DH",
                               ),
                               //stockToSalesRatio
                               _inventoryNbInfos(
                                 "Stock to sales ratio",
-                                stockToSalesRatio(),
+                                stockToSalesRatio(_startDate, _endDate),
                                 false,
                                 "",
                               ),
                               //daysOfInventoryOnHand
                               _inventoryNbInfos(
                                 "Days of inventory on hand",
-                                daysOfInventoryOnHand(),
+                                daysOfInventoryOnHand(_startDate, _endDate),
                                 false,
                                 "D",
                               ),
                               //sellThroughRate
                               _inventoryNbInfos(
                                 "Sell through rate",
-                                sellThroughRate(),
+                                sellThroughRate(_startDate, _endDate),
                                 false,
                                 "%",
                               ),
@@ -429,12 +486,13 @@ class _InventoryRelevantNumbersViewState
                           ),
                         ),
                         const SizedBox(height: 8),
+                        ExtractIntervals(
+                          startDate: _startDate,
+                          endDate: _endDate,
+                        ),
                         InventoryItemKpiChartView(
-                          inventory: widget.inventory,
-                          inventoryMetadata: widget.inventoryMetadata,
-                          myInventoryHistories: widget.myInventoryHistories,
-                          sales: sales,
-                          saleItems: saleItems,
+                          kpiData: kpiData,
+                          chartTitle: currentKpiTitle,
                         ),
                       ],
                     )

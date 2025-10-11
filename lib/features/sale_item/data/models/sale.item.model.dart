@@ -88,8 +88,8 @@ class SaleItemModel extends SaleItem {
       taxAmount: (map['taxAmount'] as num).toDouble(),
       discountApplied: (map['discountApplied'] as num).toDouble(),
       adminId: (map['adminId'] ?? '') as String,
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
-      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      createdAt: DateTime.parse(map['createdAt'] as String),
+      updatedAt: DateTime.parse(map['updatedAt'] as String),
     );
   }
 
@@ -104,8 +104,8 @@ class SaleItemModel extends SaleItem {
       'taxAmount': taxAmount,
       'discountApplied': discountApplied,
       'adminId': adminId,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 }

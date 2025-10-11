@@ -37,10 +37,10 @@ class SaleItemLocalDataSourceImpl implements SaleItemLocalDataSource {
     required Box createdBox,
     required Box updatedBox,
     required Box<String> deletedBox,
-  })  : _mainBox = mainBox,
-        _createdBox = createdBox,
-        _updatedBox = updatedBox,
-        _deletedBox = deletedBox;
+  }) : _mainBox = mainBox,
+       _createdBox = createdBox,
+       _updatedBox = updatedBox,
+       _deletedBox = deletedBox;
 
   @override
   Future<void> addCreatedSaleItem(SaleItemModel model) async {
@@ -81,6 +81,7 @@ class SaleItemLocalDataSourceImpl implements SaleItemLocalDataSource {
 
   @override
   Future<List<SaleItemModel>> getAllLocalSaleItems() async {
+    //clearAll();
     return _mainBox.values
         .map((m) => SaleItemModel.fromMap(Map<String, dynamic>.from(m)))
         .toList();

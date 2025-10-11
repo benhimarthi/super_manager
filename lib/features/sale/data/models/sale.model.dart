@@ -95,8 +95,8 @@ class SaleModel extends Sale {
       paymentMethod: map['paymentMethod'] as String,
       currency: map['currency'] as String,
       notes: map['notes'] as String?,
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
+      createdAt: DateTime.parse((map['createdAt']??"") as String),
+      updatedAt: DateTime.parse((map['updatedAt']??"") as String),
       adminId: map['adminId'] as String,
     );
   }

@@ -20,12 +20,14 @@ class SaleRemoteDataSourceImpl implements SaleRemoteDataSource {
 
   @override
   Future<SaleModel> createSale(SaleModel model) async {
-    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
     final data = model.toMap()
       ..addAll({
         'adminId': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
       });
     final docRef = _firestore.collection(_collection).doc(model.id);
     await docRef.set(data);
@@ -35,20 +37,30 @@ class SaleRemoteDataSourceImpl implements SaleRemoteDataSource {
 
   @override
   Future<List<SaleModel>> getAllSales() async {
-    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
-    final snapshot = await _firestore.collection(_collection).where('adminId', isEqualTo: uid).get();
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
+    final snapshot = await _firestore
+        .collection(_collection)
+        .where('adminId', isEqualTo: uid)
+        .get();
     return snapshot.docs.map((doc) => SaleModel.fromMap(doc.data())).toList();
   }
 
   @override
   Stream<List<SaleModel>> watchAllSales() {
-    final uid = SessionManager.getUserSession()!.administratorId ?? SessionManager.getUserSession()!.id;
+    final uid =
+        SessionManager.getUserSession()!.administratorId ??
+        SessionManager.getUserSession()!.id;
     return _firestore
         .collection(_collection)
         .where('adminId', isEqualTo: uid)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => SaleModel.fromMap(doc.data())).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SaleModel.fromMap(doc.data()))
+              .toList(),
+        );
   }
 
   @override
@@ -60,7 +72,8 @@ class SaleRemoteDataSourceImpl implements SaleRemoteDataSource {
 
   @override
   Future<SaleModel> updateSale(SaleModel model) async {
-    final data = model.toMap()..addAll({'updatedAt': FieldValue.serverTimestamp()});
+    final data = model.toMap()
+      ..addAll({'updatedAt': DateTime.now().toIso8601String()});
     final docRef = _firestore.collection(_collection).doc(model.id);
     await docRef.update(data);
     final snapshot = await docRef.get();
